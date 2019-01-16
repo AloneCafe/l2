@@ -48,6 +48,9 @@ boolean l2_eval_update_symbol_real(l2_scope *scope_p, char *symbol_name, double 
 boolean l2_eval_update_symbol_string(l2_scope *scope_p, char *symbol_name, l2_string *string_p) {
     l2_symbol_node *symbol_node_p = l2_eval_get_symbol_node(scope_p, symbol_name);
     if (!symbol_node_p) return L2_FALSE;
+    if (symbol_node_p->symbol.type == L2_SYMBOL_TYPE_STRING) /* if the symbol was a string before, make the gc ref_count of source string to decrease by 1 */
+        l2_gc_decrease_ref_count(g_parser_p->gc_list_p, symbol_node_p->symbol.u.string.str_p);
+    /* new string */
     symbol_node_p->symbol.type = L2_SYMBOL_TYPE_STRING;
     l2_string_create(&symbol_node_p->symbol.u.string);
     l2_string_strcpy(&symbol_node_p->symbol.u.string, string_p);
@@ -3651,11 +3654,11 @@ void l2_absorb_expr_atom() {
         }
 
     } else if (l2_parse_probe_next_token_by_type(L2_TOKEN_IDENTIFIER)
-               || l2_parse_probe_next_token_by_type(L2_TOKEN_INTEGER_LITERAL)
-               || l2_parse_probe_next_token_by_type(L2_TOKEN_REAL_LITERAL)
-               || l2_parse_probe_next_token_by_type(L2_TOKEN_STRING_LITERAL)
-               || l2_parse_probe_next_token_by_type_and_str(L2_TOKEN_KEYWORD, g_l2_token_keywords[0]) /* "true" */
-               || l2_parse_probe_next_token_by_type_and_str(L2_TOKEN_KEYWORD, g_l2_token_keywords[1])) /* "false" */
+           || l2_parse_probe_next_token_by_type(L2_TOKEN_INTEGER_LITERAL)
+           || l2_parse_probe_next_token_by_type(L2_TOKEN_REAL_LITERAL)
+           || l2_parse_probe_next_token_by_type(L2_TOKEN_STRING_LITERAL)
+           || l2_parse_probe_next_token_by_type_and_str(L2_TOKEN_KEYWORD, g_l2_token_keywords[0]) /* "true" */
+           || l2_parse_probe_next_token_by_type_and_str(L2_TOKEN_KEYWORD, g_l2_token_keywords[1])) /* "false" */
     {
         l2_parse_token_forward();
 
