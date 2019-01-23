@@ -11,7 +11,7 @@ char *g_l2_token_keywords[] = {
         "var",
         "if",
         "else",
-        "elseif",
+        "elif",
         "while",
         "do",
         "for",

@@ -58,17 +58,90 @@ void l2_parse_stmts(l2_scope *scope_p) {
         l2_parse_token_forward();
         sub_scope_p = l2_scope_create_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
         l2_parse_stmts(sub_scope_p);
+
         if (l2_parse_probe_next_token_by_type(L2_TOKEN_RBRACE)) {
             l2_parse_token_forward();
+            l2_scope_escape_scope(sub_scope_p);
+
         } else {
             l2_parse_token_forward();
             token_current_p = l2_parse_token_current();
             l2_parsing_error(L2_PARSING_ERROR_MISSING_BLOCK_END_MARK, token_current_p->current_line, token_current_p->current_col);
         }
-    } else if (l2_parse_probe_next_token_by_type(L2_TOKEN_SEMICOLON)) {
+    } else if (l2_parse_probe_next_token_by_type_and_str(L2_TOKEN_KEYWORD, g_l2_token_keywords[3])) { /* "if" */
         l2_parse_token_forward();
-        sub_scope_p = l2_scope_create_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
-        l2_parse_stmts(sub_scope_p);
+        token_current_p = l2_parse_token_current();
+
+        if (l2_parse_probe_next_token_by_type(L2_TOKEN_LP)) { /* ( */
+            l2_parse_token_forward();
+            l2_expr_info expr_info;
+            expr_info = l2_eval_expr(scope_p);
+            if (expr_info.val_type != L2_EXPR_VAL_TYPE_BOOL)
+                l2_parsing_error(L2_PARSING_ERROR_THE_EXPR_OF_IF_STMT_MUST_BE_A_BOOL_VALUE, token_current_p->current_line, token_current_p->current_col);
+
+            if (l2_parse_probe_next_token_by_type(L2_TOKEN_RP)) { /* ) */
+                l2_parse_token_forward();
+
+            } else {
+                l2_parse_token_forward();
+                token_current_p = l2_parse_token_current();
+                l2_parsing_error(L2_PARSING_ERROR_MISSING_BLOCK_END_MARK, token_current_p->current_line, token_current_p->current_col);
+            }
+
+            if (expr_info.val.bool) { /* if true */
+                if (l2_parse_probe_next_token_by_type(L2_TOKEN_LBRACE)) { /* { */
+                    l2_parse_token_forward();
+                    sub_scope_p = l2_scope_create_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
+                    l2_parse_stmts(sub_scope_p); /* parse stmts */
+
+                    if (l2_parse_probe_next_token_by_type(L2_TOKEN_RBRACE)) { /* } */
+                        l2_parse_token_forward();
+                        l2_scope_escape_scope(sub_scope_p);
+
+                        l2_absorb_stmt_elif();
+
+                    } else {
+                        l2_parse_token_forward();
+                        token_current_p = l2_parse_token_current();
+                        l2_parsing_error(L2_PARSING_ERROR_MISSING_BLOCK_END_MARK, token_current_p->current_line, token_current_p->current_col);
+                    }
+
+                } else {
+                    l2_parse_token_forward();
+                    token_current_p = l2_parse_token_current();
+                    l2_parsing_error(L2_PARSING_ERROR_UNEXPECTED_TOKEN, token_current_p->current_line, token_current_p->current_col, token_current_p);
+                }
+
+
+            } else { /* if false */
+                if (l2_parse_probe_next_token_by_type(L2_TOKEN_LBRACE)) { /* { */
+                    l2_parse_token_forward();
+                    sub_scope_p = l2_scope_create_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
+                    l2_absorb_stmts(sub_scope_p); /* parse stmts */
+
+                    if (l2_parse_probe_next_token_by_type(L2_TOKEN_RBRACE)) { /* } */
+                        l2_parse_token_forward();
+                        l2_scope_escape_scope(sub_scope_p);
+
+                        l2_parse_stmt_elif();
+
+                    } else {
+                        l2_parse_token_forward();
+                        token_current_p = l2_parse_token_current();
+                        l2_parsing_error(L2_PARSING_ERROR_MISSING_BLOCK_END_MARK, token_current_p->current_line, token_current_p->current_col);
+                    }
+
+                } else {
+                    l2_parse_token_forward();
+                    token_current_p = l2_parse_token_current();
+                    l2_parsing_error(L2_PARSING_ERROR_UNEXPECTED_TOKEN, token_current_p->current_line, token_current_p->current_col, token_current_p);
+                }
+
+            }
+
+
+
+        }
 
     } else if (l2_parse_probe_next_token_by_type(L2_TOKEN_TERMINATOR)) {
         return;
@@ -96,7 +169,7 @@ void l2_parse_stmt(l2_scope *scope_p) {
     if (l2_parse_probe_next_token_by_type(L2_TOKEN_SEMICOLON)) { /* empty stmt which has only single ; */
         l2_parse_token_forward();
 
-    } else if (l2_parse_probe_next_token_by_type_and_str(L2_TOKEN_KEYWORD, "var")) { /* var */
+    } else if (l2_parse_probe_next_token_by_type_and_str(L2_TOKEN_KEYWORD, g_l2_token_keywords[2])) { /* var */
         l2_parse_token_forward();
         if (l2_parse_probe_next_token_by_type(L2_TOKEN_IDENTIFIER)) { /* id */
             l2_parse_token_forward();
@@ -112,12 +185,6 @@ void l2_parse_stmt(l2_scope *scope_p) {
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         symbol_added = l2_symbol_table_add_symbol_real(&scope_p->symbol_table_p, token_current_p->u.str.str_p, right_expr_p.val.real);
-                        break;
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        //l2_gc_append(g_parser_p->gc_list_p, right_expr_p.val.str.str_p);
-                        symbol_added = l2_symbol_table_add_symbol_string(&scope_p->symbol_table_p, token_current_p->u.str.str_p, &right_expr_p.val.str);
-                        //l2_string_strcpy(&token_current_p->u.str, &right_expr_p.val.str);
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:

@@ -45,18 +45,6 @@ boolean l2_eval_update_symbol_real(l2_scope *scope_p, char *symbol_name, double 
     return L2_TRUE;
 }
 
-boolean l2_eval_update_symbol_string(l2_scope *scope_p, char *symbol_name, l2_string *string_p) {
-    l2_symbol_node *symbol_node_p = l2_eval_get_symbol_node(scope_p, symbol_name);
-    if (!symbol_node_p) return L2_FALSE;
-    if (symbol_node_p->symbol.type == L2_SYMBOL_TYPE_STRING) /* if the symbol was a string before, make the gc ref_count of source string to decrease by 1 */
-        l2_gc_decrease_ref_count(g_parser_p->gc_list_p, symbol_node_p->symbol.u.string.str_p);
-    /* new string */
-    symbol_node_p->symbol.type = L2_SYMBOL_TYPE_STRING;
-    l2_string_create(&symbol_node_p->symbol.u.string);
-    l2_string_strcpy(&symbol_node_p->symbol.u.string, string_p);
-    return L2_TRUE;
-}
-
 l2_expr_info l2_eval_expr(l2_scope *scope_p) {
     return l2_eval_expr_comma(scope_p);
 }
@@ -125,10 +113,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     symbol_updated = l2_eval_update_symbol_real(scope_p, id_str_p, right_expr_info.val.real);
                     break;
 
-                case L2_EXPR_VAL_TYPE_STRING: /* id = string */
-                    symbol_updated = l2_eval_update_symbol_string(scope_p, id_str_p, &right_expr_info.val.str);
-                    break;
-
                 case L2_EXPR_VAL_TYPE_BOOL: /* id = true/false */
                     symbol_updated = l2_eval_update_symbol_bool(scope_p, id_str_p, right_expr_info.val.bool);
                     break;
@@ -142,7 +126,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
 
             /* return the right expr info */
             res_expr_info = right_expr_info;
-            res_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
             return res_expr_info;
 
         } else if (l2_parse_probe_next_token_by_type(L2_TOKEN_DIV_ASSIGN)) { /* /= */
@@ -158,9 +141,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
             switch (right_expr_info.val_type) {
                 case L2_EXPR_VAL_TYPE_INTEGER:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "between string and integer");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             symbol_updated = l2_eval_update_symbol_integer(scope_p, id_str_p, res_expr_info.val.integer = left_symbol_p->symbol.u.integer / l2_eval_div_by_zero_filter(right_expr_info.val.integer, opr_err_line, opr_err_col));
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
@@ -184,9 +164,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
 
                 case L2_EXPR_VAL_TYPE_REAL:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "between string and real");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             symbol_updated = l2_eval_update_symbol_real(scope_p, id_str_p, res_expr_info.val.real = left_symbol_p->symbol.u.integer / right_expr_info.val.real);
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
@@ -208,33 +185,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     }
                     break;
 
-                case L2_EXPR_VAL_TYPE_STRING:
-                    switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "between string and string");
-
-                        case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "between integer and string");
-
-                        case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "between bool and string");
-
-                        case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "between real and string");
-
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "between native pointer and string");
-
-                        default:
-                            l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
-                    }
-                    break;
-
                 case L2_EXPR_VAL_TYPE_BOOL:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "between string and bool");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "between integer and bool");
 
@@ -259,7 +211,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
             if (!symbol_updated) /* if update symbol failed */
                 l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_UNDEFINED, id_err_line, id_err_col, left_id_p->u.str.str_p);
 
-            res_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
             return res_expr_info;
 
         } else if (l2_parse_probe_next_token_by_type(L2_TOKEN_MUL_ASSIGN)) { /* *= */
@@ -275,9 +226,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
             switch (right_expr_info.val_type) {
                 case L2_EXPR_VAL_TYPE_INTEGER:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "between string and integer");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             symbol_updated = l2_eval_update_symbol_integer(scope_p, id_str_p, res_expr_info.val.integer = left_symbol_p->symbol.u.integer * right_expr_info.val.integer);
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
@@ -301,9 +249,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
 
                 case L2_EXPR_VAL_TYPE_REAL:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "between string and real");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             symbol_updated = l2_eval_update_symbol_real(scope_p, id_str_p, res_expr_info.val.real = left_symbol_p->symbol.u.integer * right_expr_info.val.real);
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
@@ -325,33 +270,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     }
                     break;
 
-                case L2_EXPR_VAL_TYPE_STRING:
-                    switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "between string and string");
-
-                        case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "between integer and string");
-
-                        case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "between bool and string");
-
-                        case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "between real and string");
-
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "between native pointer and string");
-
-                        default:
-                            l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
-                    }
-                    break;
-
                 case L2_EXPR_VAL_TYPE_BOOL:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "between string and bool");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "between integer and bool");
 
@@ -376,7 +296,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
             if (!symbol_updated) /* if update symbol failed */
                 l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_UNDEFINED, id_err_line, id_err_col, left_id_p->u.str.str_p);
 
-            res_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
             return res_expr_info;
 
         } else if (l2_parse_probe_next_token_by_type(L2_TOKEN_MOD_ASSIGN)) { /* %= */
@@ -392,9 +311,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
             switch (right_expr_info.val_type) {
                 case L2_EXPR_VAL_TYPE_INTEGER:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between string and integer");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             symbol_updated = l2_eval_update_symbol_integer(scope_p, id_str_p, res_expr_info.val.integer = left_symbol_p->symbol.u.integer % l2_eval_div_by_zero_filter(right_expr_info.val.integer, opr_err_line, opr_err_col));
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
@@ -416,9 +332,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
 
                 case L2_EXPR_VAL_TYPE_REAL:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between string and real");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between integer and real");
 
@@ -436,33 +349,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     }
                     break;
 
-                case L2_EXPR_VAL_TYPE_STRING:
-                    switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between string and string");
-
-                        case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between integer and string");
-
-                        case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between bool and string");
-
-                        case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between real and string");
-
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between native pointer and string");
-
-                        default:
-                            l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
-                    }
-                    break;
-
                 case L2_EXPR_VAL_TYPE_BOOL:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between string and bool");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between integer and bool");
 
@@ -487,7 +375,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
             if (!symbol_updated) /* if update symbol failed */
                 l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_UNDEFINED, id_err_line, id_err_col, left_id_p->u.str.str_p);
 
-            res_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
             return res_expr_info;
 
         } else if (l2_parse_probe_next_token_by_type(L2_TOKEN_PLUS_ASSIGN)) { /* += */
@@ -505,13 +392,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
             switch (right_expr_info.val_type) {
                 case L2_EXPR_VAL_TYPE_INTEGER:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_cast_decimal_to_str(right_expr_info.val.integer, buff_s);
-                            l2_string_strcat_c(&left_symbol_p->symbol.u.string, buff_s);
-                            res_expr_info.val.str = left_symbol_p->symbol.u.string;
-                            res_expr_info.val_type = L2_EXPR_VAL_TYPE_STRING;
-                            break;
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             symbol_updated = l2_eval_update_symbol_integer(scope_p, id_str_p, res_expr_info.val.integer = left_symbol_p->symbol.u.integer + right_expr_info.val.integer);
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
@@ -535,13 +415,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
 
                 case L2_EXPR_VAL_TYPE_REAL:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_cast_real_to_str(right_expr_info.val.real, buff_s);
-                            l2_string_strcat_c(&left_symbol_p->symbol.u.string, buff_s);
-                            res_expr_info.val.str = left_symbol_p->symbol.u.string;
-                            res_expr_info.val_type = L2_EXPR_VAL_TYPE_STRING;
-                            break;
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             symbol_updated = l2_eval_update_symbol_real(scope_p, id_str_p, res_expr_info.val.real = left_symbol_p->symbol.u.integer + right_expr_info.val.real);
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
@@ -563,42 +436,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     }
                     break;
 
-                case L2_EXPR_VAL_TYPE_STRING:
-                    switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            if (right_expr_info.expr_type == L2_EXPR_TYPE_IN_GC) { /* gc */
-                                l2_gc_decrease_ref_count(g_parser_p->gc_list_p, right_expr_info.val.str.str_p);
-                            } /* otherwise, not gc */
-                            l2_string_strcat(&left_symbol_p->symbol.u.string, &right_expr_info.val.str);
-                            res_expr_info.val.str = left_symbol_p->symbol.u.string;
-                            res_expr_info.val_type = L2_EXPR_VAL_TYPE_STRING;
-                            break;
-
-                        case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "+=", "between integer and string");
-
-                        case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "+=", "between bool and string");
-
-                        case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "+=", "between real and string");
-
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "+=", "between native pointer and string");
-
-                        default:
-                            l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
-                    }
-                    break;
-
                 case L2_EXPR_VAL_TYPE_BOOL:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_string_strcat_c(&left_symbol_p->symbol.u.string,  right_expr_info.val.bool ? "true" : "false" );
-                            res_expr_info.val.str = left_symbol_p->symbol.u.string;
-                            res_expr_info.val_type = L2_EXPR_VAL_TYPE_STRING;
-                            break;
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "+=", "between integer and bool");
 
@@ -623,7 +462,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
             if (!symbol_updated) /* if update symbol failed */
                 l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_UNDEFINED, id_err_line, id_err_col, left_id_p->u.str.str_p);
 
-            res_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
             return res_expr_info;
 
         } else if (l2_parse_probe_next_token_by_type(L2_TOKEN_SUB_ASSIGN)) { /* -= */
@@ -641,9 +479,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
             switch (right_expr_info.val_type) {
                 case L2_EXPR_VAL_TYPE_INTEGER:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "between string and integer");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             symbol_updated = l2_eval_update_symbol_integer(scope_p, id_str_p, res_expr_info.val.integer = left_symbol_p->symbol.u.integer - right_expr_info.val.integer);
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
@@ -667,9 +502,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
 
                 case L2_EXPR_VAL_TYPE_REAL:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "between string and real");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             symbol_updated = l2_eval_update_symbol_real(scope_p, id_str_p, res_expr_info.val.real = left_symbol_p->symbol.u.integer - right_expr_info.val.real);
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
@@ -691,33 +523,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     }
                     break;
 
-                case L2_EXPR_VAL_TYPE_STRING:
-                    switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "between string and string");
-
-                        case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "between integer and string");
-
-                        case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "between bool and string");
-
-                        case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "between real and string");
-
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "between native pointer and string");
-
-                        default:
-                            l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
-                    }
-                    break;
-
                 case L2_EXPR_VAL_TYPE_BOOL:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "between string and bool");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "between integer and bool");
 
@@ -742,7 +549,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
             if (!symbol_updated) /* if update symbol failed */
                 l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_UNDEFINED, id_err_line, id_err_col, left_id_p->u.str.str_p);
 
-            res_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
             return res_expr_info;
 
         } else if (l2_parse_probe_next_token_by_type(L2_TOKEN_LSHIFT_ASSIGN)) { /* <<= */
@@ -760,9 +566,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
             switch (right_expr_info.val_type) {
                 case L2_EXPR_VAL_TYPE_INTEGER:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between string and integer");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             symbol_updated = l2_eval_update_symbol_integer(scope_p, id_str_p, res_expr_info.val.integer = left_symbol_p->symbol.u.integer << right_expr_info.val.integer);
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
@@ -784,9 +587,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
 
                 case L2_EXPR_VAL_TYPE_REAL:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between string and real");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between integer and real");
 
@@ -804,33 +604,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     }
                     break;
 
-                case L2_EXPR_VAL_TYPE_STRING:
-                    switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between string and string");
-
-                        case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between integer and string");
-
-                        case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between bool and string");
-
-                        case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between real and string");
-
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between native pointer and string");
-
-                        default:
-                            l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
-                    }
-                    break;
-
                 case L2_EXPR_VAL_TYPE_BOOL:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between string and bool");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between integer and bool");
 
@@ -855,7 +630,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
             if (!symbol_updated) /* if update symbol failed */
                 l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_UNDEFINED, id_err_line, id_err_col, left_id_p->u.str.str_p);
 
-            res_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
             return res_expr_info;
 
         } else if (l2_parse_probe_next_token_by_type(L2_TOKEN_RSHIFT_ASSIGN)) { /* >>= */
@@ -873,9 +647,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
             switch (right_expr_info.val_type) {
                 case L2_EXPR_VAL_TYPE_INTEGER:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between string and integer");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             symbol_updated = l2_eval_update_symbol_integer(scope_p, id_str_p, res_expr_info.val.integer = left_symbol_p->symbol.u.integer >> right_expr_info.val.integer);
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
@@ -897,9 +668,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
 
                 case L2_EXPR_VAL_TYPE_REAL:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between string and real");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between integer and real");
 
@@ -917,33 +685,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     }
                     break;
 
-                case L2_EXPR_VAL_TYPE_STRING:
-                    switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between string and string");
-
-                        case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between integer and string");
-
-                        case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between bool and string");
-
-                        case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between real and string");
-
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between native pointer and string");
-
-                        default:
-                            l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
-                    }
-                    break;
-
                 case L2_EXPR_VAL_TYPE_BOOL:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between string and bool");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between integer and bool");
 
@@ -968,7 +711,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
             if (!symbol_updated) /* if update symbol failed */
                 l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_UNDEFINED, id_err_line, id_err_col, left_id_p->u.str.str_p);
 
-            res_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
             return res_expr_info;
 
         } else if (l2_parse_probe_next_token_by_type(L2_TOKEN_RSHIFT_UNSIGNED_ASSIGN)) { /* >>>= */
@@ -986,9 +728,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
             switch (right_expr_info.val_type) {
                 case L2_EXPR_VAL_TYPE_INTEGER:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between string and integer");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             symbol_updated = l2_eval_update_symbol_integer(scope_p, id_str_p, res_expr_info.val.integer = ((unsigned int)left_symbol_p->symbol.u.integer) >> right_expr_info.val.integer);
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
@@ -1010,9 +749,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
 
                 case L2_EXPR_VAL_TYPE_REAL:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between string and real");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between integer and real");
 
@@ -1030,33 +766,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     }
                     break;
 
-                case L2_EXPR_VAL_TYPE_STRING:
-                    switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between string and string");
-
-                        case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between integer and string");
-
-                        case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between bool and string");
-
-                        case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between real and string");
-
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between native pointer and string");
-
-                        default:
-                            l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
-                    }
-                    break;
-
                 case L2_EXPR_VAL_TYPE_BOOL:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between string and bool");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between integer and bool");
 
@@ -1081,7 +792,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
             if (!symbol_updated) /* if update symbol failed */
                 l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_UNDEFINED, id_err_line, id_err_col, left_id_p->u.str.str_p);
 
-            res_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
             return res_expr_info;
 
         } else if (l2_parse_probe_next_token_by_type(L2_TOKEN_BIT_AND_ASSIGN)) { /* &= */
@@ -1099,9 +809,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
             switch (right_expr_info.val_type) {
                 case L2_EXPR_VAL_TYPE_INTEGER:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between string and integer");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             symbol_updated = l2_eval_update_symbol_integer(scope_p, id_str_p, res_expr_info.val.integer = left_symbol_p->symbol.u.integer & right_expr_info.val.integer);
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
@@ -1123,9 +830,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
 
                 case L2_EXPR_VAL_TYPE_REAL:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between string and real");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between integer and real");
 
@@ -1143,33 +847,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     }
                     break;
 
-                case L2_EXPR_VAL_TYPE_STRING:
-                    switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between string and string");
-
-                        case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between integer and string");
-
-                        case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between bool and string");
-
-                        case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between real and string");
-
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between native pointer and string");
-
-                        default:
-                            l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
-                    }
-                    break;
-
                 case L2_EXPR_VAL_TYPE_BOOL:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between string and bool");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between integer and bool");
 
@@ -1194,7 +873,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
             if (!symbol_updated) /* if update symbol failed */
                 l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_UNDEFINED, id_err_line, id_err_col, left_id_p->u.str.str_p);
 
-            res_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
             return res_expr_info;
 
         } else if (l2_parse_probe_next_token_by_type(L2_TOKEN_BIT_XOR_ASSIGN)) { /* ^= */
@@ -1212,9 +890,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
             switch (right_expr_info.val_type) {
                 case L2_EXPR_VAL_TYPE_INTEGER:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between string and integer");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             symbol_updated = l2_eval_update_symbol_integer(scope_p, id_str_p, res_expr_info.val.integer = left_symbol_p->symbol.u.integer ^ right_expr_info.val.integer);
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
@@ -1236,9 +911,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
 
                 case L2_EXPR_VAL_TYPE_REAL:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between string and real");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between integer and real");
 
@@ -1256,33 +928,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     }
                     break;
 
-                case L2_EXPR_VAL_TYPE_STRING:
-                    switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between string and string");
-
-                        case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between integer and string");
-
-                        case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between bool and string");
-
-                        case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between real and string");
-
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between native pointer and string");
-
-                        default:
-                            l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
-                    }
-                    break;
-
                 case L2_EXPR_VAL_TYPE_BOOL:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between string and bool");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between integer and bool");
 
@@ -1307,7 +954,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
             if (!symbol_updated) /* if update symbol failed */
                 l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_UNDEFINED, id_err_line, id_err_col, left_id_p->u.str.str_p);
 
-            res_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
             return res_expr_info;
 
         } else if (l2_parse_probe_next_token_by_type(L2_TOKEN_BIT_OR_ASSIGN)) { /* |= */
@@ -1325,9 +971,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
             switch (right_expr_info.val_type) {
                 case L2_EXPR_VAL_TYPE_INTEGER:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between string and integer");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             symbol_updated = l2_eval_update_symbol_integer(scope_p, id_str_p, res_expr_info.val.integer = left_symbol_p->symbol.u.integer | right_expr_info.val.integer);
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
@@ -1349,9 +992,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
 
                 case L2_EXPR_VAL_TYPE_REAL:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between string and real");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between integer and real");
 
@@ -1369,33 +1009,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     }
                     break;
 
-                case L2_EXPR_VAL_TYPE_STRING:
-                    switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between string and string");
-
-                        case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between integer and string");
-
-                        case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between bool and string");
-
-                        case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between real and string");
-
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between native pointer and string");
-
-                        default:
-                            l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
-                    }
-                    break;
-
                 case L2_EXPR_VAL_TYPE_BOOL:
                     switch (left_symbol_p->symbol.type) {
-                        case L2_SYMBOL_TYPE_STRING:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between string and bool");
-
                         case L2_SYMBOL_TYPE_INTEGER:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between integer and bool");
 
@@ -1420,7 +1035,6 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
             if (!symbol_updated) /* if update symbol failed */
                 l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_UNDEFINED, id_err_line, id_err_col, left_id_p->u.str.str_p);
 
-            res_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
             return res_expr_info;
 
         } else { /* no match */
@@ -1512,7 +1126,6 @@ l2_expr_info l2_eval_expr_logic_or1(l2_scope *scope_p, l2_expr_info left_expr_in
         if (left_expr_info.val_type == L2_EXPR_VAL_TYPE_BOOL) {
             if (right_expr_info.val_type == L2_EXPR_VAL_TYPE_BOOL) {
                 new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_BOOL;
-                new_left_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
                 new_left_expr_info.val.bool = (left_expr_info.val.bool || right_expr_info.val.bool);
                 return l2_eval_expr_logic_or1(scope_p, new_left_expr_info);
 
@@ -1558,7 +1171,6 @@ l2_expr_info l2_eval_expr_logic_and1(l2_scope *scope_p, l2_expr_info left_expr_i
         if (left_expr_info.val_type == L2_EXPR_VAL_TYPE_BOOL) {
             if (right_expr_info.val_type == L2_EXPR_VAL_TYPE_BOOL) {
                 new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_BOOL;
-                new_left_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
                 new_left_expr_info.val.bool = (left_expr_info.val.bool && right_expr_info.val.bool);
                 return l2_eval_expr_logic_and1(scope_p, new_left_expr_info);
 
@@ -1604,7 +1216,6 @@ l2_expr_info l2_eval_expr_bit_or1(l2_scope *scope_p, l2_expr_info left_expr_info
         if (left_expr_info.val_type == L2_EXPR_VAL_TYPE_INTEGER) {
             if (right_expr_info.val_type == L2_EXPR_VAL_TYPE_INTEGER) {
                 new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
-                new_left_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
                 new_left_expr_info.val.integer = (left_expr_info.val.integer | right_expr_info.val.integer);
                 return l2_eval_expr_bit_or1(scope_p, new_left_expr_info);
 
@@ -1650,7 +1261,6 @@ l2_expr_info l2_eval_expr_bit_xor1(l2_scope *scope_p, l2_expr_info left_expr_inf
         if (left_expr_info.val_type == L2_EXPR_VAL_TYPE_INTEGER) {
             if (right_expr_info.val_type == L2_EXPR_VAL_TYPE_INTEGER) {
                 new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
-                new_left_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
                 new_left_expr_info.val.integer = (left_expr_info.val.integer ^ right_expr_info.val.integer);
                 return l2_eval_expr_bit_xor1(scope_p, new_left_expr_info);
 
@@ -1696,7 +1306,6 @@ l2_expr_info l2_eval_expr_bit_and1(l2_scope *scope_p, l2_expr_info left_expr_inf
         if (left_expr_info.val_type == L2_EXPR_VAL_TYPE_INTEGER) {
             if (right_expr_info.val_type == L2_EXPR_VAL_TYPE_INTEGER) {
                 new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
-                new_left_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
                 new_left_expr_info.val.integer = (left_expr_info.val.integer & right_expr_info.val.integer);
                 return l2_eval_expr_bit_and1(scope_p, new_left_expr_info);
 
@@ -1741,7 +1350,6 @@ l2_expr_info l2_eval_expr_eq_ne1(l2_scope *scope_p, l2_expr_info left_expr_info)
         l2_parse_token_forward();
         current_token_p = l2_parse_token_current();
         right_expr_info = l2_eval_expr_gt_lt_ge_le(scope_p);
-        new_left_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
         new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_BOOL;
         switch (left_expr_info.val_type) {
             case L2_EXPR_VAL_TYPE_INTEGER:
@@ -1752,9 +1360,6 @@ l2_expr_info l2_eval_expr_eq_ne1(l2_scope *scope_p, l2_expr_info left_expr_info)
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "==", "integer", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "==", "integer", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = ((double)left_expr_info.val.integer == right_expr_info.val.real);
@@ -1774,31 +1379,8 @@ l2_expr_info l2_eval_expr_eq_ne1(l2_scope *scope_p, l2_expr_info left_expr_info)
                         new_left_expr_info.val.bool = (left_expr_info.val.bool == right_expr_info.val.bool);
                         break;
 
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "==", "bool", "string");
-
                     case L2_EXPR_VAL_TYPE_REAL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "==", "bool", "real");
-
-                    default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
-                }
-                break;
-
-            case L2_EXPR_VAL_TYPE_STRING:
-                switch (right_expr_info.val_type) {
-                    case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "==", "string", "integer");
-
-                    case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "==", "string", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        new_left_expr_info.val.bool = l2_string_equal(&left_expr_info.val.str, &right_expr_info.val.str);
-                        break;
-
-                    case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "==", "string", "real");
 
                     default:
                         l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
@@ -1813,9 +1395,6 @@ l2_expr_info l2_eval_expr_eq_ne1(l2_scope *scope_p, l2_expr_info left_expr_info)
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "==", "real", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "==", "real", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = (left_expr_info.val.real == right_expr_info.val.real);
@@ -1835,7 +1414,6 @@ l2_expr_info l2_eval_expr_eq_ne1(l2_scope *scope_p, l2_expr_info left_expr_info)
         l2_parse_token_forward();
         current_token_p = l2_parse_token_current();
         right_expr_info = l2_eval_expr_gt_lt_ge_le(scope_p);
-        new_left_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
         new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_BOOL;
         switch (left_expr_info.val_type) {
             case L2_EXPR_VAL_TYPE_INTEGER:
@@ -1846,9 +1424,6 @@ l2_expr_info l2_eval_expr_eq_ne1(l2_scope *scope_p, l2_expr_info left_expr_info)
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "!=", "integer", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "!=", "integer", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = ((double)left_expr_info.val.integer != right_expr_info.val.real);
@@ -1868,31 +1443,8 @@ l2_expr_info l2_eval_expr_eq_ne1(l2_scope *scope_p, l2_expr_info left_expr_info)
                         new_left_expr_info.val.bool = (left_expr_info.val.bool != right_expr_info.val.bool);
                         break;
 
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "!=", "bool", "string");
-
                     case L2_EXPR_VAL_TYPE_REAL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "!=", "bool", "real");
-
-                    default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
-                }
-                break;
-
-            case L2_EXPR_VAL_TYPE_STRING:
-                switch (right_expr_info.val_type) {
-                    case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "!=", "string", "integer");
-
-                    case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "!=", "string", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        new_left_expr_info.val.bool = !l2_string_equal(&left_expr_info.val.str, &right_expr_info.val.str);
-                        break;
-
-                    case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "!=", "string", "real");
 
                     default:
                         l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
@@ -1907,9 +1459,6 @@ l2_expr_info l2_eval_expr_eq_ne1(l2_scope *scope_p, l2_expr_info left_expr_info)
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "!=", "real", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "!=", "real", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = (left_expr_info.val.real != right_expr_info.val.real);
@@ -1965,7 +1514,6 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
         l2_parse_token_forward();
         current_token_p = l2_parse_token_current();
         right_expr_info = l2_eval_expr_lshift_rshift_rshift_unsigned(scope_p);
-        new_left_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
         new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_BOOL;
         switch (left_expr_info.val_type) {
             case L2_EXPR_VAL_TYPE_INTEGER:
@@ -1976,9 +1524,6 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">=", "integer", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">=", "integer", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = ((double)left_expr_info.val.integer >= right_expr_info.val.real);
@@ -1997,30 +1542,8 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">=", "bool", "bool");
 
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">=", "bool", "string");
-
                     case L2_EXPR_VAL_TYPE_REAL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">=", "bool", "real");
-
-                    default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
-                }
-                break;
-
-            case L2_EXPR_VAL_TYPE_STRING:
-                switch (right_expr_info.val_type) {
-                    case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">=", "string", "integer");
-
-                    case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">=", "string", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">=", "string", "string");
-
-                    case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">=", "string", "real");
 
                     default:
                         l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
@@ -2035,9 +1558,6 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">=", "real", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">=", "real", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = (left_expr_info.val.real >= right_expr_info.val.real);
@@ -2057,7 +1577,6 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
         l2_parse_token_forward();
         current_token_p = l2_parse_token_current();
         right_expr_info = l2_eval_expr_lshift_rshift_rshift_unsigned(scope_p);
-        new_left_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
         new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_BOOL;
         switch (left_expr_info.val_type) {
             case L2_EXPR_VAL_TYPE_INTEGER:
@@ -2068,9 +1587,6 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">", "integer", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">", "integer", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = ((double)left_expr_info.val.integer > right_expr_info.val.real);
@@ -2089,30 +1605,8 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">", "bool", "bool");
 
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">", "bool", "string");
-
                     case L2_EXPR_VAL_TYPE_REAL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">", "bool", "real");
-
-                    default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
-                }
-                break;
-
-            case L2_EXPR_VAL_TYPE_STRING:
-                switch (right_expr_info.val_type) {
-                    case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">", "string", "integer");
-
-                    case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">", "string", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">", "string", "string");
-
-                    case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">", "string", "real");
 
                     default:
                         l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
@@ -2127,9 +1621,6 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">", "real", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">", "real", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = (left_expr_info.val.real > right_expr_info.val.real);
@@ -2149,7 +1640,6 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
         l2_parse_token_forward();
         current_token_p = l2_parse_token_current();
         right_expr_info = l2_eval_expr_lshift_rshift_rshift_unsigned(scope_p);
-        new_left_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
         new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_BOOL;
         switch (left_expr_info.val_type) {
             case L2_EXPR_VAL_TYPE_INTEGER:
@@ -2160,9 +1650,6 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<=", "integer", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<=", "integer", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = ((double)left_expr_info.val.integer <= right_expr_info.val.real);
@@ -2181,30 +1668,8 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<=", "bool", "bool");
 
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<=", "bool", "string");
-
                     case L2_EXPR_VAL_TYPE_REAL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<=", "bool", "real");
-
-                    default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
-                }
-                break;
-
-            case L2_EXPR_VAL_TYPE_STRING:
-                switch (right_expr_info.val_type) {
-                    case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<=", "string", "integer");
-
-                    case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<=", "string", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<=", "string", "string");
-
-                    case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<=", "string", "real");
 
                     default:
                         l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
@@ -2219,9 +1684,6 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<=", "real", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<=", "real", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = (left_expr_info.val.real <= right_expr_info.val.real);
@@ -2241,7 +1703,6 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
         l2_parse_token_forward();
         current_token_p = l2_parse_token_current();
         right_expr_info = l2_eval_expr_lshift_rshift_rshift_unsigned(scope_p);
-        new_left_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
         new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_BOOL;
         switch (left_expr_info.val_type) {
             case L2_EXPR_VAL_TYPE_INTEGER:
@@ -2252,9 +1713,6 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<", "integer", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<", "integer", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = ((double)left_expr_info.val.integer < right_expr_info.val.real);
@@ -2273,30 +1731,8 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<", "bool", "bool");
 
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<", "bool", "string");
-
                     case L2_EXPR_VAL_TYPE_REAL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<", "bool", "real");
-
-                    default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
-                }
-                break;
-
-            case L2_EXPR_VAL_TYPE_STRING:
-                switch (right_expr_info.val_type) {
-                    case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<", "string", "integer");
-
-                    case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<", "string", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<", "string", "string");
-
-                    case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<", "string", "real");
 
                     default:
                         l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
@@ -2311,9 +1747,6 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<", "real", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<", "real", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = (left_expr_info.val.real < right_expr_info.val.real);
@@ -2366,7 +1799,6 @@ l2_expr_info l2_eval_expr_lshift_rshift_rshift_unsigned1(l2_scope *scope_p, l2_e
         l2_parse_token_forward();
         current_token_p = l2_parse_token_current();
         right_expr_info = l2_eval_expr_plus_sub(scope_p);
-        new_left_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
         new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
         switch (left_expr_info.val_type) {
             case L2_EXPR_VAL_TYPE_INTEGER:
@@ -2377,9 +1809,6 @@ l2_expr_info l2_eval_expr_lshift_rshift_rshift_unsigned1(l2_scope *scope_p, l2_e
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "integer", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "integer", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "integer", "real");
@@ -2397,30 +1826,8 @@ l2_expr_info l2_eval_expr_lshift_rshift_rshift_unsigned1(l2_scope *scope_p, l2_e
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "bool", "bool");
 
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "bool", "string");
-
                     case L2_EXPR_VAL_TYPE_REAL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "bool", "real");
-
-                    default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
-                }
-                break;
-
-            case L2_EXPR_VAL_TYPE_STRING:
-                switch (right_expr_info.val_type) {
-                    case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "string", "integer");
-
-                    case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "string", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "string", "string");
-
-                    case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "string", "real");
 
                     default:
                         l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
@@ -2434,9 +1841,6 @@ l2_expr_info l2_eval_expr_lshift_rshift_rshift_unsigned1(l2_scope *scope_p, l2_e
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "real", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "real", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "real", "real");
@@ -2455,7 +1859,6 @@ l2_expr_info l2_eval_expr_lshift_rshift_rshift_unsigned1(l2_scope *scope_p, l2_e
         l2_parse_token_forward();
         current_token_p = l2_parse_token_current();
         right_expr_info = l2_eval_expr_plus_sub(scope_p);
-        new_left_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
         new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
         switch (left_expr_info.val_type) {
             case L2_EXPR_VAL_TYPE_INTEGER:
@@ -2466,9 +1869,6 @@ l2_expr_info l2_eval_expr_lshift_rshift_rshift_unsigned1(l2_scope *scope_p, l2_e
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "integer", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "integer", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "integer", "real");
@@ -2486,30 +1886,8 @@ l2_expr_info l2_eval_expr_lshift_rshift_rshift_unsigned1(l2_scope *scope_p, l2_e
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "bool", "bool");
 
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "bool", "string");
-
                     case L2_EXPR_VAL_TYPE_REAL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "bool", "real");
-
-                    default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
-                }
-                break;
-
-            case L2_EXPR_VAL_TYPE_STRING:
-                switch (right_expr_info.val_type) {
-                    case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "string", "integer");
-
-                    case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "string", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "string", "string");
-
-                    case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "string", "real");
 
                     default:
                         l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
@@ -2523,9 +1901,6 @@ l2_expr_info l2_eval_expr_lshift_rshift_rshift_unsigned1(l2_scope *scope_p, l2_e
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "real", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "real", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "real", "real");
@@ -2544,7 +1919,6 @@ l2_expr_info l2_eval_expr_lshift_rshift_rshift_unsigned1(l2_scope *scope_p, l2_e
         l2_parse_token_forward();
         current_token_p = l2_parse_token_current();
         right_expr_info = l2_eval_expr_plus_sub(scope_p);
-        new_left_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
         new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
         switch (left_expr_info.val_type) {
             case L2_EXPR_VAL_TYPE_INTEGER:
@@ -2555,9 +1929,6 @@ l2_expr_info l2_eval_expr_lshift_rshift_rshift_unsigned1(l2_scope *scope_p, l2_e
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "integer", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "integer", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "integer", "real");
@@ -2575,30 +1946,8 @@ l2_expr_info l2_eval_expr_lshift_rshift_rshift_unsigned1(l2_scope *scope_p, l2_e
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "bool", "bool");
 
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "bool", "string");
-
                     case L2_EXPR_VAL_TYPE_REAL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "bool", "real");
-
-                    default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
-                }
-                break;
-
-            case L2_EXPR_VAL_TYPE_STRING:
-                switch (right_expr_info.val_type) {
-                    case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "string", "integer");
-
-                    case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "string", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "string", "string");
-
-                    case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "string", "real");
 
                     default:
                         l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
@@ -2612,9 +1961,6 @@ l2_expr_info l2_eval_expr_lshift_rshift_rshift_unsigned1(l2_scope *scope_p, l2_e
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "real", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "real", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "real", "real");
@@ -2656,18 +2002,143 @@ l2_expr_info l2_eval_expr_lshift_rshift_rshift_unsigned(l2_scope *scope_p) {
  * | nil
  *
  * */
-l2_expr_info l2_eval_expr_plus_sub1(l2_scope *scope_p, l2_expr_info left_expr_info) { /* TODO: complete this function */
+l2_expr_info l2_eval_expr_plus_sub1(l2_scope *scope_p, l2_expr_info left_expr_info) {
     l2_expr_info right_expr_info, new_left_expr_info;
     l2_token *current_token_p;
 
-    if (l2_parse_probe_next_token_by_type(L2_TOKEN_PLUS)) {
+    if (l2_parse_probe_next_token_by_type(L2_TOKEN_PLUS)) { /* + */
         l2_parse_token_forward();
         current_token_p = l2_parse_token_current();
         right_expr_info = l2_eval_expr_plus_sub(scope_p);
-        new_left_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
-        new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER; /* TODO */
 
-    } else if (l2_parse_probe_next_token_by_type(L2_TOKEN_SUB)) {
+        switch (left_expr_info.val_type) {
+            case L2_EXPR_VAL_TYPE_INTEGER:
+                switch (right_expr_info.val_type) {
+                    case L2_EXPR_VAL_TYPE_INTEGER:
+                        new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
+                        new_left_expr_info.val.integer = left_expr_info.val.integer + right_expr_info.val.integer;
+                        break;
+
+                    case L2_EXPR_VAL_TYPE_BOOL:
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "+", "integer", "bool");
+
+                    case L2_EXPR_VAL_TYPE_REAL:
+                        new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
+                        new_left_expr_info.val.real = left_expr_info.val.integer + right_expr_info.val.real;
+                        break;
+
+                    default:
+                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                }
+                break;
+
+            case L2_EXPR_VAL_TYPE_BOOL:
+                switch (right_expr_info.val_type) {
+                    case L2_EXPR_VAL_TYPE_INTEGER:
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "+", "bool", "integer");
+
+                    case L2_EXPR_VAL_TYPE_BOOL:
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "+", "bool", "bool");
+
+                    case L2_EXPR_VAL_TYPE_REAL:
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "+", "bool", "real");
+
+                    default:
+                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                }
+                break;
+
+            case L2_EXPR_VAL_TYPE_REAL:
+                switch (right_expr_info.val_type) {
+                    case L2_EXPR_VAL_TYPE_INTEGER:
+                        new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
+                        new_left_expr_info.val.real = left_expr_info.val.real + right_expr_info.val.integer;
+                        break;
+
+                    case L2_EXPR_VAL_TYPE_BOOL:
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "+", "real", "bool");
+
+                    case L2_EXPR_VAL_TYPE_REAL:
+                        new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
+                        new_left_expr_info.val.real = left_expr_info.val.real + right_expr_info.val.real;
+                        break;
+
+                    default:
+                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                }
+                break;
+
+            default:
+                l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+        }
+        return l2_eval_expr_plus_sub1(scope_p, new_left_expr_info);
+
+    } else if (l2_parse_probe_next_token_by_type(L2_TOKEN_SUB)) { /* - */
+        l2_parse_token_forward();
+        current_token_p = l2_parse_token_current();
+        right_expr_info = l2_eval_expr_plus_sub(scope_p);
+
+        switch (left_expr_info.val_type) {
+            case L2_EXPR_VAL_TYPE_INTEGER:
+                switch (right_expr_info.val_type) {
+                    case L2_EXPR_VAL_TYPE_INTEGER:
+                        new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
+                        new_left_expr_info.val.integer = left_expr_info.val.integer - right_expr_info.val.integer;
+                        break;
+
+                    case L2_EXPR_VAL_TYPE_BOOL:
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "-", "integer", "bool");
+
+                    case L2_EXPR_VAL_TYPE_REAL:
+                        new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
+                        new_left_expr_info.val.real = left_expr_info.val.integer - right_expr_info.val.real;
+                        break;
+
+                    default:
+                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                }
+                break;
+
+            case L2_EXPR_VAL_TYPE_BOOL:
+                switch (right_expr_info.val_type) {
+                    case L2_EXPR_VAL_TYPE_INTEGER:
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "-", "bool", "integer");
+
+                    case L2_EXPR_VAL_TYPE_BOOL:
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "-", "bool", "bool");
+
+                    case L2_EXPR_VAL_TYPE_REAL:
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "-", "bool", "real");
+
+                    default:
+                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                }
+                break;
+
+            case L2_EXPR_VAL_TYPE_REAL:
+                switch (right_expr_info.val_type) {
+                    case L2_EXPR_VAL_TYPE_INTEGER:
+                        new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
+                        new_left_expr_info.val.real = left_expr_info.val.real - right_expr_info.val.integer;
+                        break;
+
+                    case L2_EXPR_VAL_TYPE_BOOL:
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "-", "real", "bool");
+
+                    case L2_EXPR_VAL_TYPE_REAL:
+                        new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
+                        new_left_expr_info.val.real = left_expr_info.val.real - right_expr_info.val.real;
+                        break;
+
+                    default:
+                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                }
+                break;
+
+            default:
+                l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+        }
+        return l2_eval_expr_plus_sub1(scope_p, new_left_expr_info);
 
     } else {
         return left_expr_info;
@@ -2706,7 +2177,6 @@ l2_expr_info l2_eval_expr_mul_div_mod1(l2_scope *scope_p, l2_expr_info left_expr
         l2_parse_token_forward();
         current_token_p = l2_parse_token_current();
         right_expr_info = l2_eval_expr_single(scope_p);
-        new_left_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
         switch (left_expr_info.val_type) {
             case L2_EXPR_VAL_TYPE_INTEGER:
                 switch (right_expr_info.val_type) {
@@ -2717,9 +2187,6 @@ l2_expr_info l2_eval_expr_mul_div_mod1(l2_scope *scope_p, l2_expr_info left_expr
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "*", "integer", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "*", "integer", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
@@ -2739,30 +2206,8 @@ l2_expr_info l2_eval_expr_mul_div_mod1(l2_scope *scope_p, l2_expr_info left_expr
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "*", "bool", "bool");
 
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "*", "bool", "string");
-
                     case L2_EXPR_VAL_TYPE_REAL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "*", "bool", "real");
-
-                    default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
-                }
-                break;
-
-            case L2_EXPR_VAL_TYPE_STRING:
-                switch (right_expr_info.val_type) {
-                    case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "*", "string", "integer");
-
-                    case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "*", "string", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "*", "string", "string");
-
-                    case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "*", "string", "real");
 
                     default:
                         l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
@@ -2778,9 +2223,6 @@ l2_expr_info l2_eval_expr_mul_div_mod1(l2_scope *scope_p, l2_expr_info left_expr
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "*", "real", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "*", "real", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
@@ -2801,7 +2243,6 @@ l2_expr_info l2_eval_expr_mul_div_mod1(l2_scope *scope_p, l2_expr_info left_expr
         l2_parse_token_forward();
         current_token_p = l2_parse_token_current();
         right_expr_info = l2_eval_expr_single(scope_p);
-        new_left_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
         switch (left_expr_info.val_type) {
             case L2_EXPR_VAL_TYPE_INTEGER:
                 switch (right_expr_info.val_type) {
@@ -2812,9 +2253,6 @@ l2_expr_info l2_eval_expr_mul_div_mod1(l2_scope *scope_p, l2_expr_info left_expr
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "/", "integer", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "/", "integer", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
@@ -2834,30 +2272,8 @@ l2_expr_info l2_eval_expr_mul_div_mod1(l2_scope *scope_p, l2_expr_info left_expr
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "/", "bool", "bool");
 
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "/", "bool", "string");
-
                     case L2_EXPR_VAL_TYPE_REAL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "/", "bool", "real");
-
-                    default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
-                }
-                break;
-
-            case L2_EXPR_VAL_TYPE_STRING:
-                switch (right_expr_info.val_type) {
-                    case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "/", "string", "integer");
-
-                    case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "/", "string", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "/", "string", "string");
-
-                    case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "/", "string", "real");
 
                     default:
                         l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
@@ -2873,9 +2289,6 @@ l2_expr_info l2_eval_expr_mul_div_mod1(l2_scope *scope_p, l2_expr_info left_expr
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "/", "real", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "/", "real", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
@@ -2896,7 +2309,6 @@ l2_expr_info l2_eval_expr_mul_div_mod1(l2_scope *scope_p, l2_expr_info left_expr
         l2_parse_token_forward();
         current_token_p = l2_parse_token_current();
         right_expr_info = l2_eval_expr_single(scope_p);
-        new_left_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
         new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
         switch (left_expr_info.val_type) {
             case L2_EXPR_VAL_TYPE_INTEGER:
@@ -2907,9 +2319,6 @@ l2_expr_info l2_eval_expr_mul_div_mod1(l2_scope *scope_p, l2_expr_info left_expr
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "integer", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "integer", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "integer", "real");
@@ -2927,30 +2336,8 @@ l2_expr_info l2_eval_expr_mul_div_mod1(l2_scope *scope_p, l2_expr_info left_expr
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "bool", "bool");
 
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "bool", "string");
-
                     case L2_EXPR_VAL_TYPE_REAL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "bool", "real");
-
-                    default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
-                }
-                break;
-
-            case L2_EXPR_VAL_TYPE_STRING:
-                switch (right_expr_info.val_type) {
-                    case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "string", "integer");
-
-                    case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "string", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "string", "string");
-
-                    case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "string", "real");
 
                     default:
                         l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
@@ -2964,9 +2351,6 @@ l2_expr_info l2_eval_expr_mul_div_mod1(l2_scope *scope_p, l2_expr_info left_expr
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "real", "bool");
-
-                    case L2_EXPR_VAL_TYPE_STRING:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "real", "string");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "real", "real");
@@ -3007,7 +2391,6 @@ l2_expr_info l2_eval_expr_single(l2_scope *scope_p) {
         current_token_p = l2_parse_token_current();
 
         right_expr_info = l2_eval_expr_single(scope_p);
-        res_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
         res_expr_info.val_type = L2_EXPR_VAL_TYPE_BOOL;
         switch (right_expr_info.val_type) {
             case L2_EXPR_VAL_TYPE_INTEGER:
@@ -3016,9 +2399,6 @@ l2_expr_info l2_eval_expr_single(l2_scope *scope_p) {
             case L2_EXPR_VAL_TYPE_BOOL:
                 res_expr_info.val.bool = !(right_expr_info.val.bool);
                 break;
-
-            case L2_EXPR_VAL_TYPE_STRING:
-                l2_parsing_error(L2_PARSING_ERROR_UNITARY_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "!", "string");
 
             case L2_EXPR_VAL_TYPE_REAL:
                 l2_parsing_error(L2_PARSING_ERROR_UNITARY_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "!", "real");
@@ -3033,7 +2413,6 @@ l2_expr_info l2_eval_expr_single(l2_scope *scope_p) {
         current_token_p = l2_parse_token_current();
 
         right_expr_info = l2_eval_expr_single(scope_p);
-        res_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
         res_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
         switch (right_expr_info.val_type) {
             case L2_EXPR_VAL_TYPE_INTEGER:
@@ -3042,9 +2421,6 @@ l2_expr_info l2_eval_expr_single(l2_scope *scope_p) {
 
             case L2_EXPR_VAL_TYPE_BOOL:
                 l2_parsing_error(L2_PARSING_ERROR_UNITARY_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "~", "bool");
-
-            case L2_EXPR_VAL_TYPE_STRING:
-                l2_parsing_error(L2_PARSING_ERROR_UNITARY_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "~", "string");
 
             case L2_EXPR_VAL_TYPE_REAL:
                 l2_parsing_error(L2_PARSING_ERROR_UNITARY_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "~", "real");
@@ -3059,7 +2435,6 @@ l2_expr_info l2_eval_expr_single(l2_scope *scope_p) {
         current_token_p = l2_parse_token_current();
 
         right_expr_info = l2_eval_expr_single(scope_p);
-        res_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
         switch (right_expr_info.val_type) {
             case L2_EXPR_VAL_TYPE_INTEGER:
                 res_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
@@ -3068,9 +2443,6 @@ l2_expr_info l2_eval_expr_single(l2_scope *scope_p) {
 
             case L2_EXPR_VAL_TYPE_BOOL:
                 l2_parsing_error(L2_PARSING_ERROR_UNITARY_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "-", "bool");
-
-            case L2_EXPR_VAL_TYPE_STRING:
-                l2_parsing_error(L2_PARSING_ERROR_UNITARY_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "-", "string");
 
             case L2_EXPR_VAL_TYPE_REAL:
                 res_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
@@ -3111,11 +2483,6 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
         if (!symbol_node_p) l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_UNDEFINED, token_first_p->current_line, token_first_p->current_col, token_first_p->u.str.str_p);
 
         switch (symbol_node_p->symbol.type) { /* package symbol into expr node */
-            case L2_SYMBOL_TYPE_STRING:
-                res_expr_info.val_type = L2_EXPR_VAL_TYPE_STRING;
-                res_expr_info.val.str = symbol_node_p->symbol.u.string;
-                break;
-
             case L2_SYMBOL_TYPE_INTEGER:
                 res_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
                 res_expr_info.val.integer = symbol_node_p->symbol.u.integer;
@@ -3138,42 +2505,27 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
                 l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
         }
 
-        res_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
-
     } else if (l2_parse_probe_next_token_by_type(L2_TOKEN_INTEGER_LITERAL)) {
         l2_parse_token_forward();
         token_first_p = l2_parse_token_current();
         res_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
         res_expr_info.val.integer = token_first_p->u.integer;
-        res_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
-
-    } else if (l2_parse_probe_next_token_by_type(L2_TOKEN_STRING_LITERAL)) {
-        l2_parse_token_forward();
-        token_first_p = l2_parse_token_current();
-        res_expr_info.val_type = L2_EXPR_VAL_TYPE_STRING;
-        l2_string_create(&res_expr_info.val.str);
-        l2_string_strcpy(&res_expr_info.val.str, &token_first_p->u.str);
-        res_expr_info.expr_type = L2_EXPR_TYPE_IN_GC; /* string into gc */
-        l2_gc_append(g_parser_p->gc_list_p, res_expr_info.val.str.str_p);
 
     } else if (l2_parse_probe_next_token_by_type(L2_TOKEN_REAL_LITERAL)) {
         l2_parse_token_forward();
         token_first_p = l2_parse_token_current();
         res_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
         res_expr_info.val.real = token_first_p->u.real;
-        res_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
 
     } else if (l2_parse_probe_next_token_by_type_and_str(L2_TOKEN_KEYWORD, g_l2_token_keywords[0])) { /* "true" */
         l2_parse_token_forward();
         res_expr_info.val_type = L2_EXPR_VAL_TYPE_BOOL;
         res_expr_info.val.bool = L2_TRUE;
-        res_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
 
     } else if (l2_parse_probe_next_token_by_type_and_str(L2_TOKEN_KEYWORD, g_l2_token_keywords[1])) { /* "false" */
         l2_parse_token_forward();
         res_expr_info.val_type = L2_EXPR_VAL_TYPE_BOOL;
         res_expr_info.val.bool = L2_FALSE;
-        res_expr_info.expr_type = L2_EXPR_TYPE_NOT_IN_GC;
 
     } else {
         l2_parse_token_forward();

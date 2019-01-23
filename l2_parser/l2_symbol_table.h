@@ -15,7 +15,6 @@ typedef enum _l2_symbol_type {
     L2_SYMBOL_TYPE_REAL,
     L2_SYMBOL_TYPE_BOOL,
 
-    L2_SYMBOL_TYPE_STRING,
     L2_SYMBOL_TYPE_NATIVE_POINTER
 
 }l2_symbol_type;
@@ -27,7 +26,6 @@ typedef struct _l2_symbol {
         int integer;
         double real;
         boolean bool;
-        l2_string string;
         /* native pointer */
     }u;
 }l2_symbol;
@@ -49,6 +47,5 @@ boolean l2_symbol_table_add_symbol_without_initialization(l2_symbol_node **head_
 boolean l2_symbol_table_add_symbol_integer(l2_symbol_node **head_p, char *symbol_name, int integer);
 boolean l2_symbol_table_add_symbol_real(l2_symbol_node **head_p, char *symbol_name, double real);
 boolean l2_symbol_table_add_symbol_bool(l2_symbol_node **head_p, char *symbol_name, boolean bool);
-boolean l2_symbol_table_add_symbol_string(l2_symbol_node **head_p, char *symbol_name, l2_string *string_p);
 
 #endif

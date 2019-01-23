@@ -4,24 +4,16 @@
 #include "../l2_lexer/l2_token_stream.h"
 #include "l2_parse.h"
 
-typedef enum _l2_expr_type {
-    L2_EXPR_TYPE_NOT_IN_GC,
-    L2_EXPR_TYPE_IN_GC
-}l2_expr_type;
-
 typedef enum _l2_expr_val_type {
-    L2_EXPR_VAL_TYPE_STRING,
     L2_EXPR_VAL_TYPE_REAL,
     L2_EXPR_VAL_TYPE_INTEGER,
     L2_EXPR_VAL_TYPE_BOOL
 }l2_expr_val_type;
 
 typedef struct _l2_expr_info {
-    l2_expr_type expr_type;
     l2_expr_val_type val_type;
     union _val_union {
         boolean bool;
-        l2_string str;
         double real;
         int integer;
     }val;
