@@ -182,7 +182,57 @@ void l2_parse_stmt_var_def_list1(l2_scope *scope_p) {
  * | nil
  *
  * */
-/* TODO implement the function */
+void l2_absorb_stmt_elif() {
+
+    _if_keyword(L2_KW_ELIF) /* "elif" */
+    {
+        _if_type (L2_TOKEN_LP) /* ( */
+        {
+            l2_absorb_expr();
+
+            _if_type (L2_TOKEN_RP)
+            {
+                /* ) */
+            }_throw_missing_rp
+
+
+            _if_type (L2_TOKEN_LBRACE) /* { */
+            {
+                l2_absorb_stmts(); /* absorb stmts */
+
+                _if_type (L2_TOKEN_RBRACE) /* } */
+                {
+                    l2_absorb_stmt_elif();
+
+                } _throw_missing_rbrace
+
+            } _throw_unexpected_token
+
+
+        } _throw_unexpected_token
+    }
+    _elif_keyword (L2_KW_ELSE) /* "else" */
+    {
+        _if_type (L2_TOKEN_LBRACE) /* { */
+        {
+            l2_absorb_stmts(); /* absorb stmts */
+
+            _if_type (L2_TOKEN_RBRACE)
+            {
+                /* } */
+            } _throw_missing_rbrace
+
+        } _throw_unexpected_token
+    }
+    _end
+}
+
+/* stmt_elif ->
+ * | elif ( expr ) { stmts } stmt_elif
+ * | else { stmts }
+ * | nil
+ *
+ * */
 void l2_parse_stmt_elif(l2_scope *scope_p) { /* the scopes in if..elif..else structure is coordinate each other */
 
     l2_scope *sub_scope_p = L2_NULL_PTR;
@@ -255,6 +305,8 @@ void l2_parse_stmt_elif(l2_scope *scope_p) { /* the scopes in if..elif..else str
     }
     _end
 }
+
+/* TODO implement keywords: break, continue, return & return by value */
 
 /* stmt ->
  * | { stmts }

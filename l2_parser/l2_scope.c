@@ -17,7 +17,7 @@ l2_scope *l2_scope_create() {
     return global_p;
 }
 
-l2_scope_guid l2_scope_create_scope(l2_scope_guid src, l2_scope_create_flag cf) {
+l2_scope_guid l2_scope_create_scope(l2_scope_guid src, l2_scope_create_flag cf, l2_scope_type scope_type) {
     l2_scope *scope_p = L2_NULL_PTR;
     switch(cf) {
         case L2_SCOPE_CREATE_SUB_SCOPE:
@@ -30,6 +30,7 @@ l2_scope_guid l2_scope_create_scope(l2_scope_guid src, l2_scope_create_flag cf) 
                 scope_p->coor_p->level = src->level + 1;
                 scope_p->coor_p->upper_p = src;
                 scope_p->coor_p->lower_p = L2_NULL_PTR;
+                scope_p->coor_p->scope_type = scope_type;
                 scope_p->coor_p->symbol_table_p = l2_symbol_table_create();
                 return scope_p->coor_p;
 
@@ -39,6 +40,7 @@ l2_scope_guid l2_scope_create_scope(l2_scope_guid src, l2_scope_create_flag cf) 
                 src->lower_p->level = src->level + 1;
                 src->lower_p->upper_p = src;
                 src->lower_p->lower_p = L2_NULL_PTR;
+                src->lower_p->scope_type = scope_type;
                 src->lower_p->symbol_table_p = l2_symbol_table_create();
                 return src->lower_p;
             }
@@ -55,6 +57,7 @@ l2_scope_guid l2_scope_create_scope(l2_scope_guid src, l2_scope_create_flag cf) 
             scope_p->coor_p->level = src->level;
             scope_p->coor_p->upper_p = src->upper_p;
             scope_p->coor_p->lower_p = L2_NULL_PTR;
+            scope_p->coor_p->scope_type = scope_type;
             scope_p->coor_p->symbol_table_p = l2_symbol_table_create();
             return scope_p->coor_p;
 
@@ -112,6 +115,22 @@ void l2_scope_escape_scope(l2_scope_guid src) {
     }
 
     l2_storage_mem_delete(g_parser_p->storage_p, src);
+}
+
+l2_scope_guid l2_scope_create_common_scope(l2_scope_guid src, l2_scope_create_flag cf) {
+    return l2_scope_create_scope(src, cf, L2_SCOPE_TYPE_COMMON);
+}
+
+l2_scope_guid l2_scope_create_loop_scope(l2_scope_guid src, l2_scope_create_flag cf, int continue_entry_pos, int break_entry_pos) {
+    l2_scope_guid res_guid = l2_scope_create_scope(src, cf, L2_SCOPE_TYPE_LOOP);
+    res_guid->u.loop.continue_entry_pos = continue_entry_pos;
+    res_guid->u.loop.break_entry_pos = break_entry_pos;
+    return res_guid;
+}
+
+/* TODO implement it */
+l2_scope_guid l2_scope_create_procedure_scope(l2_scope_guid src, l2_scope_create_flag cf, l2_scope_type scope_type) {
+    return NULL;
 }
 
 
