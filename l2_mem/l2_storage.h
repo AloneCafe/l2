@@ -22,5 +22,6 @@ void *l2_storage_mem_new_with_zero(l2_storage *storage_p, l2_mem_size mem_size);
 void *l2_storage_mem_renew(l2_storage *storage_p, void *old_void_ptr, l2_mem_size mem_renew_size);
 void *l2_storage_mem_resize(l2_storage *storage_p, void *old_void_ptr, l2_mem_size mem_old_size, l2_mem_size mem_resize);
 void l2_storage_mem_delete(l2_storage *storage_p, void *void_ptr);
+void l2_storage_mem_copy(l2_storage *storage_p, void *dest_void_ptr, void *src_void_ptr, int size);
 
 #endif

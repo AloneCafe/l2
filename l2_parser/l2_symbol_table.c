@@ -143,3 +143,41 @@ void l2_symbol_table_destroy(l2_symbol_node *head_p) {
     l2_symbol_table_destroy(head_p->next);
     l2_storage_mem_delete(g_parser_p->storage_p, head_p);
 }
+
+boolean l2_symbol_table_add_symbol_procedure(l2_symbol_node **head_p, char *symbol_name, l2_procedure procedure) {
+
+    /* judge the symbol if already defined before */
+    if (l2_symbol_table_get_symbol_node_by_name_in_symbol_table(*head_p, symbol_name) != L2_NULL_PTR) return L2_FALSE;
+    l2_symbol_node *current_p = *head_p;
+
+    if (*head_p == L2_NULL_PTR) {
+        *head_p = l2_storage_mem_new_with_zero(g_parser_p->storage_p, sizeof(l2_symbol_node));
+        (*head_p)->next = L2_NULL_PTR;
+        (*head_p)->symbol.symbol_name = symbol_name;
+        (*head_p)->symbol.type = L2_SYMBOL_TYPE_PROCEDURE;
+        (*head_p)->symbol.u.procedure.entry_pos = procedure.entry_pos;
+        return L2_TRUE;
+    }
+
+    while (current_p->next) {
+        current_p = current_p->next;
+    }
+    current_p->next = l2_storage_mem_new_with_zero(g_parser_p->storage_p, sizeof(l2_symbol_node));
+    current_p->next->next = L2_NULL_PTR;
+    current_p->next->symbol.symbol_name = symbol_name;
+    current_p->next->symbol.type = L2_SYMBOL_TYPE_PROCEDURE;
+    current_p->next->symbol.u.procedure.entry_pos = procedure.entry_pos;
+    return L2_TRUE;
+}
+
+void l2_symbol_table_copy(l2_symbol_node **dest_p, l2_symbol_node *src_p) {
+    if (!src_p) {
+        (*dest_p) = L2_NULL_PTR;
+        return;
+    }
+
+    *dest_p = l2_storage_mem_new_with_zero(g_parser_p->storage_p, sizeof(l2_symbol_node));
+    l2_storage_mem_copy(g_parser_p->storage_p, *dest_p, src_p, sizeof(l2_symbol_node));
+    (*dest_p)->next = L2_NULL_PTR;
+    l2_symbol_table_copy(&(*dest_p)->next, src_p->next);
+}

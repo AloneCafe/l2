@@ -82,10 +82,6 @@ void l2_parsing_error(const l2_parsing_error_type error_type, int lines, int col
             fprintf(stderr, "l2 parsing error at line %d, column %d, unexpected token\n", lines, cols);
             break;
 
-        case L2_PARSING_ERROR_MAY_LOSE_RIGHT_PAIR_OF_PARENTHESES:
-            fprintf(stderr, "l2 parsing error at line %d, column %d, may lose the right pair of parentheses \')\'\n", lines, cols);
-            break;
-
         case L2_PARSING_ERROR_ILLEGAL_NUMBER_IN_AN_OCTAL_LITERAL:
             illegal_char = (char)va_arg(va, int);
             fprintf(stderr, "l2 parsing error at line %d, column %d, illegal number \'%c\' in an octal literal\n", lines, cols, illegal_char);
@@ -115,16 +111,20 @@ void l2_parsing_error(const l2_parsing_error_type error_type, int lines, int col
             fprintf(stderr, "l2 parsing error at line %d, column %d, incomplete string literal, string literal should be completed with double quote mark \" in the end\n", lines, cols);
             break;
 
-        case L2_PARSING_ERROR_INCOMPLETE_CONDITION_EXPRESSION:
-            fprintf(stderr, "l2 parsing error near line %d, column %d, incomplete condition expression\n", lines, cols);
+        case L2_PARSING_ERROR_MISSING_COLON:
+            fprintf(stderr, "l2 parsing error near line %d, column %d, incomplete condition expression, maybe missing colon \':\'\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_MISSING_SEMICOLON:
             fprintf(stderr, "l2 parsing error near line %d, column %d, missing semicolon at the end of statement\n", lines, cols);
             break;
 
-        case L2_PARSING_ERROR_MISSING_BLOCK_END_MARK:
+        case L2_PARSING_ERROR_MISSING_RBRACE:
             fprintf(stderr, "l2 parsing error near line %d, column %d, missing block end mark \'}\'\n", lines, cols);
+            break;
+
+        case L2_PARSING_ERROR_MISSING_RP:
+            fprintf(stderr, "l2 parsing error near line %d, column %d, missing the right part of parentheses \')\'\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_IDENTIFIER_UNDEFINED:
@@ -153,8 +153,8 @@ void l2_parsing_error(const l2_parsing_error_type error_type, int lines, int col
             fprintf(stderr, "l2 parsing error near line %d, column %d, divide by integer zero\n", lines, cols);
             break;
 
-        case L2_PARSING_ERROR_CONDITION_MUST_BE_A_BOOL_VALUE:
-            fprintf(stderr, "l2 parsing error near line %d, column %d, the condition must be a bool-value\n", lines, cols);
+        case L2_PARSING_ERROR_EXPR_NOT_BOOL:
+            fprintf(stderr, "l2 parsing error near line %d, column %d, the expression is not bool\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_RIGHT_SIDE_OF_OPERATOR_MUST_BE_A_BOOL_VALUE:

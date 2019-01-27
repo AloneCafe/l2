@@ -65,6 +65,23 @@ typedef enum _l2_token_type {
 
 }l2_token_type;
 
+typedef enum _l2_keywords {
+    L2_KW_TRUE,
+    L2_KW_FALSE,
+    L2_KW_VAR,
+    L2_KW_IF,
+    L2_KW_ELSE,
+    L2_KW_ELIF,
+    L2_KW_WHILE,
+    L2_KW_DO,
+    L2_KW_FOR,
+    L2_KW_BREAK,
+    L2_KW_CONTINUE,
+    L2_KW_RETURN,
+    L2_KW_PROCEDURE
+
+}l2_keyword;
+
 typedef struct _l2_token {
     l2_token_type type;
     union {

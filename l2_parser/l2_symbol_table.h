@@ -15,9 +15,16 @@ typedef enum _l2_symbol_type {
     L2_SYMBOL_TYPE_REAL,
     L2_SYMBOL_TYPE_BOOL,
 
-    L2_SYMBOL_TYPE_NATIVE_POINTER
+    L2_SYMBOL_TYPE_PROCEDURE
 
 }l2_symbol_type;
+
+typedef struct _l2_procedure {
+    int entry_pos;
+    /* entry_pos is, the token position of the '(' which after procedure id at token stream,
+     * due to parse both parameter list and procedure content
+     * */
+}l2_procedure;
 
 typedef struct _l2_symbol {
     l2_symbol_type type;
@@ -26,7 +33,9 @@ typedef struct _l2_symbol {
         int integer;
         double real;
         boolean bool;
-        /* native pointer */
+
+        l2_procedure procedure;
+
     }u;
 }l2_symbol;
 
@@ -41,11 +50,12 @@ void l2_symbol_table_destroy(l2_symbol_node *head_p);
 l2_symbol_node *l2_symbol_table_get_symbol_node_by_name_in_symbol_table(l2_symbol_node *head_p, char *symbol_name);
 l2_symbol_node *l2_symbol_table_get_symbol_node_by_name_in_scope(l2_scope *scope_p, char *symbol_name);
 l2_symbol_node *l2_symbol_table_get_symbol_node_by_name_in_upper_scope(l2_scope *scope_p, char *symbol_name);
-
+void l2_symbol_table_copy(l2_symbol_node **dest_p, l2_symbol_node *src_p);
 
 boolean l2_symbol_table_add_symbol_without_initialization(l2_symbol_node **head_p, char *symbol_name);
 boolean l2_symbol_table_add_symbol_integer(l2_symbol_node **head_p, char *symbol_name, int integer);
 boolean l2_symbol_table_add_symbol_real(l2_symbol_node **head_p, char *symbol_name, double real);
 boolean l2_symbol_table_add_symbol_bool(l2_symbol_node **head_p, char *symbol_name, boolean bool);
+boolean l2_symbol_table_add_symbol_procedure(l2_symbol_node **head_p, char *symbol_name, l2_procedure procedure);
 
 #endif

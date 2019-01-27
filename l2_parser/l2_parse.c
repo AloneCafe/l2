@@ -121,6 +121,140 @@ void l2_absorb_formal_param_list() {
     } _end
 }
 
+/* stmt_var_def_list1 ->
+ * | , id stmt_var_def_list1
+ * | , id = expr stmt_var_def_list1
+ * | nil
+ * */
+void l2_parse_stmt_var_def_list1(l2_scope *scope_p) {
+
+    boolean symbol_added;
+    l2_expr_info right_expr_info;
+
+    _declr_current_token_p
+
+    _if_type (L2_TOKEN_COMMA)
+    {
+        _if_type (L2_TOKEN_IDENTIFIER) /* id */
+        {
+            _get_current_token_p
+
+            _if_type (L2_TOKEN_ASSIGN) /* = */
+            {
+                right_expr_info = l2_eval_expr(scope_p); /* expr */
+
+                switch (right_expr_info.val_type) {
+                    case L2_EXPR_VAL_TYPE_INTEGER:
+                        symbol_added = l2_symbol_table_add_symbol_integer(&scope_p->symbol_table_p, current_token_p->u.str.str_p, right_expr_info.val.integer);
+                        break;
+
+                    case L2_EXPR_VAL_TYPE_REAL:
+                        symbol_added = l2_symbol_table_add_symbol_real(&scope_p->symbol_table_p, current_token_p->u.str.str_p, right_expr_info.val.real);
+                        break;
+
+                    case L2_EXPR_VAL_TYPE_BOOL:
+                        symbol_added = l2_symbol_table_add_symbol_bool(&scope_p->symbol_table_p, current_token_p->u.str.str_p, right_expr_info.val.bool);
+                        break;
+
+                    default:
+                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error token type");
+                }
+            }
+            _else /* without initialization */
+            {
+                symbol_added = l2_symbol_table_add_symbol_without_initialization(&scope_p->symbol_table_p, current_token_p->u.str.str_p);
+            }
+
+            /* handle last part of definition list in recursion */
+            l2_parse_stmt_var_def_list1(scope_p);
+
+            if (!symbol_added)
+                l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_REDEFINED, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);
+
+        } _throw_unexpected_token
+
+    } _end
+}
+
+/* stmt_elif ->
+ * | elif ( expr ) { stmts } stmt_elif
+ * | else { stmts }
+ * | nil
+ *
+ * */
+/* TODO implement the function */
+void l2_parse_stmt_elif(l2_scope *scope_p) { /* the scopes in if..elif..else structure is coordinate each other */
+
+    l2_scope *sub_scope_p = L2_NULL_PTR;
+
+    _declr_current_token_p
+
+    _if_keyword(L2_KW_ELIF) /* "elif" */
+    {
+        _get_current_token_p
+
+        _if_type (L2_TOKEN_LP) /* ( */
+        {
+            l2_expr_info expr_info;
+            expr_info = l2_eval_expr(scope_p);
+
+            if (expr_info.val_type != L2_EXPR_VAL_TYPE_BOOL)
+                l2_parsing_error(L2_PARSING_ERROR_EXPR_NOT_BOOL, current_token_p->current_line,
+                                 current_token_p->current_col);
+
+            _if_type (L2_TOKEN_RP)
+            {
+                /* ) */
+            }_throw_missing_rp
+
+            if (expr_info.val.bool) { /* elif true */
+                _if_type (L2_TOKEN_LBRACE) /* { */
+                {
+                    sub_scope_p = l2_scope_create_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
+                    l2_parse_stmts(sub_scope_p); /* parse stmts */
+
+                    _if_type (L2_TOKEN_RBRACE) /* } */
+                    {
+                        l2_scope_escape_scope(sub_scope_p);
+                        l2_absorb_stmt_elif();
+
+                    } _throw_missing_rbrace
+
+                } _throw_unexpected_token
+
+            } else { /* elif false */
+                _if_type (L2_TOKEN_LBRACE) /* { */
+                {
+                    l2_absorb_stmts(); /* parse stmts */
+
+                    _if_type (L2_TOKEN_RBRACE) /* } */
+                    {
+                        l2_parse_stmt_elif(scope_p);
+
+                    } _throw_missing_rbrace
+
+                } _throw_unexpected_token
+            }
+
+        } _throw_unexpected_token
+    }
+    _elif_keyword (L2_KW_ELSE) /* "else" */
+    {
+        _if_type (L2_TOKEN_LBRACE) /* { */
+        {
+            sub_scope_p = l2_scope_create_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
+            l2_parse_stmts(sub_scope_p); /* parse stmts */
+
+            _if_type (L2_TOKEN_RBRACE) /* } */
+            {
+                l2_scope_escape_scope(sub_scope_p);
+
+            } _throw_missing_rbrace
+
+        } _throw_unexpected_token
+    }
+    _end
+}
 
 /* stmt ->
  * | { stmts }
@@ -134,7 +268,7 @@ void l2_absorb_formal_param_list() {
  * | continue ;
  * | return ;
  * | return expr ;
- * | if ( expr ) { stmts } stmt_elsif
+ * | if ( expr ) { stmts } stmt_elif
  * | var id stmt_var_def_list1 ;
  * | var id = expr stmt_var_def_list1 ;
  * | ;
@@ -244,6 +378,11 @@ void l2_parse_stmt(l2_scope *scope_p) {
 
                 } _throw_unexpected_token
             }
+            _elif_type (L2_TOKEN_COMMA)
+            {
+                /* this means there is a empty expr in for-loop */
+                /* also absorb ';' */
+            }
             _else
             {
                 l2_eval_expr(scope_p);
@@ -251,7 +390,6 @@ void l2_parse_stmt(l2_scope *scope_p) {
                 {
                     /* absorb ';' */
                 } _throw_missing_semicolon
-
             }
 
             /* handle the second expr ( bool-expr that takes effects to the execution flow of loop ) */
@@ -268,17 +406,38 @@ void l2_parse_stmt(l2_scope *scope_p) {
             /* symbol table copy */
             l2_symbol_table_copy(&sub_scope_p->symbol_table_p, for_init_symbol_table_p);
 
-            second_expr_info = l2_eval_expr(sub_scope_p);
-            _if_type (L2_TOKEN_SEMICOLON)
+            _if_type (L2_TOKEN_COMMA)
             {
-                /* absorb ';' */
-            } _throw_missing_semicolon
+                /* this means there is a empty expr in for-loop,
+                 * and the second expr will have a bool-value with true if it is empty  */
 
+                second_expr_info.val_type = L2_EXPR_VAL_TYPE_BOOL;
+                second_expr_info.val.bool = L2_TRUE;
+
+                /* also absorb ';' */
+            }
+            _else
+            {
+                second_expr_info = l2_eval_expr(sub_scope_p);
+                _if_type (L2_TOKEN_SEMICOLON)
+                {
+                    /* absorb ';' */
+                } _throw_missing_semicolon
+            }
 
             /* handle the third expr ( absorb and record its pos ) */
             third_expr_entry_pos = l2_token_stream_get_pos(g_parser_p->token_stream_p);
 
-            l2_absorb_expr();
+            _if_type (L2_TOKEN_COMMA)
+            {
+                /* this means there is a empty expr in for-loop */
+                /* absorb ';' */
+            }
+            _else
+            {
+                l2_absorb_expr();
+            }
+
 
             _if_type (L2_TOKEN_RP)
             {
@@ -287,7 +446,7 @@ void l2_parse_stmt(l2_scope *scope_p) {
 
         } _throw_unexpected_token
 
-        /* TODO */
+        /* TODO due to check the code logic */
         if (second_expr_info.val.bool) { /* for true */
             _if_type (L2_TOKEN_LBRACE) /* { */
             {
@@ -474,13 +633,11 @@ void l2_parse_stmt(l2_scope *scope_p) {
             } else { /* if false */
                 _if_type (L2_TOKEN_LBRACE) /* { */
                 {
-                    sub_scope_p = l2_scope_create_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
                     l2_absorb_stmts(); /* parse stmts */
 
                     _if_type (L2_TOKEN_RBRACE) /* } */
                     {
-                        l2_scope_escape_scope(sub_scope_p);
-                        l2_parse_stmt_elif();
+                        l2_parse_stmt_elif(scope_p);
                     } _throw_missing_rbrace
 
                 } _throw_unexpected_token
@@ -493,13 +650,13 @@ void l2_parse_stmt(l2_scope *scope_p) {
     {
         /* empty stmt which has only single ; */
     }
-    _elif_keyword (L2_KW_VAR)
+    _elif_keyword (L2_KW_VAR) /* "var" */
     {
-        _if_type (L2_TOKEN_IDENTIFIER)
+        _if_type (L2_TOKEN_IDENTIFIER) /* id */
         {
             _get_current_token_p
 
-            _if_type (L2_TOKEN_ASSIGN)
+            _if_type (L2_TOKEN_ASSIGN) /* = */
             {
                 right_expr_info = l2_eval_expr(scope_p); /* expr */
 
@@ -519,18 +676,19 @@ void l2_parse_stmt(l2_scope *scope_p) {
                     default:
                         l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error token type");
                 }
-
-                _if_type (L2_TOKEN_SEMICOLON)
-                {
-                    /* absorb ';' */
-                } _throw_missing_semicolon
-
             }
-            _elif_type (L2_TOKEN_SEMICOLON)
+            _else
             {
                 symbol_added = l2_symbol_table_add_symbol_without_initialization(&scope_p->symbol_table_p, current_token_p->u.str.str_p);
+            }
 
-            } _throw_unexpected_token
+            /* handle last part of definition list in recursion */
+            l2_parse_stmt_var_def_list1(scope_p);
+
+            _if_type (L2_TOKEN_SEMICOLON)
+            {
+                /* absorb ';' */
+            } _throw_missing_semicolon
 
             if (!symbol_added)
                 l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_REDEFINED, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);

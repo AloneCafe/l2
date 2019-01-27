@@ -131,3 +131,7 @@ void l2_storage_mem_delete(l2_storage *storage_p, void *void_ptr) {
 
     l2_internal_error(L2_INTERNAL_ERROR_MEM_BLOCK_NOT_MANAGED, void_ptr);
 }
+
+void l2_storage_mem_copy(l2_storage *storage_p, void *dest_void_ptr, void *src_void_ptr, int size) {
+    memcpy(dest_void_ptr, src_void_ptr, size);
+}
