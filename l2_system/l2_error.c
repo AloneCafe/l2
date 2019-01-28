@@ -193,6 +193,14 @@ void l2_parsing_error(const l2_parsing_error_type error_type, int lines, int col
             fprintf(stderr, "\'%s\' <%s>\n", token_str, token_str2);
             break;
 
+        case L2_PARSING_ERROR_INVALID_CONTINUE_IN_CURRENT_CONTEXT:
+            fprintf(stderr, "l2 parsing error near line %d, column %d, invalid keyword \'continue\' in current content\n", lines, cols);
+            break;
+
+        case L2_PARSING_ERROR_INVALID_BREAK_IN_CURRENT_CONTEXT:
+            fprintf(stderr, "l2 parsing error near line %d, column %d, invalid keyword \'break\' in current content\n", lines, cols);
+            break;
+
         default:
             fprintf(stderr, "l2 parsing error, an unknown error occured\n");
     }

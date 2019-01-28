@@ -121,18 +121,37 @@ l2_scope_guid l2_scope_create_common_scope(l2_scope_guid src, l2_scope_create_fl
     return l2_scope_create_scope(src, cf, L2_SCOPE_TYPE_COMMON);
 }
 
-l2_scope_guid l2_scope_create_loop_scope(l2_scope_guid src, l2_scope_create_flag cf, int continue_entry_pos, int break_entry_pos) {
-    l2_scope_guid res_guid = l2_scope_create_scope(src, cf, L2_SCOPE_TYPE_LOOP);
-    res_guid->u.loop.continue_entry_pos = continue_entry_pos;
-    res_guid->u.loop.break_entry_pos = break_entry_pos;
+l2_scope_guid l2_scope_create_for_scope(l2_scope_guid src, l2_scope_create_flag cf, int loop_entry_pos) {
+    l2_scope_guid res_guid = l2_scope_create_scope(src, cf, L2_SCOPE_TYPE_FOR);
+    res_guid->u.loop_entry_pos = loop_entry_pos;
     return res_guid;
 }
 
-/* TODO implement it */
-l2_scope_guid l2_scope_create_procedure_scope(l2_scope_guid src, l2_scope_create_flag cf, l2_scope_type scope_type) {
-    return NULL;
+l2_scope_guid l2_scope_create_while_scope(l2_scope_guid src, l2_scope_create_flag cf, int loop_entry_pos) {
+    l2_scope_guid res_guid = l2_scope_create_scope(src, cf, L2_SCOPE_TYPE_WHILE);
+    res_guid->u.loop_entry_pos = loop_entry_pos;
+    return res_guid;
 }
 
+l2_scope_guid l2_scope_create_do_while_scope(l2_scope_guid src, l2_scope_create_flag cf, int loop_entry_pos) {
+    l2_scope_guid res_guid = l2_scope_create_scope(src, cf, L2_SCOPE_TYPE_DO_WHILE);
+    res_guid->u.loop_entry_pos = loop_entry_pos;
+    return res_guid;
+}
 
+l2_scope_guid l2_scope_find_nearest_scope_by_type(l2_scope_guid current_scope, l2_scope_type scope_type) {
+    l2_scope_guid scope;
+    for (scope = current_scope; scope != L2_NULL_PTR; scope = scope->upper_p) {
+        if (scope->scope_type == scope_type) return scope;
+    }
+    return L2_NULL_PTR;
+}
 
-
+l2_scope_guid l2_scope_find_nearest_loop_scope(l2_scope_guid current_scope) {
+    l2_scope_guid scope;
+    for (scope = current_scope; scope != L2_NULL_PTR; scope = scope->upper_p) {
+        if (scope->scope_type == L2_SCOPE_TYPE_FOR || scope->scope_type == L2_SCOPE_TYPE_DO_WHILE || scope->scope_type == L2_SCOPE_TYPE_WHILE)
+            return scope;
+    }
+    return L2_NULL_PTR;
+}

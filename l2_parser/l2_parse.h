@@ -67,6 +67,13 @@ typedef struct _l2_parser {
     l2_gc_list *gc_list_p;
 }l2_parser;
 
+typedef enum _l2_stmt_interrupt_type {
+    L2_STMT_NO_INTERRUPT,
+    L2_STMT_INTERRUPT_BREAK,
+    L2_STMT_INTERRUPT_CONTINUE,
+    L2_STMT_INTERRUPT_RETURN
+}l2_stmt_interrupt_type;
+
 void l2_parse_initialize(FILE *fp);
 void l2_parse_finalize();
 

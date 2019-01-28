@@ -7,6 +7,7 @@
 #include "../l2_system/l2_error.h"
 #include "../l2_system/l2_assert.h"
 #include "l2_eval.h"
+#include "l2_scope.h"
 
 extern char *g_l2_token_keywords[];
 
@@ -255,12 +256,12 @@ void l2_parse_stmt_elif(l2_scope *scope_p) { /* the scopes in if..elif..else str
             _if_type (L2_TOKEN_RP)
             {
                 /* ) */
-            }_throw_missing_rp
+            } _throw_missing_rp
 
             if (expr_info.val.bool) { /* elif true */
                 _if_type (L2_TOKEN_LBRACE) /* { */
                 {
-                    sub_scope_p = l2_scope_create_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
+                    sub_scope_p = l2_scope_create_common_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
                     l2_parse_stmts(sub_scope_p); /* parse stmts */
 
                     _if_type (L2_TOKEN_RBRACE) /* } */
@@ -292,7 +293,7 @@ void l2_parse_stmt_elif(l2_scope *scope_p) { /* the scopes in if..elif..else str
     {
         _if_type (L2_TOKEN_LBRACE) /* { */
         {
-            sub_scope_p = l2_scope_create_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
+            sub_scope_p = l2_scope_create_common_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
             l2_parse_stmts(sub_scope_p); /* parse stmts */
 
             _if_type (L2_TOKEN_RBRACE) /* } */
@@ -307,6 +308,8 @@ void l2_parse_stmt_elif(l2_scope *scope_p) { /* the scopes in if..elif..else str
 }
 
 /* TODO implement keywords: break, continue, return & return by value */
+
+
 
 /* stmt ->
  * | { stmts }
@@ -326,14 +329,117 @@ void l2_parse_stmt_elif(l2_scope *scope_p) { /* the scopes in if..elif..else str
  * | ;
  * | expr ;
  * */
-void l2_parse_stmt(l2_scope *scope_p) {
+l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
 
-    l2_token *current_token_p;
+    _declr_current_token_p
     l2_expr_info right_expr_info;
     boolean symbol_added;
     l2_scope *sub_scope_p = L2_NULL_PTR;
 
-    _if_keyword (L2_KW_PROCEDURE) /* "procedure" */ /* the definition of procedure */
+    /* these are needed by handle return statement */
+    boolean have_ret_val;
+    l2_expr_info ret_expr_info;
+
+    l2_scope *loop_scope_p;
+
+    _if_keyword (L2_KW_BREAK) /* "break" */
+    {
+        _get_current_token_p
+        _if_type (L2_TOKEN_SEMICOLON)
+        {
+            loop_scope_p = l2_scope_find_nearest_loop_scope(scope_p);
+            if (!loop_scope_p)
+                l2_parsing_error(L2_PARSING_ERROR_INVALID_BREAK_IN_CURRENT_CONTEXT, current_token_p->current_line, current_token_p->current_col)
+
+            int loop_entry_pos = loop_scope_p->u.loop_entry_pos;
+            switch (loop_scope_p->scope_type) {
+                case L2_SCOPE_TYPE_FOR:
+                    /* begin before third expr */
+
+                    /* just absorb the third expr */
+                    l2_absorb_expr();
+
+                    _if_type (L2_TOKEN_RP)
+                    {
+                        /* absorb ')' */
+                    } _throw_missing_rp
+
+                    _if_type (L2_TOKEN_LBRACE) /* { */
+                    {
+                        l2_absorb_stmts(); /* parse stmts */
+
+                        _if_type (L2_TOKEN_RBRACE)
+                        {
+                            /* absorb '}' */
+                            l2_scope_escape_scope(sub_scope_p); /* TODO */
+
+                        } _throw_missing_rbrace
+
+                    } _throw_unexpected_token
+
+                    break;
+
+                case L2_SCOPE_TYPE_WHILE:
+
+                    break;
+
+                case L2_SCOPE_TYPE_DO_WHILE:
+
+                    break;
+
+                default:
+                    l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "invalid scope type");
+            }
+
+        } _throw_missing_semicolon
+    }
+    _elif_keyword (L2_KW_CONTINUE) /* "continue" */
+    {
+        _get_current_token_p
+        _if_type (L2_TOKEN_SEMICOLON)
+        {
+            loop_scope_p = l2_scope_find_nearest_loop_scope(scope_p);
+            if (!loop_scope_p)
+                l2_parsing_error(L2_PARSING_ERROR_INVALID_CONTINUE_IN_CURRENT_CONTEXT, current_token_p->current_line, current_token_p->current_col)
+
+            int loop_entry_pos = loop_scope_p->u.loop_entry_pos;
+            switch (loop_scope_p->scope_type) {
+                case L2_SCOPE_TYPE_FOR:
+
+                    break;
+
+                case L2_SCOPE_TYPE_WHILE:
+
+                    break;
+
+                case L2_SCOPE_TYPE_DO_WHILE:
+
+                    break;
+
+                default:
+                    l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "invalid scope type");
+            }
+
+        } _throw_missing_semicolon
+    }
+    _elif_keyword (L2_KW_RETURN) /* "return" */
+    {
+        _if_type (L2_TOKEN_SEMICOLON)
+        {
+            have_ret_val = L2_FALSE; /* has no return value */
+        }
+        _else
+        {
+            have_ret_val = L2_TRUE; /* has return value */
+            ret_expr_info = l2_eval_expr(scope_p); /* TODO */
+
+            _if_type (L2_TOKEN_SEMICOLON)
+            {
+                /* absorb ';' */
+            } _throw_missing_semicolon
+        }
+    }
+    _elif_keyword (L2_KW_PROCEDURE) /* "procedure" */ /* the definition of procedure */
     {
         l2_procedure procedure;
         _if_type (L2_TOKEN_IDENTIFIER) /* id */
@@ -417,9 +523,6 @@ void l2_parse_stmt(l2_scope *scope_p) {
                     }
                     _elif_type (L2_TOKEN_SEMICOLON)
                     {
-                        /* in this form of variable definition, variable could only take effects to the sub scope */
-                        sub_scope_p = l2_scope_create_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
-
                         /* absorb ';' without initializing the variable */
                         symbol_added = l2_symbol_table_add_symbol_without_initialization(&for_init_symbol_table_p, current_token_p->u.str.str_p);
 
@@ -430,7 +533,7 @@ void l2_parse_stmt(l2_scope *scope_p) {
 
                 } _throw_unexpected_token
             }
-            _elif_type (L2_TOKEN_COMMA)
+            _elif_type (L2_TOKEN_SEMICOLON)
             {
                 /* this means there is a empty expr in for-loop */
                 /* also absorb ';' */
@@ -453,12 +556,12 @@ void l2_parse_stmt(l2_scope *scope_p) {
             __for_loop_entry__:
 
             /* in this form of variable definition, variable could only take effects to the sub scope */
-            sub_scope_p = l2_scope_create_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
+            sub_scope_p = l2_scope_create_for_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE, loop_entry_pos);
 
             /* symbol table copy */
             l2_symbol_table_copy(&sub_scope_p->symbol_table_p, for_init_symbol_table_p);
 
-            _if_type (L2_TOKEN_COMMA)
+            _if_type (L2_TOKEN_SEMICOLON)
             {
                 /* this means there is a empty expr in for-loop,
                  * and the second expr will have a bool-value with true if it is empty  */
@@ -480,16 +583,11 @@ void l2_parse_stmt(l2_scope *scope_p) {
             /* handle the third expr ( absorb and record its pos ) */
             third_expr_entry_pos = l2_token_stream_get_pos(g_parser_p->token_stream_p);
 
-            _if_type (L2_TOKEN_COMMA)
-            {
-                /* this means there is a empty expr in for-loop */
-                /* absorb ';' */
-            }
-            _else
-            {
-                l2_absorb_expr();
-            }
+            /* the loop entry pos is, the pos of third expr */
+            sub_scope_p->u.loop_entry_pos = third_expr_entry_pos;
 
+            /* just absorb the third expr */
+            l2_absorb_expr();
 
             _if_type (L2_TOKEN_RP)
             {
@@ -502,7 +600,7 @@ void l2_parse_stmt(l2_scope *scope_p) {
         if (second_expr_info.val.bool) { /* for true */
             _if_type (L2_TOKEN_LBRACE) /* { */
             {
-                l2_parse_stmts(sub_scope_p); /* parse stmts */
+                l2_parse_stmts(sub_scope_p); /* parse stmts, may parse break or continue*/
 
                 _if_type (L2_TOKEN_RBRACE) /* } */
                 {
@@ -545,7 +643,7 @@ void l2_parse_stmt(l2_scope *scope_p) {
 
         _if_type (L2_TOKEN_LBRACE) /* { */
         {
-            sub_scope_p = l2_scope_create_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
+            sub_scope_p = l2_scope_create_do_while_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE, loop_entry_pos);
             l2_parse_stmts(sub_scope_p); /* parse stmts */
 
             _if_type (L2_TOKEN_RBRACE) /* } */
@@ -609,7 +707,7 @@ void l2_parse_stmt(l2_scope *scope_p) {
             if (expr_info.val.bool) { /* while true */
                 _if_type (L2_TOKEN_LBRACE) /* { */
                 {
-                    sub_scope_p = l2_scope_create_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
+                    sub_scope_p = l2_scope_create_while_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE, loop_entry_pos);
                     l2_parse_stmts(sub_scope_p); /* parse stmts */
 
                     _if_type (L2_TOKEN_RBRACE) /* } */
@@ -641,7 +739,7 @@ void l2_parse_stmt(l2_scope *scope_p) {
     _elif_type (L2_TOKEN_LBRACE) /* { */
     {
         /* while parse a sub stmts block, a new sub scope should be also created */
-        sub_scope_p = l2_scope_create_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
+        sub_scope_p = l2_scope_create_common_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
 
         l2_parse_stmts(sub_scope_p); /* stmts */
 
@@ -671,7 +769,7 @@ void l2_parse_stmt(l2_scope *scope_p) {
             if (expr_info.val.bool) { /* if true */
                 _if_type (L2_TOKEN_LBRACE) /* { */
                 {
-                    sub_scope_p = l2_scope_create_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
+                    sub_scope_p = l2_scope_create_common_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
                     l2_parse_stmts(sub_scope_p); /* parse stmts */
 
                     _if_type (L2_TOKEN_RBRACE) /* } */

@@ -11,19 +11,11 @@ typedef enum _l2_scope_create_flag {
 
 typedef enum _l2_scope_type {
     L2_SCOPE_TYPE_COMMON,
-    L2_SCOPE_TYPE_LOOP,
-    L2_SCOPE_TYPE_PROCEDURE
+    L2_SCOPE_TYPE_DO_WHILE,
+    L2_SCOPE_TYPE_WHILE,
+    L2_SCOPE_TYPE_FOR
     /* L2_SCOPE_TYPE_CLASS */
 }l2_scope_type;
-
-typedef struct _l2_scope_loop {
-    int continue_entry_pos;
-    int break_entry_pos;
-}l2_scope_loop;
-
-typedef struct _l2_scope_procedure {
-
-}l2_scope_procedure;
 
 typedef struct _l2_scope {
     int level; /* begin with 0 */
@@ -33,7 +25,7 @@ typedef struct _l2_scope {
     struct _l2_scope *guid; /* identify the unique scope on the whole, refer to address? */
     l2_scope_type scope_type;
     union {
-        l2_scope_loop loop;
+        int loop_entry_pos;
     }u;
     struct _l2_symbol_node *symbol_table_p; /* the symbol table in this scope */
 }l2_scope, * l2_scope_guid, l2_scope_mirror;
@@ -41,8 +33,11 @@ typedef struct _l2_scope {
 l2_scope *l2_scope_create();
 l2_scope_guid l2_scope_create_scope(l2_scope_guid src, l2_scope_create_flag cf, l2_scope_type scope_type);
 l2_scope_guid l2_scope_create_common_scope(l2_scope_guid src, l2_scope_create_flag cf);
-l2_scope_guid l2_scope_create_loop_scope(l2_scope_guid src, l2_scope_create_flag cf, int continue_entry_pos, int break_entry_pos);
-l2_scope_guid l2_scope_create_procedure_scope(l2_scope_guid src, l2_scope_create_flag cf, l2_scope_type scope_type);
+l2_scope_guid l2_scope_create_for_scope(l2_scope_guid src, l2_scope_create_flag cf, int loop_entry_pos);
+l2_scope_guid l2_scope_create_while_scope(l2_scope_guid src, l2_scope_create_flag cf, int loop_entry_pos);
+l2_scope_guid l2_scope_create_do_while_scope(l2_scope_guid src, l2_scope_create_flag cf, int loop_entry_pos);
+l2_scope_guid l2_scope_find_nearest_loop_scope(l2_scope_guid current_scope);
+l2_scope_guid l2_scope_find_nearest_scope_by_type(l2_scope_guid current_scope, l2_scope_type scope_type);
 
 void l2_scope_lower_finalize_recursion(l2_scope *scope_lower_p);
 void l2_scope_coor_finalize_recursion(l2_scope *scope_coor_p);
