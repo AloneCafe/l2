@@ -5,6 +5,7 @@
 #include "../l2_lexer/l2_token_stream.h"
 #include "l2_scope.h"
 #include "../l2_mem/l2_gc.h"
+#include "l2_eval.h"
 
 #define token_keyword
 
@@ -71,8 +72,16 @@ typedef enum _l2_stmt_interrupt_type {
     L2_STMT_NO_INTERRUPT,
     L2_STMT_INTERRUPT_BREAK,
     L2_STMT_INTERRUPT_CONTINUE,
-    L2_STMT_INTERRUPT_RETURN
+    L2_STMT_INTERRUPT_RETURN_WITH_VAL,
+    L2_STMT_INTERRUPT_RETURN_WITHOUT_VAL
 }l2_stmt_interrupt_type;
+
+typedef struct _l2_stmt_interrupt {
+    l2_stmt_interrupt_type type;
+    union {
+        l2_expr_info ret_expr_info;
+    }u;
+}l2_stmt_interrupt;
 
 void l2_parse_initialize(FILE *fp);
 void l2_parse_finalize();
@@ -81,8 +90,8 @@ boolean l2_parse_probe_next_token_by_type_and_str(l2_token_type type, char *str)
 boolean l2_parse_probe_next_token_by_type(l2_token_type type);
 
 void l2_parse();
-void l2_parse_stmts(l2_scope *scope_p);
-void l2_parse_stmt(l2_scope *scope_p);
+l2_stmt_interrupt l2_parse_stmts(l2_scope *scope_p);
+l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p);
 
 void l2_parse_token_forward();
 l2_token *l2_parse_token_current();

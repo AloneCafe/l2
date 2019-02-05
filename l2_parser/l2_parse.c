@@ -50,14 +50,20 @@ void l2_parse() {
  * | eof
  *
  * */
-void l2_parse_stmts(l2_scope *scope_p) {
+l2_stmt_interrupt l2_parse_stmts(l2_scope *scope_p) {
     l2_token *current_token_p;
     l2_scope *sub_scope_p;
+    l2_stmt_interrupt irt;
+
     if (l2_parse_probe_next_token_by_type(L2_TOKEN_TERMINATOR)) {
-        return;
+        irt.type = L2_STMT_NO_INTERRUPT;
+        return irt;
 
     } else {
-        l2_parse_stmt(scope_p);
+        irt = l2_parse_stmt(scope_p);
+        if (irt.type != L2_STMT_NO_INTERRUPT)
+            return irt;
+        /* there is no interrupt */
         l2_parse_stmts(scope_p);
 
     }
@@ -336,108 +342,48 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
     boolean symbol_added;
     l2_scope *sub_scope_p = L2_NULL_PTR;
 
-    /* these are needed by handle return statement */
-    boolean have_ret_val;
-    l2_expr_info ret_expr_info;
+    l2_stmt_interrupt irt;
 
     l2_scope *loop_scope_p;
 
     _if_keyword (L2_KW_BREAK) /* "break" */
     {
-        _get_current_token_p
         _if_type (L2_TOKEN_SEMICOLON)
         {
-            loop_scope_p = l2_scope_find_nearest_loop_scope(scope_p);
-            if (!loop_scope_p)
-                l2_parsing_error(L2_PARSING_ERROR_INVALID_BREAK_IN_CURRENT_CONTEXT, current_token_p->current_line, current_token_p->current_col)
-
-            int loop_entry_pos = loop_scope_p->u.loop_entry_pos;
-            switch (loop_scope_p->scope_type) {
-                case L2_SCOPE_TYPE_FOR:
-                    /* begin before third expr */
-
-                    /* just absorb the third expr */
-                    l2_absorb_expr();
-
-                    _if_type (L2_TOKEN_RP)
-                    {
-                        /* absorb ')' */
-                    } _throw_missing_rp
-
-                    _if_type (L2_TOKEN_LBRACE) /* { */
-                    {
-                        l2_absorb_stmts(); /* parse stmts */
-
-                        _if_type (L2_TOKEN_RBRACE)
-                        {
-                            /* absorb '}' */
-                            l2_scope_escape_scope(sub_scope_p); /* TODO */
-
-                        } _throw_missing_rbrace
-
-                    } _throw_unexpected_token
-
-                    break;
-
-                case L2_SCOPE_TYPE_WHILE:
-
-                    break;
-
-                case L2_SCOPE_TYPE_DO_WHILE:
-
-                    break;
-
-                default:
-                    l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "invalid scope type");
-            }
+            irt.type = L2_STMT_INTERRUPT_BREAK;
 
         } _throw_missing_semicolon
+
+        return irt;
     }
     _elif_keyword (L2_KW_CONTINUE) /* "continue" */
     {
-        _get_current_token_p
         _if_type (L2_TOKEN_SEMICOLON)
         {
-            loop_scope_p = l2_scope_find_nearest_loop_scope(scope_p);
-            if (!loop_scope_p)
-                l2_parsing_error(L2_PARSING_ERROR_INVALID_CONTINUE_IN_CURRENT_CONTEXT, current_token_p->current_line, current_token_p->current_col)
-
-            int loop_entry_pos = loop_scope_p->u.loop_entry_pos;
-            switch (loop_scope_p->scope_type) {
-                case L2_SCOPE_TYPE_FOR:
-
-                    break;
-
-                case L2_SCOPE_TYPE_WHILE:
-
-                    break;
-
-                case L2_SCOPE_TYPE_DO_WHILE:
-
-                    break;
-
-                default:
-                    l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "invalid scope type");
-            }
+            irt.type = L2_STMT_INTERRUPT_CONTINUE;
 
         } _throw_missing_semicolon
+
+        return irt;
     }
     _elif_keyword (L2_KW_RETURN) /* "return" */
     {
         _if_type (L2_TOKEN_SEMICOLON)
         {
-            have_ret_val = L2_FALSE; /* has no return value */
+            irt.type = L2_STMT_INTERRUPT_RETURN_WITHOUT_VAL; /* has no return value */
         }
         _else
         {
-            have_ret_val = L2_TRUE; /* has return value */
-            ret_expr_info = l2_eval_expr(scope_p); /* TODO */
+            irt.type = L2_STMT_INTERRUPT_RETURN_WITH_VAL; /* has return value */
+            irt.u.ret_expr_info = l2_eval_expr(scope_p);
 
             _if_type (L2_TOKEN_SEMICOLON)
             {
                 /* absorb ';' */
             } _throw_missing_semicolon
         }
+
+        return irt;
     }
     _elif_keyword (L2_KW_PROCEDURE) /* "procedure" */ /* the definition of procedure */
     {
@@ -600,7 +546,24 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
         if (second_expr_info.val.bool) { /* for true */
             _if_type (L2_TOKEN_LBRACE) /* { */
             {
-                l2_parse_stmts(sub_scope_p); /* parse stmts, may parse break or continue*/
+                irt = l2_parse_stmts(sub_scope_p); /* parse stmts, may parse break or continue*/
+                /* TODO */
+                switch (irt.type) {
+                    case L2_STMT_INTERRUPT_RETURN_WITHOUT_VAL:
+                        break;
+
+                    case L2_STMT_INTERRUPT_RETURN_WITH_VAL:
+                        break;
+
+                    case L2_STMT_INTERRUPT_BREAK:
+                        break;
+
+                    case L2_STMT_INTERRUPT_CONTINUE:
+                        break;
+
+                    case L2_STMT_NO_INTERRUPT:
+                        break;
+                }
 
                 _if_type (L2_TOKEN_RBRACE) /* } */
                 {
