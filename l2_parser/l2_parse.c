@@ -15,6 +15,7 @@ l2_parser *g_parser_p;
 
 void l2_parse_finalize() {
     l2_token_stream_destroy(g_parser_p->token_stream_p);
+    l2_call_stack_destroy(g_parser_p->call_stack_p);
     l2_scope_destroy(g_parser_p->global_scope_p);
     l2_gc_destroy(g_parser_p->gc_list_p);
     l2_storage_destroy(g_parser_p->storage_p);
@@ -26,6 +27,7 @@ void l2_parse_initialize(FILE *fp) {
     g_parser_p->storage_p = l2_storage_create();
     g_parser_p->gc_list_p = l2_gc_create();
     g_parser_p->global_scope_p = l2_scope_create();
+    g_parser_p->call_stack_p = l2_call_stack_create();
     g_parser_p->token_stream_p = l2_token_stream_create(fp);
 }
 
@@ -53,11 +55,9 @@ void l2_parse() {
 l2_stmt_interrupt l2_parse_stmts(l2_scope *scope_p) {
     l2_token *current_token_p;
     l2_scope *sub_scope_p;
-    l2_stmt_interrupt irt;
+    l2_stmt_interrupt irt = { .type = L2_STMT_NO_INTERRUPT };
 
     if (l2_parse_probe_next_token_by_type(L2_TOKEN_TERMINATOR)) {
-        irt.type = L2_STMT_NO_INTERRUPT;
-        return irt;
 
     } else {
         irt = l2_parse_stmt(scope_p);
@@ -68,9 +68,11 @@ l2_stmt_interrupt l2_parse_stmts(l2_scope *scope_p) {
         }
 
         /* there is no interrupt */
-        l2_parse_stmts(scope_p);
+        irt = l2_parse_stmts(scope_p);
 
     }
+
+    return irt;
 }
 
 /* stmts ->
@@ -244,11 +246,11 @@ void l2_absorb_stmt_elif() {
  * | nil
  *
  * */
-void l2_parse_stmt_elif(l2_scope *scope_p) { /* the scopes in if..elif..else structure is coordinate each other */
-
+l2_stmt_interrupt l2_parse_stmt_elif(l2_scope *scope_p) { /* the scopes in if..elif..else structure is coordinate each other */
+    _declr_current_token_p
     l2_scope *sub_scope_p = L2_NULL_PTR;
 
-    _declr_current_token_p
+    l2_stmt_interrupt irt = { .type = L2_STMT_NO_INTERRUPT };
 
     _if_keyword(L2_KW_ELIF) /* "elif" */
     {
@@ -272,7 +274,7 @@ void l2_parse_stmt_elif(l2_scope *scope_p) { /* the scopes in if..elif..else str
                 _if_type (L2_TOKEN_LBRACE) /* { */
                 {
                     sub_scope_p = l2_scope_create_common_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
-                    l2_parse_stmts(sub_scope_p); /* parse stmts */
+                    irt = l2_parse_stmts(sub_scope_p); /* parse stmts */
 
                     _if_type (L2_TOKEN_RBRACE) /* } */
                     {
@@ -290,7 +292,7 @@ void l2_parse_stmt_elif(l2_scope *scope_p) { /* the scopes in if..elif..else str
 
                     _if_type (L2_TOKEN_RBRACE) /* } */
                     {
-                        l2_parse_stmt_elif(scope_p);
+                        irt = l2_parse_stmt_elif(scope_p);
 
                     } _throw_missing_rbrace
 
@@ -304,7 +306,7 @@ void l2_parse_stmt_elif(l2_scope *scope_p) { /* the scopes in if..elif..else str
         _if_type (L2_TOKEN_LBRACE) /* { */
         {
             sub_scope_p = l2_scope_create_common_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
-            l2_parse_stmts(sub_scope_p); /* parse stmts */
+            irt = l2_parse_stmts(sub_scope_p); /* parse stmts */
 
             _if_type (L2_TOKEN_RBRACE) /* } */
             {
@@ -315,6 +317,8 @@ void l2_parse_stmt_elif(l2_scope *scope_p) { /* the scopes in if..elif..else str
         } _throw_unexpected_token
     }
     _end
+
+    return irt;
 }
 
 /* TODO implement keywords: break, continue, return & return by value */
@@ -346,28 +350,37 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
     boolean symbol_added;
     l2_scope *sub_scope_p = L2_NULL_PTR;
 
-    l2_stmt_interrupt irt;
+    l2_stmt_interrupt irt = { .type = L2_STMT_NO_INTERRUPT };
 
     l2_scope *loop_scope_p;
 
     _if_keyword (L2_KW_BREAK) /* "break" */
     {
+        _get_current_token_p
         _if_type (L2_TOKEN_SEMICOLON)
         {
             irt.type = L2_STMT_INTERRUPT_BREAK;
 
         } _throw_missing_semicolon
-
+/*
+        if (scope_p->scope_type == L2_SCOPE_TYPE_COMMON)
+            l2_parsing_error(L2_PARSING_ERROR_INVALID_BREAK_IN_CURRENT_CONTEXT, current_token_p->current_line, current_token_p->current_col);
+*/
         return irt;
     }
     _elif_keyword (L2_KW_CONTINUE) /* "continue" */
     {
+        _get_current_token_p
         _if_type (L2_TOKEN_SEMICOLON)
         {
             irt.type = L2_STMT_INTERRUPT_CONTINUE;
 
         } _throw_missing_semicolon
 
+/*
+        if (scope_p->scope_type == L2_SCOPE_TYPE_COMMON)
+            l2_parsing_error(L2_PARSING_ERROR_INVALID_CONTINUE_IN_CURRENT_CONTEXT, current_token_p->current_line, current_token_p->current_col);
+*/
         return irt;
     }
     _elif_keyword (L2_KW_RETURN) /* "return" */
@@ -764,13 +777,15 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
         /* while parse a sub stmts block, a new sub scope should be also created */
         sub_scope_p = l2_scope_create_common_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
 
-        l2_parse_stmts(sub_scope_p); /* stmts */
+        irt = l2_parse_stmts(sub_scope_p); /* stmts */
 
-        _if_type (L2_TOKEN_RBRACE)
+        _if_type (L2_TOKEN_RBRACE) /* } */
         {
             l2_scope_escape_scope(sub_scope_p);
 
         } _throw_missing_rbrace
+
+        return irt;
 
     }
     _elif_keyword (L2_KW_IF) /* "if" */
@@ -793,7 +808,7 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
                 _if_type (L2_TOKEN_LBRACE) /* { */
                 {
                     sub_scope_p = l2_scope_create_common_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
-                    l2_parse_stmts(sub_scope_p); /* parse stmts */
+                    irt = l2_parse_stmts(sub_scope_p); /* parse stmts */
 
                     _if_type (L2_TOKEN_RBRACE) /* } */
                     {
@@ -810,11 +825,13 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
 
                     _if_type (L2_TOKEN_RBRACE) /* } */
                     {
-                        l2_parse_stmt_elif(scope_p);
+                        irt = l2_parse_stmt_elif(scope_p);
                     } _throw_missing_rbrace
 
                 } _throw_unexpected_token
             }
+
+            return irt;
 
         } _throw_unexpected_token
 
@@ -877,9 +894,10 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
         {
             /* absorb ';' */
         } _throw_missing_semicolon
-
-        return;
     }
+
+    irt.type = L2_STMT_NO_INTERRUPT;
+    return irt;
 }
 
 void l2_parse_token_forward() {

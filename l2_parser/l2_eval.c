@@ -2506,7 +2506,7 @@ l2_expr_info l2_eval_expr_single(l2_scope *scope_p) {
 
 /* expr_atom ->
  * | id
- * | //not implement// id ( real_param_list )
+ * | id ( real_param_list )
  * | //not implement// id [ expr ]
  * | integer_literal
  * | string_literal
@@ -2524,31 +2524,43 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
     _if_type (L2_TOKEN_IDENTIFIER) /* id */
     {
         _get_current_token_p
-        char *id_str_p = current_token_p->u.str.str_p;
-        symbol_node_p = l2_eval_get_symbol_node(scope_p, id_str_p);
-        if (!symbol_node_p) l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_UNDEFINED, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);
 
-        switch (symbol_node_p->symbol.type) { /* package symbol into expr node */
-            case L2_SYMBOL_TYPE_INTEGER:
-                res_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
-                res_expr_info.val.integer = symbol_node_p->symbol.u.integer;
-                break;
+        _if_type (L2_TOKEN_LP) /* '(' */
+        {
+            /* TODO handle procedure calling */
+            symbol_node_p->symbol.u.procedure
+        }
+        _else
+        {
+            char *id_str_p = current_token_p->u.str.str_p;
+            symbol_node_p = l2_eval_get_symbol_node(scope_p, id_str_p);
+            if (!symbol_node_p)
+                l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_UNDEFINED, current_token_p->current_line,
+                                 current_token_p->current_col, current_token_p->u.str.str_p);
 
-            case L2_SYMBOL_TYPE_BOOL:
-                res_expr_info.val_type = L2_EXPR_VAL_TYPE_BOOL;
-                res_expr_info.val.bool = symbol_node_p->symbol.u.bool;
-                break;
+            switch (symbol_node_p->symbol.type) { /* package symbol into expr node */
+                case L2_SYMBOL_TYPE_INTEGER:
+                    res_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
+                    res_expr_info.val.integer = symbol_node_p->symbol.u.integer;
+                    break;
 
-            case L2_SYMBOL_TYPE_REAL:
-                res_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
-                res_expr_info.val.real = symbol_node_p->symbol.u.real;
-                break;
+                case L2_SYMBOL_TYPE_BOOL:
+                    res_expr_info.val_type = L2_EXPR_VAL_TYPE_BOOL;
+                    res_expr_info.val.bool = symbol_node_p->symbol.u.bool;
+                    break;
 
-            case L2_PARSING_ERROR_INCOMPATIBLE_OPERATION:
-                l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an native pointer (package algorithm is not implement yet)");
+                case L2_SYMBOL_TYPE_REAL:
+                    res_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
+                    res_expr_info.val.real = symbol_node_p->symbol.u.real;
+                    break;
 
-            default:
-                l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                case L2_PARSING_ERROR_INCOMPATIBLE_OPERATION:
+                    l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE,
+                                      "eval return an native pointer (package algorithm is not implement yet)");
+
+                default:
+                    l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+            }
         }
 
     }
@@ -3062,7 +3074,7 @@ void l2_absorb_expr_single() {
 
 /* expr_atom ->
  * | ( expr )
- * | // not implement // id ( real_param_list )
+ * | id ( real_param_list )
  * | // not implement // id expr_array
  * | id
  * | string_literal
@@ -3080,7 +3092,15 @@ void l2_absorb_expr_atom() {
         _throw_missing_rp
     }
     _elif_type (L2_TOKEN_IDENTIFIER)
-    { }
+    {
+        _if_type (L2_TOKEN_LP)
+        {
+            l2_absorb_real_param_list();
+            _if_type (L2_TOKEN_RP)
+            { }
+            _throw_missing_rp
+        } _end
+    }
     _elif_type (L2_TOKEN_INTEGER_LITERAL)
     { }
     _elif_type (L2_TOKEN_REAL_LITERAL)

@@ -6,6 +6,7 @@
 #include "l2_scope.h"
 #include "../l2_mem/l2_gc.h"
 #include "l2_eval.h"
+#include "l2_call_stack.h"
 
 #define token_keyword
 
@@ -66,6 +67,7 @@ typedef struct _l2_parser {
     l2_scope *global_scope_p;
     l2_storage *storage_p;
     l2_gc_list *gc_list_p;
+    l2_call_stack *call_stack_p;
 }l2_parser;
 
 typedef enum _l2_stmt_interrupt_type {

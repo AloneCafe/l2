@@ -36,4 +36,4 @@ add_executable(l2
         l2_parser/l2_symbol_table.h
         l2_parser/l2_parse.c
         l2_parser/l2_parse.h
-        l2_parser/l2_eval.c l2_parser/l2_eval.h)
+        l2_parser/l2_eval.c l2_parser/l2_eval.h l2_parser/l2_call_stack.c l2_parser/l2_call_stack.h)
