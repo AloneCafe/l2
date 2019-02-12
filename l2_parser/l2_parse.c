@@ -61,8 +61,12 @@ l2_stmt_interrupt l2_parse_stmts(l2_scope *scope_p) {
 
     } else {
         irt = l2_parse_stmt(scope_p);
-        if (irt.type != L2_STMT_NO_INTERRUPT)
+        if (irt.type != L2_STMT_NO_INTERRUPT) {
+            /* absorb last stmts */
+            l2_absorb_stmts();
             return irt;
+        }
+
         /* there is no interrupt */
         l2_parse_stmts(scope_p);
 
@@ -547,37 +551,35 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
             _if_type (L2_TOKEN_LBRACE) /* { */
             {
                 irt = l2_parse_stmts(sub_scope_p); /* parse stmts, may parse break or continue*/
-                /* TODO */
+
+                _if_type (L2_TOKEN_RBRACE) /* } */
+                {
+                    l2_scope_escape_scope(sub_scope_p);
+
+                } _throw_missing_rbrace
+
+                /* handle stmts interrupt */
                 switch (irt.type) {
                     case L2_STMT_INTERRUPT_RETURN_WITHOUT_VAL:
-                        break;
-
                     case L2_STMT_INTERRUPT_RETURN_WITH_VAL:
-                        break;
+                        return irt;
 
                     case L2_STMT_INTERRUPT_BREAK:
                         break;
 
                     case L2_STMT_INTERRUPT_CONTINUE:
-                        break;
+                        /* evaluate the third expr */
+                        l2_token_stream_set_pos(g_parser_p->token_stream_p, third_expr_entry_pos);
+                        l2_eval_expr(sub_scope_p);
+                        /* | */
+                        /* V */
 
                     case L2_STMT_NO_INTERRUPT:
-                        break;
+                        l2_token_stream_set_pos(g_parser_p->token_stream_p, loop_entry_pos);
+                        goto __for_loop_entry__;
                 }
 
-                _if_type (L2_TOKEN_RBRACE) /* } */
-                {
-                    l2_token_stream_set_pos(g_parser_p->token_stream_p, third_expr_entry_pos);
-                    l2_eval_expr(sub_scope_p);
-
-                    l2_scope_escape_scope(sub_scope_p);
-
-                } _throw_missing_rbrace
-
             } _throw_unexpected_token
-
-            l2_token_stream_set_pos(g_parser_p->token_stream_p, loop_entry_pos);
-            goto __for_loop_entry__;
 
         } else { /* for false */
             _if_type (L2_TOKEN_LBRACE) /* { */
@@ -607,7 +609,7 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
         _if_type (L2_TOKEN_LBRACE) /* { */
         {
             sub_scope_p = l2_scope_create_do_while_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE, loop_entry_pos);
-            l2_parse_stmts(sub_scope_p); /* parse stmts */
+            irt = l2_parse_stmts(sub_scope_p); /* parse stmts */
 
             _if_type (L2_TOKEN_RBRACE) /* } */
             {
@@ -623,24 +625,70 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
 
             _if_type (L2_TOKEN_LP) /* ( */
             {
-                expr_info = l2_eval_expr(scope_p);
+                /* handle stmts interrupt */
+                switch (irt.type) {
+                    case L2_STMT_INTERRUPT_RETURN_WITHOUT_VAL:
+                    case L2_STMT_INTERRUPT_RETURN_WITH_VAL:
+                        l2_absorb_expr();
+                        _if_type (L2_TOKEN_RP)
+                        {
+                            /* absorb ')' */
+                        } _throw_missing_rp
 
-                _if_type (L2_TOKEN_RP)
-                {
-                    /* absorb ')' */
-                } _throw_missing_rp
+                        _if_type (L2_TOKEN_SEMICOLON)
+                        {
+                            /*  absorb ';'*/
+                        } _throw_missing_semicolon
+                        return irt;
 
-                _if_type (L2_TOKEN_SEMICOLON)
-                {
-                    /*  absorb ';'*/
-                } _throw_missing_semicolon
+                    case L2_STMT_INTERRUPT_BREAK:
+                        l2_absorb_expr();
+                        _if_type (L2_TOKEN_RP)
+                        {
+                            /* absorb ')' */
+                        } _throw_missing_rp
 
-                if (expr_info.val_type != L2_EXPR_VAL_TYPE_BOOL)
-                    l2_parsing_error(L2_PARSING_ERROR_EXPR_NOT_BOOL, current_token_p->current_line, current_token_p->current_col);
+                        _if_type (L2_TOKEN_SEMICOLON)
+                        {
+                            /*  absorb ';' */
+                        } _throw_missing_semicolon
+                        break;
 
-                if (expr_info.val.bool) { /* while true */
-                    l2_token_stream_set_pos(g_parser_p->token_stream_p, loop_entry_pos);
-                    goto __do_loop_entry__;
+                    case L2_STMT_INTERRUPT_CONTINUE:
+                        l2_absorb_expr();
+                        _if_type (L2_TOKEN_RP)
+                        {
+                            /* absorb ')' */
+                        } _throw_missing_rp
+
+                        _if_type (L2_TOKEN_SEMICOLON)
+                        {
+                            /*  absorb ';' */
+                        } _throw_missing_semicolon
+
+                        l2_token_stream_set_pos(g_parser_p->token_stream_p, loop_entry_pos);
+                        goto __do_loop_entry__;
+
+                    case L2_STMT_NO_INTERRUPT:
+                        expr_info = l2_eval_expr(scope_p);
+
+                        _if_type (L2_TOKEN_RP)
+                        {
+                            /* absorb ')' */
+                        } _throw_missing_rp
+
+                        _if_type (L2_TOKEN_SEMICOLON)
+                        {
+                            /*  absorb ';'*/
+                        } _throw_missing_semicolon
+
+                        if (expr_info.val_type != L2_EXPR_VAL_TYPE_BOOL)
+                            l2_parsing_error(L2_PARSING_ERROR_EXPR_NOT_BOOL, current_token_p->current_line, current_token_p->current_col);
+
+                        if (expr_info.val.bool) { /* while true */
+                            l2_token_stream_set_pos(g_parser_p->token_stream_p, loop_entry_pos);
+                            goto __do_loop_entry__;
+                        }
                 }
 
             } _throw_unexpected_token
@@ -671,7 +719,7 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
                 _if_type (L2_TOKEN_LBRACE) /* { */
                 {
                     sub_scope_p = l2_scope_create_while_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE, loop_entry_pos);
-                    l2_parse_stmts(sub_scope_p); /* parse stmts */
+                    irt = l2_parse_stmts(sub_scope_p); /* parse stmts */
 
                     _if_type (L2_TOKEN_RBRACE) /* } */
                     {
@@ -679,10 +727,22 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
 
                     } _throw_missing_rbrace
 
-                } _throw_unexpected_token
+                    /* handle stmts interrupt */
+                    switch (irt.type) {
+                        case L2_STMT_INTERRUPT_RETURN_WITHOUT_VAL:
+                        case L2_STMT_INTERRUPT_RETURN_WITH_VAL:
+                            return irt;
 
-                l2_token_stream_set_pos(g_parser_p->token_stream_p, loop_entry_pos);
-                goto __while_loop_entry__;
+                        case L2_STMT_INTERRUPT_BREAK:
+                            break;
+
+                        case L2_STMT_INTERRUPT_CONTINUE:
+                        case L2_STMT_NO_INTERRUPT:
+                            l2_token_stream_set_pos(g_parser_p->token_stream_p, loop_entry_pos);
+                            goto __while_loop_entry__;
+                    }
+
+                } _throw_unexpected_token
 
             } else { /* while false */
                 _if_type (L2_TOKEN_LBRACE) /* { */
