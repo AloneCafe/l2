@@ -2504,6 +2504,34 @@ l2_expr_info l2_eval_expr_single(l2_scope *scope_p) {
     }
 }
 
+/* formal_param_list1 ->
+ * | , id formal_param_list1
+ * | nil
+ * */
+void l2_parse_real_param_list1() {
+    _if_type (L2_TOKEN_COMMA)
+    {
+        _if_type (L2_TOKEN_IDENTIFIER)
+        {
+            l2_parse_real_param_list1();
+        } _throw_unexpected_token
+
+    } _end
+}
+
+/* formal_param_list ->
+ * | id formal_param_list1
+ * | nil
+ *
+ * */
+void l2_parse_real_param_list() {
+    _if_type (L2_TOKEN_IDENTIFIER)
+    {
+        l2_parse_real_param_list1();
+    } _end
+}
+
+
 /* expr_atom ->
  * | id
  * | id ( real_param_list )
@@ -2528,7 +2556,10 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
         _if_type (L2_TOKEN_LP) /* '(' */
         {
             /* TODO handle procedure calling */
-            symbol_node_p->symbol.u.procedure
+            //symbol_node_p->symbol.u.procedure
+            l2_vector symbol_vec;
+            symbol_vec = l2_parse_real_param_list(scope_p);
+
         }
         _else
         {
