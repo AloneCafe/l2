@@ -2577,6 +2577,14 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
             l2_vector_create(&symbol_vec, sizeof(l2_symbol));
             l2_parse_real_param_list(scope_p, &symbol_vec);
 
+            _if_type (L2_TOKEN_RP)
+            {
+                /* absorb ')' */
+            } _throw_missing_rp
+
+            /* perform function call */
+
+
         }
         _else
         {
