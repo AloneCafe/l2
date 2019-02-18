@@ -1,9 +1,11 @@
+#include "memory.h"
 #include "l2_eval.h"
 #include "../l2_system/l2_error.h"
 #include "l2_symbol_table.h"
 #include "stdarg.h"
 #include "../l2_lexer/l2_token_stream.h"
 #include "../l2_lexer/l2_cast.h"
+#include "l2_parse.h"
 
 extern char *g_l2_token_keywords[];
 extern l2_parser *g_parser_p;
@@ -2602,7 +2604,7 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
                 /* TODO enter into procedure */
                 _if_type (L2_TOKEN_LP) /* ( */
                 {
-                    l2_absorb_formal_param_list();
+                    l2_parse_formal_param_list();
 
                     _if_type (L2_TOKEN_RP)
                     {
@@ -2611,7 +2613,27 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
 
                     _if_type (L2_TOKEN_LBRACE) /* { */
                     {
-                        l2_absorb_stmts();
+                        /* TODO the function maybe return a interrupt */
+                        l2_stmt_interrupt irt = l2_parse_stmts(scope_p);
+                        switch (irt.type) {
+                            case L2_STMT_INTERRUPT_CONTINUE:
+                                break;
+
+                            case L2_STMT_INTERRUPT_BREAK:
+                                break;
+
+                            case L2_STMT_INTERRUPT_RETURN_WITH_VAL:
+                                /* the copy with light transfer */
+                                memcpy(&res_expr_info, &irt.u.ret_expr_info, sizeof(res_expr_info));
+                                /* TODO */
+                                break;
+
+                            case L2_STMT_INTERRUPT_RETURN_WITHOUT_VAL:
+                                break;
+
+                            case L2_STMT_NO_INTERRUPT:
+                                break;
+                        }
 
                         _if_type (L2_TOKEN_RBRACE)
                         {
