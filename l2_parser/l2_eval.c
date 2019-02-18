@@ -2573,6 +2573,9 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
         {
             /* TODO handle procedure calling */
             //symbol_node_p->symbol.u.procedure
+            symbol_node_p = l2_eval_get_symbol_node(scope_p, current_token_p->u.str.str_p);
+            if (!symbol_node_p) l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_UNDEFINED, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);
+
             l2_vector symbol_vec;
             l2_vector_create(&symbol_vec, sizeof(l2_symbol));
             l2_parse_real_param_list(scope_p, &symbol_vec);
@@ -2582,8 +2585,49 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
                 /* absorb ')' */
             } _throw_missing_rp
 
-            /* perform function call */
 
+            /* judge the symbol type ( procedure ) */
+            if (symbol_node_p->symbol.type == L2_SYMBOL_TYPE_PROCEDURE) {
+
+                /* package call procedure information into a single call_frame */
+                l2_call_frame call_frame;
+                call_frame.param_list.symbol_vec = symbol_vec;
+                call_frame.ret_pos = l2_token_stream_get_pos(g_parser_p->token_stream_p);
+
+                l2_call_stack_push_frame(g_parser_p->call_stack_p, call_frame);
+
+                /* perform procedure call, take parser into a new token stream position */
+                l2_token_stream_set_pos(g_parser_p->token_stream_p, symbol_node_p->symbol.u.procedure.entry_pos);
+
+                /* TODO enter into procedure */
+                _if_type (L2_TOKEN_LP) /* ( */
+                {
+                    l2_absorb_formal_param_list();
+
+                    _if_type (L2_TOKEN_RP)
+                    {
+                        /* absorb ')' */
+                    } _throw_missing_rp
+
+                    _if_type (L2_TOKEN_LBRACE) /* { */
+                    {
+                        l2_absorb_stmts();
+
+                        _if_type (L2_TOKEN_RBRACE)
+                        {
+                            /* absorb '}' */
+                            /* store the procedure information as a symbol into symbol table */
+                            symbol_added = l2_symbol_table_add_symbol_procedure(&scope_p->symbol_table_p, current_token_p->u.str.str_p, procedure);
+
+                        } _throw_missing_rbrace
+
+                    } _throw_unexpected_token
+
+                } _throw_unexpected_token
+
+            } else {
+                l2_parsing_error(L2_PARSING_ERROR_SYMBOL_IS_NOT_PROCEDURE, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);
+            }
 
         }
         _else

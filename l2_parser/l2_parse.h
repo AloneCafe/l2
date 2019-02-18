@@ -98,7 +98,7 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p);
 void l2_parse_token_forward();
 l2_token *l2_parse_token_current();
 void l2_parse_token_back();
-int l2_parse_token_stream_get_pos();
-void l2_parse_token_stream_set_pos(int pos);
+//int l2_parse_token_stream_get_pos();
+//void l2_parse_token_stream_set_pos(int pos);
 
 #endif

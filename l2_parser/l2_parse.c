@@ -423,7 +423,7 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
                 {
                     l2_absorb_stmts();
 
-                    _if_type (L2_TOKEN_LBRACE)
+                    _if_type (L2_TOKEN_RBRACE)
                     {
                         /* absorb '}' */
                         /* store the procedure information as a symbol into symbol table */

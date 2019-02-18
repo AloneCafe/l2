@@ -32,4 +32,3 @@ l2_call_frame l2_call_stack_top_frame(l2_call_stack *call_stack_p) {
     return *(l2_call_frame *)l2_stack_back(&call_stack_p->stack);
 }
 
-
