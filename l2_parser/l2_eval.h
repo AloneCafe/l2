@@ -53,4 +53,8 @@ void l2_absorb_expr_mul_div_mod();
 void l2_absorb_expr_single();
 void l2_absorb_expr_atom();
 
+void l2_parse_real_param_list(l2_scope *scope_p, l2_vector *symbol_vec_p);
+void l2_parse_real_param_list1(l2_scope *scope_p, l2_vector *symbol_vec_p);
+
+
 #endif

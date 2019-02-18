@@ -2508,12 +2508,20 @@ l2_expr_info l2_eval_expr_single(l2_scope *scope_p) {
  * | , id formal_param_list1
  * | nil
  * */
-void l2_parse_real_param_list1() {
+void l2_parse_real_param_list1(l2_scope *scope_p, l2_vector *symbol_vec_p) {
+    _declr_current_token_p
     _if_type (L2_TOKEN_COMMA)
     {
         _if_type (L2_TOKEN_IDENTIFIER)
         {
-            l2_parse_real_param_list1();
+            _get_current_token_p
+            char *id_str_p = current_token_p->u.str.str_p;
+            l2_symbol_node *symbol_node_p = l2_eval_get_symbol_node(scope_p, id_str_p);
+            if (!symbol_node_p) l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_UNDEFINED, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);
+            /* symbol_node_p is not null */
+            l2_vector_append(symbol_vec_p, &(symbol_node_p->symbol));
+            l2_parse_real_param_list1(scope_p, symbol_vec_p);
+
         } _throw_unexpected_token
 
     } _end
@@ -2524,10 +2532,18 @@ void l2_parse_real_param_list1() {
  * | nil
  *
  * */
-void l2_parse_real_param_list() {
+void l2_parse_real_param_list(l2_scope *scope_p, l2_vector *symbol_vec_p) {
+    _declr_current_token_p
     _if_type (L2_TOKEN_IDENTIFIER)
     {
-        l2_parse_real_param_list1();
+        _get_current_token_p
+        char *id_str_p = current_token_p->u.str.str_p;
+        l2_symbol_node *symbol_node_p = l2_eval_get_symbol_node(scope_p, id_str_p);
+        if (!symbol_node_p) l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_UNDEFINED, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);
+        /* symbol_node_p is not null */
+        l2_vector_append(symbol_vec_p, &(symbol_node_p->symbol));
+        l2_parse_real_param_list1(scope_p, symbol_vec_p);
+
     } _end
 }
 
@@ -2558,7 +2574,8 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
             /* TODO handle procedure calling */
             //symbol_node_p->symbol.u.procedure
             l2_vector symbol_vec;
-            symbol_vec = l2_parse_real_param_list(scope_p);
+            l2_vector_create(&symbol_vec, sizeof(l2_symbol));
+            l2_parse_real_param_list(scope_p, &symbol_vec);
 
         }
         _else
