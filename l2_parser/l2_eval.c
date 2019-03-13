@@ -178,8 +178,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
                             break;
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "between native pointer and integer");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "between native pointer and integer");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -201,8 +201,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
                             break;
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "between native pointer and real");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "between native pointer and real");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -220,8 +220,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "between real and bool");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "between native pointer and bool");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "between native pointer and bool");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -264,8 +264,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
                             break;
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "between native pointer and integer");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "between native pointer and integer");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -287,8 +287,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
                             break;
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "between native pointer and real");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "between native pointer and real");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -306,8 +306,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "between real and bool");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "between native pointer and bool");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "between native pointer and bool");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -348,8 +348,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between real and integer");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between native pointer and integer");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between native pointer and integer");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -367,8 +367,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between real and real");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between native pointer and real");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between native pointer and real");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -386,8 +386,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between real and bool");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between native pointer and bool");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between native pointer and bool");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -432,8 +432,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
                             break;
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "+=", "between native pointer and integer");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "+=", "between native pointer and integer");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -455,8 +455,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
                             break;
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "+=", "between native pointer and real");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "+=", "between native pointer and real");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -474,8 +474,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "+=", "between real and bool");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "+=", "between native pointer and bool");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "+=", "between native pointer and bool");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -520,8 +520,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
                             break;
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "between native pointer and integer");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "between native pointer and integer");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -543,8 +543,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
                             break;
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "between native pointer and real");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "between native pointer and real");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -562,8 +562,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "between real and bool");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "between native pointer and bool");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "between native pointer and bool");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -606,8 +606,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between real and integer");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between native pointer and integer");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between native pointer and integer");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -625,8 +625,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between real and real");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between native pointer and real");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between native pointer and real");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -644,8 +644,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between real and bool");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between native pointer and bool");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between native pointer and bool");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -688,8 +688,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between real and integer");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between native pointer and integer");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between native pointer and integer");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -707,8 +707,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between real and real");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between native pointer and real");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between native pointer and real");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -726,8 +726,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between real and bool");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between native pointer and bool");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between native pointer and bool");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -770,8 +770,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between real and integer");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between native pointer and integer");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between native pointer and integer");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -789,8 +789,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between real and real");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between native pointer and real");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between native pointer and real");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -808,8 +808,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between real and bool");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between native pointer and bool");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between native pointer and bool");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -852,8 +852,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between real and integer");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between native pointer and integer");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between native pointer and integer");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -871,8 +871,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between real and real");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between native pointer and real");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between native pointer and real");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -890,8 +890,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between real and bool");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between native pointer and bool");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between native pointer and bool");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -934,8 +934,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between real and integer");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between native pointer and integer");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between native pointer and integer");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -953,8 +953,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between real and real");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between native pointer and real");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between native pointer and real");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -972,8 +972,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between real and bool");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between native pointer and bool");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between native pointer and bool");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -1016,8 +1016,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between real and integer");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between native pointer and integer");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between native pointer and integer");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -1035,8 +1035,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between real and real");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between native pointer and real");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between native pointer and real");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
@@ -1054,8 +1054,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                         case L2_SYMBOL_TYPE_REAL:
                             l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between real and bool");
 
-                        case L2_SYMBOL_TYPE_NATIVE_POINTER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between native pointer and bool");
+                        //case L2_SYMBOL_TYPE_NATIVE_POINTER:
+                        //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between native pointer and bool");
 
                         default:
                             l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "illegal symbol type");
