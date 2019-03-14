@@ -1,11 +1,12 @@
 #include "memory.h"
+#include "l2_parse.h"
 #include "l2_eval.h"
 #include "../l2_system/l2_error.h"
 #include "l2_symbol_table.h"
 #include "stdarg.h"
 #include "../l2_lexer/l2_token_stream.h"
 #include "../l2_lexer/l2_cast.h"
-#include "l2_parse.h"
+
 
 extern char *g_l2_token_keywords[];
 extern l2_parser *g_parser_p;
@@ -2591,7 +2592,7 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
             /* judge the symbol type ( procedure ) */
             if (symbol_node_p->symbol.type == L2_SYMBOL_TYPE_PROCEDURE) {
 
-                /* package call procedure information into a single call_frame */
+                /* put all of call procedure informations into a single call_frame */
                 l2_call_frame call_frame;
                 call_frame.param_list.symbol_vec = symbol_vec;
                 call_frame.ret_pos = l2_token_stream_get_pos(g_parser_p->token_stream_p);
@@ -2615,6 +2616,7 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
                     {
                         /* TODO the function maybe return a interrupt */
                         l2_stmt_interrupt irt = l2_parse_stmts(scope_p);
+
                         switch (irt.type) {
                             case L2_STMT_INTERRUPT_CONTINUE:
                                 break;
@@ -2625,29 +2627,30 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
                             case L2_STMT_INTERRUPT_RETURN_WITH_VAL:
                                 /* the copy with light transfer */
                                 memcpy(&res_expr_info, &irt.u.ret_expr_info, sizeof(res_expr_info));
-                                /* TODO */
+
+                                // TODO
                                 break;
 
                             case L2_STMT_INTERRUPT_RETURN_WITHOUT_VAL:
+                                /* the copy with light transfer */
+                                res_expr_info.val_type = L2_EXPR_VAL_NO_VAL;
                                 break;
 
                             case L2_STMT_NO_INTERRUPT:
+
                                 break;
                         }
 
                         _if_type (L2_TOKEN_RBRACE)
                         {
                             /* absorb '}' */
-                            /* store the procedure information as a symbol into symbol table */
-                            symbol_added = l2_symbol_table_add_symbol_procedure(&scope_p->symbol_table_p, current_token_p->u.str.str_p, procedure);
-
                         } _throw_missing_rbrace
 
                     } _throw_unexpected_token
 
                 } _throw_unexpected_token
 
-            } else {
+            } else { /* symbol is not procedure, it will not call the procedure */
                 l2_parsing_error(L2_PARSING_ERROR_SYMBOL_IS_NOT_PROCEDURE, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);
             }
 

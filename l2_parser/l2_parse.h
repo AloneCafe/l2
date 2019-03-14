@@ -80,6 +80,8 @@ typedef enum _l2_stmt_interrupt_type {
 
 typedef struct _l2_stmt_interrupt {
     l2_stmt_interrupt_type type;
+    int line_of_irt_stmt;
+    int col_of_irt_stmt;
     union {
         l2_expr_info ret_expr_info;
     }u;

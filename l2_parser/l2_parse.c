@@ -53,17 +53,18 @@ void l2_parse() {
  *
  * */
 l2_stmt_interrupt l2_parse_stmts(l2_scope *scope_p) {
-    l2_token *current_token_p;
-    l2_scope *sub_scope_p;
+    _declr_current_token_p
     l2_stmt_interrupt irt = { .type = L2_STMT_NO_INTERRUPT };
 
     if (l2_parse_probe_next_token_by_type(L2_TOKEN_TERMINATOR)) {
 
     } else {
         irt = l2_parse_stmt(scope_p);
+
         if (irt.type != L2_STMT_NO_INTERRUPT) {
             /* absorb last stmts */
             l2_absorb_stmts();
+
             return irt;
         }
 
@@ -360,6 +361,8 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
         _if_type (L2_TOKEN_SEMICOLON)
         {
             irt.type = L2_STMT_INTERRUPT_BREAK;
+            irt.col_of_irt_stmt = current_token_p->current_col;
+            irt.line_of_irt_stmt = current_token_p->current_line;
 
         } _throw_missing_semicolon
 /*
@@ -374,6 +377,8 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
         _if_type (L2_TOKEN_SEMICOLON)
         {
             irt.type = L2_STMT_INTERRUPT_CONTINUE;
+            irt.col_of_irt_stmt = current_token_p->current_col;
+            irt.line_of_irt_stmt = current_token_p->current_line;
 
         } _throw_missing_semicolon
 
@@ -385,13 +390,18 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
     }
     _elif_keyword (L2_KW_RETURN) /* "return" */
     {
+        _get_current_token_p
         _if_type (L2_TOKEN_SEMICOLON)
         {
             irt.type = L2_STMT_INTERRUPT_RETURN_WITHOUT_VAL; /* has no return value */
+            irt.col_of_irt_stmt = current_token_p->current_col;
+            irt.line_of_irt_stmt = current_token_p->current_line;
         }
         _else
         {
             irt.type = L2_STMT_INTERRUPT_RETURN_WITH_VAL; /* has return value */
+            irt.col_of_irt_stmt = current_token_p->current_col;
+            irt.line_of_irt_stmt = current_token_p->current_line;
             irt.u.ret_expr_info = l2_eval_expr(scope_p);
 
             _if_type (L2_TOKEN_SEMICOLON)
