@@ -1254,7 +1254,7 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
                 l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error token type");
         }
     }
-    _else
+    _else /* TODO find some bugs in the shadow */
     {
         l2_eval_expr(scope_p); /* expr */
 

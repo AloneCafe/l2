@@ -1076,15 +1076,13 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
         _else /* no match */
         {
             l2_parse_token_back();
-            /*return l2_eval_expr_condition(scope_p);*/
-            return l2_eval_expr_atom(scope_p);
+            return l2_eval_expr_condition(scope_p);
         }
 
     }
     _else
     {
-        /*return l2_eval_expr_condition(scope_p);*/
-        return l2_eval_expr_atom(scope_p);
+        return l2_eval_expr_condition(scope_p);
     }
 }
 
