@@ -4,6 +4,8 @@
 
 #include "l2_cast.h"
 #include "../l2_system/l2_assert.h"
+#include "../l2_base/l2_vector.h"
+#include "../l2_base/l2_stack.h"
 
 int l2_cast_hex_str_to_int(const char *s) {
     l2_assert(s, L2_INTERNAL_ERROR_NULL_POINTER);
@@ -54,4 +56,15 @@ void l2_cast_decimal_to_str(int dec_num, char *s) {
 void l2_cast_real_to_str(double real_num, char *s) {
     l2_assert(s, L2_INTERNAL_ERROR_NULL_POINTER);
     sprintf(s, "%lf", real_num);
+}
+
+/* the stack must be destroyed by caller in the end */
+l2_stack l2_cast_vector_to_stack(l2_vector *vec_p) {
+    l2_stack stack;
+    l2_stack_create(&stack, vec_p->single_size);
+    int i;
+    for (i = 0; i < vec_p->size; i++) {
+        l2_stack_push_back(&stack, l2_vector_at(vec_p, i));
+    }
+    return stack;
 }

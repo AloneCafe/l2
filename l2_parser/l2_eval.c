@@ -2507,8 +2507,8 @@ l2_expr_info l2_eval_expr_single(l2_scope *scope_p) {
     }
 }
 
-/* formal_param_list1 ->
- * | , id formal_param_list1
+/* real_param_list1 ->
+ * | , id real_param_list1
  * | nil
  * */
 void l2_parse_real_param_list1(l2_scope *scope_p, l2_vector *symbol_vec_p) {
@@ -2530,8 +2530,8 @@ void l2_parse_real_param_list1(l2_scope *scope_p, l2_vector *symbol_vec_p) {
     } _end
 }
 
-/* formal_param_list ->
- * | id formal_param_list1
+/* real_param_list ->
+ * | id real_param_list1
  * | nil
  *
  * */
@@ -2548,6 +2548,98 @@ void l2_parse_real_param_list(l2_scope *scope_p, l2_vector *symbol_vec_p) {
         l2_parse_real_param_list1(scope_p, symbol_vec_p);
 
     } _end
+}
+
+/* formal_param_list1 ->
+ * | , id formal_param_list1
+ * | nil
+ * */
+/* symbol_vec_p: including the symbols of real parameters */
+/* symbol_pos: the current identifier count */
+void l2_parse_formal_param_list1(l2_scope *scope_p, l2_vector *symbol_vec_p, int symbol_pos) {
+    _declr_current_token_p
+    _if_type (L2_TOKEN_COMMA)
+    {
+        _if_type (L2_TOKEN_IDENTIFIER)
+        {
+            _get_current_token_p
+            /* if (id count < real params count) */
+            if (symbol_pos < symbol_vec_p->size) {
+
+                l2_symbol symbol = *(l2_symbol *)l2_vector_at(symbol_vec_p, symbol_pos);
+                symbol.symbol_name = current_token_p->u.str.str_p;
+
+                boolean add_symbol_result = l2_symbol_table_add_symbol(&scope_p->symbol_table_p, symbol);
+
+                if (!add_symbol_result) {
+                    l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_REDEFINED, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);
+                }
+
+                l2_parse_formal_param_list1(scope_p, symbol_vec_p, symbol_pos + 1);
+
+            } else { /* id count >= real params count */
+                _if_type (L2_TOKEN_IDENTIFIER)
+                {
+                    l2_parsing_error(L2_PARSING_ERROR_TOO_FEW_PARAMETERS, current_token_p->current_line, current_token_p->current_col);
+                }
+                _else
+                {
+                    /* symbol_pos == symbol_vec_p->size ( means real parameters list is over ) */
+                    /* and next token is not identifier ( means formal parameters list is over ) */
+                    return;
+                }
+
+            }
+
+        } _throw_unexpected_token
+
+    } _end
+}
+
+/* formal_param_list ->
+ * | id formal_param_list1
+ * | nil
+ *
+ * */
+void l2_parse_formal_param_list(l2_scope *scope_p, l2_vector *symbol_vec_p) {
+    _declr_current_token_p
+    _get_current_token_p
+    int symbol_pos = 0;
+
+    _if_type (L2_TOKEN_IDENTIFIER)
+    {
+        _get_current_token_p
+        if (symbol_pos < symbol_vec_p->size) {
+
+            l2_symbol symbol = *(l2_symbol *)l2_vector_at(symbol_vec_p, symbol_pos);
+            symbol.symbol_name = current_token_p->u.str.str_p;
+
+            boolean add_symbol_result = l2_symbol_table_add_symbol(&scope_p->symbol_table_p, symbol);
+
+            if (!add_symbol_result) {
+                l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_REDEFINED, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);
+            }
+
+            l2_parse_formal_param_list1(scope_p, symbol_vec_p, symbol_pos + 1);
+        }
+        else {
+            _if_type (L2_TOKEN_IDENTIFIER)
+            {
+                l2_parsing_error(L2_PARSING_ERROR_TOO_FEW_PARAMETERS, current_token_p->current_line, current_token_p->current_col);
+            }
+            _else
+            {
+                /* symbol_pos == symbol_vec_p->size ( means real parameters list is over ) */
+                /* and next token is not identifier ( means formal parameters list is over ) */
+                return;
+            }
+        }
+
+    } _end
+
+    if (symbol_pos < symbol_vec_p->size) {
+        l2_parsing_error(L2_PARSING_ERROR_TOO_MANY_PARAMETERS, current_token_p->current_line, current_token_p->current_col);
+    }
 }
 
 
@@ -2602,10 +2694,13 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
                 /* perform procedure call, take parser into a new token stream position */
                 l2_token_stream_set_pos(g_parser_p->token_stream_p, symbol_node_p->symbol.u.procedure.entry_pos);
 
+                /* create new sub scope */
+                l2_scope *procedure_scope_p = l2_scope_create_common_scope(symbol_node_p->symbol.u.procedure.upper_scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
+
                 /* TODO enter into procedure */
                 _if_type (L2_TOKEN_LP) /* ( */
                 {
-                    l2_parse_formal_param_list();
+                    l2_parse_formal_param_list(procedure_scope_p, &symbol_vec);
 
                     _if_type (L2_TOKEN_RP)
                     {
@@ -2615,29 +2710,28 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
                     _if_type (L2_TOKEN_LBRACE) /* { */
                     {
                         /* TODO the function maybe return a interrupt */
-                        l2_stmt_interrupt irt = l2_parse_stmts(scope_p);
+                        l2_stmt_interrupt irt = l2_parse_stmts(procedure_scope_p);
 
                         switch (irt.type) {
                             case L2_STMT_INTERRUPT_CONTINUE:
-                                break;
+                                l2_parsing_error(L2_PARSING_ERROR_INVALID_CONTINUE_IN_CURRENT_CONTEXT, irt.line_of_irt_stmt, irt.col_of_irt_stmt);
 
                             case L2_STMT_INTERRUPT_BREAK:
-                                break;
+                                l2_parsing_error(L2_PARSING_ERROR_INVALID_BREAK_IN_CURRENT_CONTEXT, irt.line_of_irt_stmt, irt.col_of_irt_stmt);
 
                             case L2_STMT_INTERRUPT_RETURN_WITH_VAL:
                                 /* the copy with light transfer */
                                 memcpy(&res_expr_info, &irt.u.ret_expr_info, sizeof(res_expr_info));
-
-                                // TODO
                                 break;
 
                             case L2_STMT_INTERRUPT_RETURN_WITHOUT_VAL:
-                                /* the copy with light transfer */
+                                /* no return value */
                                 res_expr_info.val_type = L2_EXPR_VAL_NO_VAL;
                                 break;
 
                             case L2_STMT_NO_INTERRUPT:
-
+                                /* no interrupt means no return stmt */
+                                res_expr_info.val_type = L2_EXPR_VAL_NO_VAL;
                                 break;
                         }
 
@@ -2650,10 +2744,17 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
 
                 } _throw_unexpected_token
 
+                /* procedure execution complete, restore call frame*/
+                call_frame = l2_call_stack_pop_frame(g_parser_p->call_stack_p);
+                l2_token_stream_set_pos(g_parser_p->token_stream_p, call_frame.ret_pos);
+                l2_vector_destroy(&symbol_vec);
+
             } else { /* symbol is not procedure, it will not call the procedure */
+                l2_vector_destroy(&symbol_vec);
                 l2_parsing_error(L2_PARSING_ERROR_SYMBOL_IS_NOT_PROCEDURE, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);
             }
 
+            return res_expr_info;
         }
         _else
         {

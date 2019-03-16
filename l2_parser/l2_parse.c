@@ -419,6 +419,7 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
         {
             _get_current_token_p
             procedure.entry_pos = l2_token_stream_get_pos(g_parser_p->token_stream_p);
+            procedure.upper_scope_p = scope_p;
 
             _if_type (L2_TOKEN_LP) /* ( */
             {

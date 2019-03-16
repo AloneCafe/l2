@@ -24,6 +24,7 @@ typedef struct _l2_procedure {
     /* entry_pos is, the token position of the '(' which after procedure id at token stream,
      * due to parse both parameter list and procedure content
      * */
+    l2_scope *upper_scope_p;
 }l2_procedure;
 
 typedef struct _l2_symbol {
@@ -57,5 +58,7 @@ boolean l2_symbol_table_add_symbol_integer(l2_symbol_node **head_p, char *symbol
 boolean l2_symbol_table_add_symbol_real(l2_symbol_node **head_p, char *symbol_name, double real);
 boolean l2_symbol_table_add_symbol_bool(l2_symbol_node **head_p, char *symbol_name, boolean bool);
 boolean l2_symbol_table_add_symbol_procedure(l2_symbol_node **head_p, char *symbol_name, l2_procedure procedure);
+
+boolean l2_symbol_table_add_symbol(l2_symbol_node **head_p, l2_symbol symbol);
 
 #endif
