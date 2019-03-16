@@ -2780,10 +2780,6 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
                     res_expr_info.val.real = symbol_node_p->symbol.u.real;
                     break;
 
-                case L2_PARSING_ERROR_INCOMPATIBLE_OPERATION:
-                    l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE,
-                                      "eval return an native pointer (package algorithm is not implement yet)");
-
                 default:
                     l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
             }
@@ -3296,6 +3292,35 @@ void l2_absorb_expr_single() {
     {
         l2_absorb_expr_atom();
     }
+}
+
+/* real_param_list1 ->
+ * | , id real_param_list1
+ * | nil
+ * */
+void l2_absorb_real_param_list1() {
+    _declr_current_token_p
+    _if_type (L2_TOKEN_COMMA)
+    {
+        _if_type (L2_TOKEN_IDENTIFIER)
+        {
+            l2_absorb_real_param_list1();
+
+        } _throw_unexpected_token
+
+    } _end
+}
+
+/* real_param_list ->
+ * | id real_param_list1
+ * | nil
+ *
+ * */
+void l2_absorb_real_param_list() {
+    _if_type (L2_TOKEN_IDENTIFIER)
+    {
+        l2_absorb_real_param_list1();
+    } _end
 }
 
 /* expr_atom ->

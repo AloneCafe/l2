@@ -201,6 +201,19 @@ void l2_parsing_error(const l2_parsing_error_type error_type, int lines, int col
             fprintf(stderr, "l2 parsing error near line %d, column %d, invalid keyword \'break\' in current content\n", lines, cols);
             break;
 
+        case L2_PARSING_ERROR_SYMBOL_IS_NOT_PROCEDURE:
+            token_str = va_arg(va, char *);
+            fprintf(stderr, "l2 parsing error near line %d, column %d, symbol \'%s\' is not a procedure", lines, cols, token_str);
+            break;
+
+        case L2_PARSING_ERROR_TOO_MANY_PARAMETERS:
+            fprintf(stderr, "l2 parsing error near line %d, column %d, there are too many parameters", lines, cols);
+            break;
+
+        case L2_PARSING_ERROR_TOO_FEW_PARAMETERS:
+            fprintf(stderr, "l2 parsing error near line %d, column %d, there are too few parameters", lines, cols);
+            break;
+
         default:
             fprintf(stderr, "l2 parsing error, an unknown error occured\n");
     }

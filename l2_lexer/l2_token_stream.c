@@ -18,7 +18,8 @@ char *g_l2_token_keywords[] = {
         "break",
         "continue",
         "return",
-        "procedure"
+        "procedure",
+        "eval"
 };
 
 l2_token_stream *l2_token_stream_create(FILE *fp) {

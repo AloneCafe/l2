@@ -47,6 +47,340 @@ void l2_parse() {
     l2_parse_stmts(g_parser_p->global_scope_p);
 }
 
+void l2_absorb_stmt_var_def_list1();
+void l2_absorb_stmt_elif();
+void l2_absorb_formal_param_list();
+void l2_absorb_stmts();
+
+
+/* stmt ->
+ * | { stmts }
+ * | procedure id ( formal_param_list ) { stmts }
+ * | while ( expr ) { stmts }
+ * | do { stmts } while ( expr ) ;
+ * | for ( expr ; expr ; expr ) { stmts }
+ * | for ( var id = expr stmt_var_def_list1 ; expr ; expr ) { stmts }
+ * | for ( var id stmt_var_def_list1 ; expr ; expr ) { stmts }
+ * | break ;
+ * | continue ;
+ * | return ;
+ * | return expr ;
+ * | if ( expr ) { stmts } stmt_elif
+ * | var id stmt_var_def_list1 ;
+ * | var id = expr stmt_var_def_list1 ;
+ * | ;
+ * | expr ;
+ * | eval expr;
+ * |
+ * */
+void l2_absorb_stmt() {
+    _declr_current_token_p
+
+    _if_keyword (L2_KW_BREAK) /* "break" */
+    {
+        _get_current_token_p
+        _if_type (L2_TOKEN_SEMICOLON)
+        {
+            /* absorb ';' */
+        } _throw_missing_semicolon
+    }
+    _elif_keyword (L2_KW_CONTINUE) /* "continue" */
+    {
+        _get_current_token_p
+        _if_type (L2_TOKEN_SEMICOLON)
+        {
+            /* absorb ';' */
+        } _throw_missing_semicolon
+    }
+    _elif_keyword (L2_KW_RETURN) /* "return" */
+    {
+        _get_current_token_p
+        _if_type (L2_TOKEN_SEMICOLON)
+        {
+            /* absorb ';' */
+        }
+        _else
+        {
+            l2_absorb_expr(); /* absorb return expr */
+
+            _if_type (L2_TOKEN_SEMICOLON)
+            {
+                /* absorb ';' */
+            } _throw_missing_semicolon
+        }
+    }
+    _elif_keyword (L2_KW_PROCEDURE) /* "procedure" */ /* the definition of procedure */
+    {
+        _if_type (L2_TOKEN_IDENTIFIER) /* id */
+        {
+
+            _if_type (L2_TOKEN_LP) /* ( */
+            {
+                l2_absorb_formal_param_list();
+
+                _if_type (L2_TOKEN_RP)
+                {
+                    /* absorb ')' */
+                } _throw_missing_rp
+
+                _if_type (L2_TOKEN_LBRACE) /* { */
+                {
+                    l2_absorb_stmts();
+
+                    _if_type (L2_TOKEN_RBRACE)
+                    {
+                        /* absorb '}' */
+                    } _throw_missing_rbrace
+
+                } _throw_unexpected_token
+
+            } _throw_unexpected_token
+
+        } _throw_unexpected_token
+    }
+    _elif_keyword (L2_KW_FOR) /* "for" */ /* for-loop */
+    {
+        _if_type (L2_TOKEN_LP) /* ( */
+        {
+            /* handle the first expr ( allow to using definition stmt for variable )*/
+            _if_keyword (L2_KW_VAR)
+            {
+                _if_type (L2_TOKEN_IDENTIFIER) /* id */
+                {
+                    _get_current_token_p
+
+                    _if_type (L2_TOKEN_ASSIGN) /* = */
+                    {
+                        l2_absorb_expr(); /* absorb expr */
+
+                        _if_type (L2_TOKEN_SEMICOLON)
+                        {
+                            /* absorb ';' */
+                        } _throw_missing_semicolon
+
+                    }
+                    _elif_type (L2_TOKEN_SEMICOLON)
+                    {
+                        /* absorb ';' without initializing the variable */
+                    } _throw_unexpected_token
+
+                } _throw_unexpected_token
+            }
+            _elif_type (L2_TOKEN_SEMICOLON)
+            {
+                /* this means there is a empty expr in for-loop */
+                /* also absorb ';' */
+            }
+            _else
+            {
+                l2_absorb_expr();
+                _if_type (L2_TOKEN_SEMICOLON)
+                {
+                    /* absorb ';' */
+                } _throw_missing_semicolon
+            }
+
+            _if_type (L2_TOKEN_SEMICOLON)
+            {
+                /* this means there is a empty expr in for-loop,
+                 * and the second expr will have a bool-value with true if it is empty  */
+                /* also absorb ';' */
+            }
+            _else
+            {
+                l2_absorb_expr();
+                _if_type (L2_TOKEN_SEMICOLON)
+                {
+                    /* absorb ';' */
+                } _throw_missing_semicolon
+            }
+
+            /* handle the third expr ( absorb it ) */
+            /* just absorb the third expr */
+            l2_absorb_expr();
+
+            _if_type (L2_TOKEN_RP)
+            {
+                /* absorb ')' */
+            } _throw_missing_rp
+
+        } _throw_unexpected_token
+
+        /* absorb the for stmt loop structure */
+        _if_type (L2_TOKEN_LBRACE) /* { */
+        {
+            l2_absorb_stmts(); /* parse stmts, may parse break or continue*/
+
+            _if_type (L2_TOKEN_RBRACE) /* } */
+            {
+                /* absorb '}' */
+            }_throw_missing_rbrace
+
+        } _throw_unexpected_token
+
+    }
+    _elif_keyword (L2_KW_DO) /* "do" */ /* do...while-loop */
+    {
+        _if_type (L2_TOKEN_LBRACE) /* { */
+        {
+            l2_absorb_stmts(); /* absorb stmts */
+
+            _if_type (L2_TOKEN_RBRACE) /* } */
+            {
+                /* absorb '}' */
+            } _throw_missing_rbrace
+
+        } _throw_unexpected_token
+
+        _if_keyword (L2_KW_WHILE) /* "while" */
+        {
+            _get_current_token_p
+
+            _if_type (L2_TOKEN_LP) /* ( */
+            {
+                l2_absorb_expr(); /* absorb expr */
+            } _throw_unexpected_token
+
+            _if_type (L2_TOKEN_RP) /* ) */
+            {
+                /* absorb ')' */
+            } _throw_missing_rp
+
+            _if_type (L2_TOKEN_SEMICOLON) /* ; */
+            {
+                /* absorb ';' */
+            } _throw_missing_semicolon
+
+        } _throw_unexpected_token
+
+    }
+    _elif_keyword (L2_KW_WHILE) /* "while" */ /* while-loop */
+    {
+        _if_type (L2_TOKEN_LP) /* ( */
+        {
+            l2_absorb_expr(); /* absorb expr */
+
+            _if_type (L2_TOKEN_RP)
+            {
+                /* absorb ')' */
+            } _throw_missing_rp
+
+
+            _if_type (L2_TOKEN_LBRACE) /* { */
+            {
+                l2_absorb_stmts(); /* absorb stmts */
+
+                _if_type (L2_TOKEN_RBRACE)
+                {
+                    /* absorb '}' */
+                } _throw_missing_rbrace
+
+            } _throw_unexpected_token
+
+        } _throw_unexpected_token
+
+    }
+    _elif_type (L2_TOKEN_LBRACE) /* { */
+    {
+        l2_absorb_stmts(); /* absorb stmts */
+
+        _if_type (L2_TOKEN_RBRACE) /* } */
+        {
+            /* absorb '}' */
+        } _throw_missing_rbrace
+
+    }
+    _elif_keyword (L2_KW_IF) /* "if" */
+    {
+        _get_current_token_p
+
+        _if_type (L2_TOKEN_LP) /* ( */
+        {
+            l2_absorb_expr(); /* absorb expr */
+
+            _if_type (L2_TOKEN_RP)
+            {
+                /* absorb ')' */
+            } _throw_missing_rp
+
+            _if_type (L2_TOKEN_LBRACE) /* { */
+            {
+                l2_absorb_stmts(); /* absorb stmts */
+
+                _if_type (L2_TOKEN_RBRACE) /* } */
+                {
+                    l2_absorb_stmt_elif();
+                } _throw_missing_rbrace
+
+            } _throw_unexpected_token
+
+        } _throw_unexpected_token
+
+    }
+    _elif_type (L2_TOKEN_SEMICOLON)
+    {
+        /* empty stmt which has only single ; */
+    }
+    _elif_keyword (L2_KW_VAR) /* "var" */
+    {
+        _if_type (L2_TOKEN_IDENTIFIER) /* id */
+        {
+            _if_type (L2_TOKEN_ASSIGN) /* = */
+            {
+                l2_absorb_expr(); /* expr */
+            }
+            _else /* without initialization */
+            {
+
+            }
+
+            /* handle last part of definition list in recursion */
+            l2_absorb_stmt_var_def_list1();
+
+            _if_type (L2_TOKEN_SEMICOLON)
+            {
+                /* absorb ';' */
+            } _throw_missing_semicolon
+
+        } _throw_unexpected_token
+
+    }
+    _elif_keyword(L2_KW_EVAL)
+    {
+        l2_absorb_expr(); /* absorb expr */
+
+        _if_type (L2_TOKEN_SEMICOLON)
+        {
+            /* absorb ';' */
+        } _throw_missing_semicolon
+    }
+    _else
+    {
+        l2_absorb_expr(); /* absorb expr */
+
+        _if_type (L2_TOKEN_SEMICOLON)
+        {
+            /* absorb ';' */
+        } _throw_missing_semicolon
+    }
+}
+
+/* stmts ->
+ * | stmt stmts
+ * | eof
+ *
+ * */
+void l2_absorb_stmts() {
+    if (l2_parse_probe_next_token_by_type(L2_TOKEN_TERMINATOR)) {
+        return;
+
+    } else {
+        l2_absorb_stmt();
+        l2_absorb_stmts();
+
+    }
+}
+
 /* stmts ->
  * | stmt stmts
  * | eof
@@ -76,38 +410,6 @@ l2_stmt_interrupt l2_parse_stmts(l2_scope *scope_p) {
     return irt;
 }
 
-/* stmts ->
- * | stmt stmts
- * | eof
- *
- * */
-void l2_absorb_stmts() {
-    if (l2_parse_probe_next_token_by_type(L2_TOKEN_TERMINATOR)) {
-        return;
-
-    } else {
-        l2_absorb_stmt();
-        l2_absorb_stmts();
-
-    }
-}
-
-/* stmt ->
- * | { stmts }
- * | procedure id ( formal_param_list ) { stmts }
- * | while ( expr ) { stmts }
- * | do { stmts } while ( expr ) ;
- * | for ( expr ; expr ; expr ) { stmts }
- * | if ( expr ) { stmts } stmt_elsif
- * | var id ;
- * | var id = expr ;
- * | ;
- * | expr ;
- * */
-void l2_absorb_stmt() {
-
-}
-
 /* formal_param_list1 ->
  * | , id formal_param_list1
  * | nil
@@ -132,6 +434,34 @@ void l2_absorb_formal_param_list() {
     _if_type (L2_TOKEN_IDENTIFIER)
     {
         l2_absorb_formal_param_list1();
+    } _end
+}
+
+/* stmt_var_def_list1 ->
+ * | , id stmt_var_def_list1
+ * | , id = expr stmt_var_def_list1
+ * | nil
+ * */
+void l2_absorb_stmt_var_def_list1() {
+
+    _if_type (L2_TOKEN_COMMA)
+    {
+        _if_type (L2_TOKEN_IDENTIFIER) /* id */
+        {
+            _if_type (L2_TOKEN_ASSIGN) /* = */
+            {
+                l2_absorb_expr(); /* expr */
+            }
+            _else /* without initialization */
+            {
+
+            }
+
+            /* handle last part of definition list in recursion */
+            l2_absorb_stmt_var_def_list1();
+
+        } _throw_unexpected_token
+
     } _end
 }
 
@@ -343,6 +673,7 @@ l2_stmt_interrupt l2_parse_stmt_elif(l2_scope *scope_p) { /* the scopes in if..e
  * | var id = expr stmt_var_def_list1 ;
  * | ;
  * | expr ;
+ * | eval expr;
  * */
 l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
 
@@ -896,6 +1227,32 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
 
         } _throw_unexpected_token
 
+    }
+    _elif_keyword(L2_KW_EVAL)
+    {
+        right_expr_info = l2_eval_expr(scope_p); /* expr */
+
+        _if_type (L2_TOKEN_SEMICOLON)
+        {
+            /* absorb ';' */
+        } _throw_missing_semicolon
+
+        switch (right_expr_info.val_type) {
+            case L2_EXPR_VAL_TYPE_INTEGER:
+                fprintf(stdout, "%d", right_expr_info.val.integer);
+                break;
+
+            case L2_EXPR_VAL_TYPE_REAL:
+                fprintf(stdout, "%lf", right_expr_info.val.real);
+                break;
+
+            case L2_EXPR_VAL_TYPE_BOOL:
+                fprintf(stdout, "%s", right_expr_info.val.bool ? "true" : "false");
+                break;
+
+            default:
+                l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error token type");
+        }
     }
     _else
     {

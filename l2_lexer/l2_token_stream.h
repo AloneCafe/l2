@@ -78,7 +78,8 @@ typedef enum _l2_keywords {
     L2_KW_BREAK,
     L2_KW_CONTINUE,
     L2_KW_RETURN,
-    L2_KW_PROCEDURE
+    L2_KW_PROCEDURE,
+    L2_KW_EVAL
 
 }l2_keyword;
 
