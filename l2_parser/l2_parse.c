@@ -390,9 +390,18 @@ l2_stmt_interrupt l2_parse_stmts(l2_scope *scope_p) {
     _declr_current_token_p
     l2_stmt_interrupt irt = { .type = L2_STMT_NO_INTERRUPT };
 
-    if (l2_parse_probe_next_token_by_type(L2_TOKEN_TERMINATOR)) {
+    _if_type(L2_TOKEN_TERMINATOR)
+    {
 
-    } else {
+    }
+    _else
+    {
+        //_if_type(L2_TOKEN_RBRACE) /* } */
+        //{
+            // TODO /* TODO *//////////////////////////////////////////////////////////////////////////////////////////////////
+        //    l2_token_stream_rollback(g_parser_p->token_stream_p);
+        //} _end
+
         irt = l2_parse_stmt(scope_p);
 
         if (irt.type != L2_STMT_NO_INTERRUPT) {
@@ -406,7 +415,6 @@ l2_stmt_interrupt l2_parse_stmts(l2_scope *scope_p) {
         irt = l2_parse_stmts(scope_p);
 
     }
-
     return irt;
 }
 
@@ -651,10 +659,6 @@ l2_stmt_interrupt l2_parse_stmt_elif(l2_scope *scope_p) { /* the scopes in if..e
 
     return irt;
 }
-
-/* TODO implement keywords: break, continue, return & return by value */
-
-
 
 /* stmt ->
  * | { stmts }
@@ -1116,19 +1120,26 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
     }
     _elif_type (L2_TOKEN_LBRACE) /* { */
     {
-        /* while parse a sub stmts block, a new sub scope should be also created */
-        sub_scope_p = l2_scope_create_common_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
-
-        irt = l2_parse_stmts(sub_scope_p); /* stmts */
-
-        _if_type (L2_TOKEN_RBRACE) /* } */
+        //_if_type (L2_TOKEN_RBRACE) /* } */
+        //{
+            /* TODO *//////////////////////////////////////////////////////////////////////////////////////////////////
+            /* absorb '}' */
+        //}
+        //_else
         {
-            l2_scope_escape_scope(sub_scope_p);
+            /* while parse a sub stmts block, a new sub scope should be also created */
+            sub_scope_p = l2_scope_create_common_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
 
-        } _throw_missing_rbrace
+            irt = l2_parse_stmts(sub_scope_p); /* stmts */
 
-        return irt;
+            _if_type (L2_TOKEN_RBRACE) /* } */
+            {
+                l2_scope_escape_scope(sub_scope_p);
 
+            } _throw_missing_rbrace
+
+            return irt;
+        }
     }
     _elif_keyword (L2_KW_IF) /* "if" */
     {
