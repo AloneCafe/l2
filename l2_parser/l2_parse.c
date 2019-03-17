@@ -24,6 +24,7 @@ void l2_parse_finalize() {
 
 void l2_parse_initialize(FILE *fp) {
     g_parser_p = malloc(sizeof(l2_parser));
+    g_parser_p->braces_flag = 0;
     g_parser_p->storage_p = l2_storage_create();
     g_parser_p->gc_list_p = l2_gc_create();
     g_parser_p->global_scope_p = l2_scope_create();
@@ -396,13 +397,13 @@ l2_stmt_interrupt l2_parse_stmts(l2_scope *scope_p) {
     }
     _else
     {
-        //_if_type(L2_TOKEN_RBRACE) /* } */
-        //{
-            // TODO /* TODO *//////////////////////////////////////////////////////////////////////////////////////////////////
-        //    l2_token_stream_rollback(g_parser_p->token_stream_p);
-        //} _end
-
         irt = l2_parse_stmt(scope_p);
+
+        if (irt.type == L2_STMT_NOT_STMT) {
+            irt.type = L2_STMT_NO_INTERRUPT;
+            //irt.type = L2_STMT_NOT_STMT;
+            return irt;
+        }
 
         if (irt.type != L2_STMT_NO_INTERRUPT) {
             /* absorb last stmts */
@@ -413,7 +414,6 @@ l2_stmt_interrupt l2_parse_stmts(l2_scope *scope_p) {
 
         /* there is no interrupt */
         irt = l2_parse_stmts(scope_p);
-
     }
     return irt;
 }
@@ -1162,26 +1162,21 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
     }
     _elif_type (L2_TOKEN_LBRACE) /* { */
     {
-        //_if_type (L2_TOKEN_RBRACE) /* } */
-        //{
-            /* TODO *//////////////////////////////////////////////////////////////////////////////////////////////////
-            /* absorb '}' */
-        //}
-        //_else
+        /* braces flag + 1 */
+        g_parser_p->braces_flag += 1;
+
+        /* while parse a sub stmts block, a new sub scope should be also created */
+        sub_scope_p = l2_scope_create_common_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
+
+        irt = l2_parse_stmts(sub_scope_p); /* stmts */
+
+        _if_type (L2_TOKEN_RBRACE) /* } */
         {
-            /* while parse a sub stmts block, a new sub scope should be also created */
-            sub_scope_p = l2_scope_create_common_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
+            l2_scope_escape_scope(sub_scope_p);
 
-            irt = l2_parse_stmts(sub_scope_p); /* stmts */
+        } _throw_missing_rbrace
 
-            _if_type (L2_TOKEN_RBRACE) /* } */
-            {
-                l2_scope_escape_scope(sub_scope_p);
-
-            } _throw_missing_rbrace
-
-            return irt;
-        }
+        return irt;
     }
     _elif_keyword (L2_KW_IF) /* "if" */
     {
@@ -1322,16 +1317,27 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
                 l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error token type");
         }
     }
-    _else /* TODO find some bugs in the shadow */
+    _else /* TODO */
     {
-        _if (l2_eval_expr(scope_p).val_type != L2_EXPR_VAL_NOT_EXPR) { /* expr */
+        if (l2_eval_expr(scope_p).val_type == L2_EXPR_VAL_NOT_EXPR) { /* if it's not a expr */
 
-        } _throw_unexpected_token
+            /* braces flag - 1 */
+            g_parser_p->braces_flag -= 1;
 
-        _if_type (L2_TOKEN_SEMICOLON)
-        {
-            /* absorb ';' */
-        } _throw_missing_semicolon
+            _if (g_parser_p->braces_flag >= 0) {
+
+            } _throw_unexpected_token
+
+            irt.type = L2_STMT_NOT_STMT;
+            return irt;
+
+        } else {
+            /* if it's a expr, after eval_expr() then absorb ';' */
+            _if_type (L2_TOKEN_SEMICOLON)
+            {
+                /* absorb ';' */
+            } _throw_missing_semicolon
+        }
     }
 
     irt.type = L2_STMT_NO_INTERRUPT;

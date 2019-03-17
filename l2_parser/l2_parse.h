@@ -68,9 +68,11 @@ typedef struct _l2_parser {
     l2_storage *storage_p;
     l2_gc_list *gc_list_p;
     l2_call_stack *call_stack_p;
+    int braces_flag;
 }l2_parser;
 
 typedef enum _l2_stmt_interrupt_type {
+    L2_STMT_NOT_STMT,
     L2_STMT_NO_INTERRUPT,
     L2_STMT_INTERRUPT_BREAK,
     L2_STMT_INTERRUPT_CONTINUE,

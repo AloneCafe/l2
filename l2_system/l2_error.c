@@ -214,6 +214,10 @@ void l2_parsing_error(const l2_parsing_error_type error_type, int lines, int col
             fprintf(stderr, "l2 parsing error near line %d, column %d, there are too few parameters", lines, cols);
             break;
 
+        case L2_PARSING_ERROR_EXPR_RESULT_WITHOUT_VALUE:
+            fprintf(stderr, "l2 parsing error near line %d, column %d, expr without value", lines, cols);
+            break;
+
         default:
             fprintf(stderr, "l2 parsing error, an unknown error occured\n");
     }
