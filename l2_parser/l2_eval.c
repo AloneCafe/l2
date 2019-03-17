@@ -1117,6 +1117,11 @@ l2_expr_info l2_eval_expr_condition(l2_scope *scope_p) {
 
         } else { /* true */
             l2_expr_info second_expr_info = l2_eval_expr(scope_p); /* eval the second expr */
+
+            _if (second_expr_info.val_type != L2_EXPR_VAL_NOT_EXPR) {
+
+            } _throw_unexpected_token
+
             _if_type (L2_TOKEN_COLON)
             {
                 l2_absorb_expr_condition(); /* absorb the third expr */
@@ -2809,7 +2814,10 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
         res_expr_info.val_type = L2_EXPR_VAL_TYPE_BOOL;
         res_expr_info.val.bool = L2_FALSE;
 
-    } _throw_unexpected_token
+    } _else {
+        res_expr_info.val_type = L2_EXPR_VAL_NOT_EXPR;
+    }
+
 
     return res_expr_info;
 }

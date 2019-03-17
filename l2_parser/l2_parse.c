@@ -495,6 +495,10 @@ void l2_parse_stmt_var_def_list1(l2_scope *scope_p) {
             {
                 right_expr_info = l2_eval_expr(scope_p); /* expr */
 
+                _if (right_expr_info.val_type != L2_EXPR_VAL_NOT_EXPR) {
+
+                } _throw_unexpected_token
+
                 switch (right_expr_info.val_type) {
                     case L2_EXPR_VAL_TYPE_INTEGER:
                         symbol_added = l2_symbol_table_add_symbol_integer(&scope_p->symbol_table_p, current_token_p->u.str.str_p, right_expr_info.val.integer);
@@ -507,6 +511,9 @@ void l2_parse_stmt_var_def_list1(l2_scope *scope_p) {
                     case L2_EXPR_VAL_TYPE_BOOL:
                         symbol_added = l2_symbol_table_add_symbol_bool(&scope_p->symbol_table_p, current_token_p->u.str.str_p, right_expr_info.val.bool);
                         break;
+
+                    case L2_EXPR_VAL_NO_VAL:
+                        l2_parsing_error(L2_PARSING_ERROR_EXPR_RESULT_WITHOUT_VALUE, current_token_p->current_line, current_token_p->current_col);
 
                     default:
                         l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error token type");
@@ -599,6 +606,10 @@ l2_stmt_interrupt l2_parse_stmt_elif(l2_scope *scope_p) { /* the scopes in if..e
         {
             l2_expr_info expr_info;
             expr_info = l2_eval_expr(scope_p);
+
+            _if (expr_info.val_type != L2_EXPR_VAL_NOT_EXPR) {
+
+            } _throw_unexpected_token
 
             if (expr_info.val_type != L2_EXPR_VAL_TYPE_BOOL)
                 l2_parsing_error(L2_PARSING_ERROR_EXPR_NOT_BOOL, current_token_p->current_line,
@@ -739,6 +750,10 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
             irt.line_of_irt_stmt = current_token_p->current_line;
             irt.u.ret_expr_info = l2_eval_expr(scope_p);
 
+            _if (irt.u.ret_expr_info.val_type != L2_EXPR_VAL_NOT_EXPR) {
+
+            } _throw_unexpected_token
+
             _if_type (L2_TOKEN_SEMICOLON)
             {
                 /* absorb ';' */
@@ -807,6 +822,10 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
                     {
                         right_expr_info = l2_eval_expr(scope_p); /* expr */
 
+                        _if (right_expr_info.val_type != L2_EXPR_VAL_NOT_EXPR) {
+
+                        } _throw_unexpected_token
+
                         switch (right_expr_info.val_type) {
                             case L2_EXPR_VAL_TYPE_INTEGER:
                                 symbol_added = l2_symbol_table_add_symbol_integer(&for_init_symbol_table_p, current_token_p->u.str.str_p, right_expr_info.val.integer);
@@ -819,6 +838,9 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
                             case L2_EXPR_VAL_TYPE_BOOL:
                                 symbol_added = l2_symbol_table_add_symbol_bool(&for_init_symbol_table_p, current_token_p->u.str.str_p, right_expr_info.val.bool);
                                 break;
+
+                            case L2_EXPR_VAL_NO_VAL:
+                                l2_parsing_error(L2_PARSING_ERROR_EXPR_RESULT_WITHOUT_VALUE, current_token_p->current_line, current_token_p->current_col);
 
                             default:
                                 l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error token type");
@@ -849,7 +871,10 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
             }
             _else
             {
-                l2_eval_expr(scope_p);
+                _if (l2_eval_expr(scope_p).val_type != L2_EXPR_VAL_NOT_EXPR) {
+
+                } _throw_unexpected_token
+
                 _if_type (L2_TOKEN_SEMICOLON)
                 {
                     /* absorb ';' */
@@ -883,6 +908,11 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
             _else
             {
                 second_expr_info = l2_eval_expr(sub_scope_p);
+
+                _if (second_expr_info.val_type != L2_EXPR_VAL_NOT_EXPR) {
+
+                } _throw_unexpected_token
+
                 _if_type (L2_TOKEN_SEMICOLON)
                 {
                     /* absorb ';' */
@@ -929,7 +959,11 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
                     case L2_STMT_INTERRUPT_CONTINUE:
                         /* evaluate the third expr */
                         l2_token_stream_set_pos(g_parser_p->token_stream_p, third_expr_entry_pos);
-                        l2_eval_expr(sub_scope_p);
+
+                        _if (l2_eval_expr(sub_scope_p).val_type != L2_EXPR_VAL_NOT_EXPR) {
+
+                        } _throw_unexpected_token
+
                         /* | */
                         /* V */
 
@@ -1031,6 +1065,10 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
                     case L2_STMT_NO_INTERRUPT:
                         expr_info = l2_eval_expr(scope_p);
 
+                        _if (expr_info.val_type != L2_EXPR_VAL_NOT_EXPR) {
+
+                        } _throw_unexpected_token
+
                         _if_type (L2_TOKEN_RP)
                         {
                             /* absorb ')' */
@@ -1065,6 +1103,10 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
         _if_type (L2_TOKEN_LP) /* ( */
         {
             expr_info = l2_eval_expr(scope_p);
+
+            _if (expr_info.val_type != L2_EXPR_VAL_NOT_EXPR) {
+
+            } _throw_unexpected_token
 
             _if_type (L2_TOKEN_RP)
             {
@@ -1150,6 +1192,10 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
             l2_expr_info expr_info;
             expr_info = l2_eval_expr(scope_p);
 
+            _if (expr_info.val_type != L2_EXPR_VAL_NOT_EXPR) {
+
+            } _throw_unexpected_token
+
             if (expr_info.val_type != L2_EXPR_VAL_TYPE_BOOL)
                 l2_parsing_error(L2_PARSING_ERROR_EXPR_NOT_BOOL, current_token_p->current_line, current_token_p->current_col);
 
@@ -1203,6 +1249,10 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
             {
                 right_expr_info = l2_eval_expr(scope_p); /* expr */
 
+                _if (right_expr_info.val_type != L2_EXPR_VAL_NOT_EXPR) {
+
+                } _throw_unexpected_token
+
                 switch (right_expr_info.val_type) {
                     case L2_EXPR_VAL_TYPE_INTEGER:
                         symbol_added = l2_symbol_table_add_symbol_integer(&scope_p->symbol_table_p, current_token_p->u.str.str_p, right_expr_info.val.integer);
@@ -1215,6 +1265,9 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
                     case L2_EXPR_VAL_TYPE_BOOL:
                         symbol_added = l2_symbol_table_add_symbol_bool(&scope_p->symbol_table_p, current_token_p->u.str.str_p, right_expr_info.val.bool);
                         break;
+
+                    case L2_EXPR_VAL_NO_VAL:
+                        l2_parsing_error(L2_PARSING_ERROR_EXPR_RESULT_WITHOUT_VALUE, current_token_p->current_line, current_token_p->current_col);
 
                     default:
                         l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error token type");
@@ -1243,6 +1296,10 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
     {
         right_expr_info = l2_eval_expr(scope_p); /* expr */
 
+        _if (right_expr_info.val_type != L2_EXPR_VAL_NOT_EXPR) {
+
+        } _throw_unexpected_token
+
         _if_type (L2_TOKEN_SEMICOLON)
         {
             /* absorb ';' */
@@ -1267,7 +1324,9 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
     }
     _else /* TODO find some bugs in the shadow */
     {
-        l2_eval_expr(scope_p); /* expr */
+        _if (l2_eval_expr(scope_p).val_type != L2_EXPR_VAL_NOT_EXPR) { /* expr */
+
+        } _throw_unexpected_token
 
         _if_type (L2_TOKEN_SEMICOLON)
         {

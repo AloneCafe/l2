@@ -5,6 +5,7 @@
 #include "l2_parse.h"
 
 typedef enum _l2_expr_val_type {
+    L2_EXPR_VAL_NOT_EXPR, /* not expr */
     L2_EXPR_VAL_NO_VAL,
     L2_EXPR_VAL_TYPE_REAL,
     L2_EXPR_VAL_TYPE_INTEGER,
