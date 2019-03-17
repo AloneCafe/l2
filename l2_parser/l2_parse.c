@@ -49,7 +49,7 @@ void l2_parse() {
 }
 
 void l2_absorb_stmt_var_def_list1();
-void l2_absorb_stmt_elif();
+boolean l2_absorb_stmt_elif();
 void l2_absorb_formal_param_list();
 boolean l2_absorb_stmts();
 
@@ -126,12 +126,17 @@ boolean l2_absorb_stmt() {
 
                 _if_type (L2_TOKEN_LBRACE) /* { */
                 {
-                    l2_absorb_stmts();
+                    /* braces flag + 1 */
+                    g_parser_p->braces_flag += 1;
+
+                    boolean stmts_flag = l2_absorb_stmts(); /* absorb stmts */
 
                     _if_type (L2_TOKEN_RBRACE)
                     {
                         /* absorb '}' */
                     } _throw_missing_rbrace
+
+                    return stmts_flag;
 
                 } _throw_unexpected_token
 
@@ -210,12 +215,17 @@ boolean l2_absorb_stmt() {
         /* absorb the for stmt loop structure */
         _if_type (L2_TOKEN_LBRACE) /* { */
         {
-            l2_absorb_stmts(); /* parse stmts, may parse break or continue*/
+            /* braces flag + 1 */
+            g_parser_p->braces_flag += 1;
+
+            boolean stmts_flag = l2_absorb_stmts(); /* parse stmts, may parse break or continue*/
 
             _if_type (L2_TOKEN_RBRACE) /* } */
             {
                 /* absorb '}' */
             }_throw_missing_rbrace
+
+            return stmts_flag;
 
         } _throw_unexpected_token
 
@@ -224,12 +234,17 @@ boolean l2_absorb_stmt() {
     {
         _if_type (L2_TOKEN_LBRACE) /* { */
         {
-            l2_absorb_stmts(); /* absorb stmts */
+            /* braces flag + 1 */
+            g_parser_p->braces_flag += 1;
+
+            boolean stmts_flag = l2_absorb_stmts(); /* absorb stmts */
 
             _if_type (L2_TOKEN_RBRACE) /* } */
             {
                 /* absorb '}' */
             } _throw_missing_rbrace
+
+            return stmts_flag;
 
         } _throw_unexpected_token
 
@@ -269,12 +284,17 @@ boolean l2_absorb_stmt() {
 
             _if_type (L2_TOKEN_LBRACE) /* { */
             {
-                l2_absorb_stmts(); /* absorb stmts */
+                /* braces flag + 1 */
+                g_parser_p->braces_flag += 1;
+
+                boolean stmts_flag = l2_absorb_stmts(); /* absorb stmts */
 
                 _if_type (L2_TOKEN_RBRACE)
                 {
                     /* absorb '}' */
                 } _throw_missing_rbrace
+
+                return stmts_flag;
 
             } _throw_unexpected_token
 
@@ -311,12 +331,21 @@ boolean l2_absorb_stmt() {
 
             _if_type (L2_TOKEN_LBRACE) /* { */
             {
-                l2_absorb_stmts(); /* absorb stmts */
+                /* braces flag + 1 */
+                g_parser_p->braces_flag += 1;
+
+                boolean stmts_flag = l2_absorb_stmts(); /* absorb stmts */
 
                 _if_type (L2_TOKEN_RBRACE) /* } */
                 {
-                    l2_absorb_stmt_elif();
+
                 } _throw_missing_rbrace
+
+                if (stmts_flag) {
+                    return l2_absorb_stmt_elif();
+                } else {
+                    return L2_FALSE;
+                }
 
             } _throw_unexpected_token
 
@@ -564,7 +593,7 @@ void l2_parse_stmt_var_def_list1(l2_scope *scope_p) {
  * | nil
  *
  * */
-void l2_absorb_stmt_elif() {
+boolean l2_absorb_stmt_elif() {
 
     _if_keyword(L2_KW_ELIF) /* "elif" */
     {
@@ -580,13 +609,21 @@ void l2_absorb_stmt_elif() {
 
             _if_type (L2_TOKEN_LBRACE) /* { */
             {
-                l2_absorb_stmts(); /* absorb stmts */
+                /* braces flag + 1 */
+                g_parser_p->braces_flag += 1;
+
+                boolean stmts_flag = l2_absorb_stmts(); /* absorb stmts */
 
                 _if_type (L2_TOKEN_RBRACE) /* } */
                 {
-                    l2_absorb_stmt_elif();
 
                 } _throw_missing_rbrace
+
+                if (stmts_flag) {
+                    return l2_absorb_stmt_elif();
+                } else {
+                    return L2_FALSE;
+                }
 
             } _throw_unexpected_token
 
@@ -597,16 +634,23 @@ void l2_absorb_stmt_elif() {
     {
         _if_type (L2_TOKEN_LBRACE) /* { */
         {
-            l2_absorb_stmts(); /* absorb stmts */
+            /* braces flag + 1 */
+            g_parser_p->braces_flag += 1;
+
+            boolean stmts_flag = l2_absorb_stmts(); /* absorb stmts */
 
             _if_type (L2_TOKEN_RBRACE)
             {
                 /* } */
             } _throw_missing_rbrace
 
+            return stmts_flag;
+
         } _throw_unexpected_token
     }
     _end
+
+    return L2_TRUE;
 }
 
 /* stmt_elif ->
