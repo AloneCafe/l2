@@ -2829,8 +2829,8 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
  * ---------------------------------------------------------------------------
  * */
 
-void l2_absorb_expr() {
-    l2_absorb_expr_comma();
+boolean l2_absorb_expr() {
+    return l2_absorb_expr_comma();
 }
 
 /* expr_comma ->
@@ -2848,18 +2848,15 @@ void l2_absorb_expr() {
  * | nil
  *
  * */
-void l2_absorb_expr_comma1() {
+boolean l2_absorb_expr_comma1() {
     _if_type (L2_TOKEN_COMMA)
     {
-        l2_absorb_expr_assign();
-        l2_absorb_expr_comma1();
-
+        return l2_absorb_expr_assign() ? l2_absorb_expr_comma1() : L2_FALSE;
     } _end
 }
 
-void l2_absorb_expr_comma() {
-    l2_absorb_expr_assign();
-    l2_absorb_expr_comma1();
+boolean l2_absorb_expr_comma() {
+    return l2_absorb_expr_assign() ? l2_absorb_expr_comma1() : L2_FALSE;
 }
 
 /* expr_assign ->
@@ -2878,7 +2875,7 @@ void l2_absorb_expr_comma() {
  * | expr_condition
  *
  * */
-void l2_absorb_expr_assign() {
+boolean l2_absorb_expr_assign() {
     _if_type (L2_TOKEN_IDENTIFIER)
     {
         _if_type(L2_TOKEN_ASSIGN) { l2_absorb_expr_assign(); }
@@ -2896,12 +2893,12 @@ void l2_absorb_expr_assign() {
         _else
         {
             l2_parse_token_back();
-            l2_absorb_expr_condition();
+            return l2_absorb_expr_condition();
         }
     }
     _else
     {
-        l2_absorb_expr_condition();
+        return l2_absorb_expr_condition();
     }
 }
 
@@ -2909,19 +2906,34 @@ void l2_absorb_expr_assign() {
  * | expr_logic_or ? expr : expr_condition
  * | expr_logic_or
  * */
-void l2_absorb_expr_condition() {
+boolean l2_absorb_expr_condition() {
     _declr_current_token_p
-    l2_absorb_expr_logic_or();
-    _if_type(L2_TOKEN_QM)
-    {
-        l2_absorb_expr();
-
-        _if_type(L2_TOKEN_COLON)
+    if (l2_absorb_expr_logic_or()) {
+        _if_type(L2_TOKEN_QM)
         {
-            l2_absorb_expr_condition();
+            if (l2_absorb_expr()) {
+                return L2_FALSE;
+            } else {
+                _if_type(L2_TOKEN_COLON)
+                {
+                    if (l2_absorb_expr_condition()) {
 
-        } _throw_missing_colon
-    } _end
+                    } else {
+                        return L2_FALSE;
+                    }
+
+                } _throw_missing_colon
+            }
+
+
+        } _end
+
+        return L2_TRUE;
+
+    } else {
+        return L2_FALSE;
+    }
+
 }
 
 /* expr_logic_or ->
@@ -2939,17 +2951,17 @@ void l2_absorb_expr_condition() {
  * | nil
  *
  * */
-void l2_absorb_expr_logic_or1() {
+boolean l2_absorb_expr_logic_or1() {
     _if_type (L2_TOKEN_LOGIC_OR)
     {
-        l2_absorb_expr_logic_and();
-        l2_absorb_expr_logic_or1();
+        return l2_absorb_expr_logic_and() ? l2_absorb_expr_logic_or1() : L2_FALSE;
     } _end
+
+    return L2_TRUE;
 }
 
-void l2_absorb_expr_logic_or() {
-    l2_absorb_expr_logic_and();
-    l2_absorb_expr_logic_or1();
+boolean l2_absorb_expr_logic_or() {
+    return l2_absorb_expr_logic_and() ? l2_absorb_expr_logic_or1() : L2_FALSE;
 }
 
 /* expr_logic_and ->
@@ -2967,17 +2979,17 @@ void l2_absorb_expr_logic_or() {
  * | nil
  *
  * */
-void l2_absorb_expr_logic_and1() {
+boolean l2_absorb_expr_logic_and1() {
     _if_type (L2_TOKEN_LOGIC_AND)
     {
-        l2_absorb_expr_bit_or();
-        l2_absorb_expr_logic_and1();
+        return l2_absorb_expr_bit_or() ? l2_absorb_expr_logic_and1() : L2_FALSE;
     } _end
+
+    return L2_TRUE;
 }
 
-void l2_absorb_expr_logic_and() {
-    l2_absorb_expr_bit_or();
-    l2_absorb_expr_logic_and1();
+boolean l2_absorb_expr_logic_and() {
+    return l2_absorb_expr_bit_or() ? l2_absorb_expr_logic_and1() : L2_FALSE;
 }
 
 /* expr_bit_or ->
@@ -2995,17 +3007,17 @@ void l2_absorb_expr_logic_and() {
  * | nil
  *
  * */
-void l2_absorb_expr_bit_or1() {
+boolean l2_absorb_expr_bit_or1() {
     _if_type (L2_TOKEN_BIT_OR)
     {
-        l2_absorb_expr_bit_xor();
-        l2_absorb_expr_bit_or1();
+        return l2_absorb_expr_bit_xor() ? l2_absorb_expr_bit_or1() : L2_FALSE;
     } _end
+
+    return L2_TRUE;
 }
 
-void l2_absorb_expr_bit_or() {
-    l2_absorb_expr_bit_xor();
-    l2_absorb_expr_bit_or1();
+boolean l2_absorb_expr_bit_or() {
+    return l2_absorb_expr_bit_xor() ? l2_absorb_expr_bit_or1() : L2_FALSE;
 }
 
 /* expr_bit_xor ->
@@ -3023,17 +3035,17 @@ void l2_absorb_expr_bit_or() {
  * | nil
  *
  * */
-void l2_absorb_expr_bit_xor1() {
+boolean l2_absorb_expr_bit_xor1() {
     _if_type (L2_TOKEN_BIT_XOR)
     {
-        l2_absorb_expr_bit_and();
-        l2_absorb_expr_bit_xor1();
+        return l2_absorb_expr_bit_and() ? l2_absorb_expr_bit_xor1() : L2_FALSE;
     } _end
+
+    return L2_TRUE;
 }
 
-void l2_absorb_expr_bit_xor() {
-    l2_absorb_expr_bit_and();
-    l2_absorb_expr_bit_xor1();
+boolean l2_absorb_expr_bit_xor() {
+    return l2_absorb_expr_bit_and() ? l2_absorb_expr_bit_xor1() : L2_FALSE;
 }
 
 /* expr_bit_and ->
@@ -3051,17 +3063,17 @@ void l2_absorb_expr_bit_xor() {
  * | nil
  *
  * */
-void l2_absorb_expr_bit_and1() {
+boolean l2_absorb_expr_bit_and1() {
     _if_type (L2_TOKEN_BIT_AND)
     {
-        l2_absorb_expr_eq_ne();
-        l2_absorb_expr_bit_and1();
+        return l2_absorb_expr_eq_ne() ? l2_absorb_expr_bit_and1() : L2_FALSE;
     } _end
+
+    return L2_TRUE;
 }
 
-void l2_absorb_expr_bit_and() {
-    l2_absorb_expr_eq_ne();
-    l2_absorb_expr_bit_and1();
+boolean l2_absorb_expr_bit_and() {
+    return l2_absorb_expr_eq_ne() ? l2_absorb_expr_bit_and1() : L2_FALSE;
 }
 
 /* expr_eq_ne ->
@@ -3081,25 +3093,23 @@ void l2_absorb_expr_bit_and() {
  * | nil
  *
  * */
-void l2_absorb_expr_eq_ne1() {
+boolean l2_absorb_expr_eq_ne1() {
     _if_type (L2_TOKEN_EQUAL)
     {
-        l2_absorb_expr_gt_lt_ge_le();
-        l2_absorb_expr_eq_ne1();
+        return l2_absorb_expr_gt_lt_ge_le() ? l2_absorb_expr_eq_ne1() : L2_FALSE;
     }
     _elif_type (L2_TOKEN_NOT_EQUAL)
     {
-        l2_absorb_expr_gt_lt_ge_le();
-        l2_absorb_expr_eq_ne1();
+        return l2_absorb_expr_gt_lt_ge_le() ? l2_absorb_expr_eq_ne1() : L2_FALSE;
     }
     _end
+
+    return L2_TRUE;
 }
 
 
-void l2_absorb_expr_eq_ne() {
-    l2_absorb_expr_gt_lt_ge_le();
-    l2_absorb_expr_eq_ne1();
-
+boolean l2_absorb_expr_eq_ne() {
+    return l2_absorb_expr_gt_lt_ge_le() ? l2_absorb_expr_eq_ne1() : L2_FALSE;
 }
 
 /* expr_gt_lt_ge_le ->
@@ -3123,33 +3133,30 @@ void l2_absorb_expr_eq_ne() {
  * | nil
  *
  * */
-void l2_absorb_expr_gt_lt_ge_le1() {
+boolean l2_absorb_expr_gt_lt_ge_le1() {
     _if_type (L2_TOKEN_GREAT_EQUAL_THAN)
     {
-        l2_absorb_expr_lshift_rshift_rshift_unsigned();
-        l2_absorb_expr_gt_lt_ge_le1();
+        return l2_absorb_expr_lshift_rshift_rshift_unsigned() ? l2_absorb_expr_gt_lt_ge_le1() : L2_FALSE;
     }
     _elif_type (L2_TOKEN_GREAT_THAN)
     {
-        l2_absorb_expr_lshift_rshift_rshift_unsigned();
-        l2_absorb_expr_gt_lt_ge_le1();
+        return l2_absorb_expr_lshift_rshift_rshift_unsigned() ? l2_absorb_expr_gt_lt_ge_le1() : L2_FALSE;
     }
     _elif_type (L2_TOKEN_LESS_EQUAL_THAN)
     {
-        l2_absorb_expr_lshift_rshift_rshift_unsigned();
-        l2_absorb_expr_gt_lt_ge_le1();
+        return l2_absorb_expr_lshift_rshift_rshift_unsigned() ? l2_absorb_expr_gt_lt_ge_le1() : L2_FALSE;
     }
     _elif_type (L2_TOKEN_LESS_THAN)
     {
-        l2_absorb_expr_lshift_rshift_rshift_unsigned();
-        l2_absorb_expr_gt_lt_ge_le1();
+        return l2_absorb_expr_lshift_rshift_rshift_unsigned() ? l2_absorb_expr_gt_lt_ge_le1() : L2_FALSE;
     }
     _end
+
+    return L2_TRUE;
 }
 
-void l2_absorb_expr_gt_lt_ge_le() {
-    l2_absorb_expr_lshift_rshift_rshift_unsigned();
-    l2_absorb_expr_gt_lt_ge_le1();
+boolean l2_absorb_expr_gt_lt_ge_le() {
+    return l2_absorb_expr_lshift_rshift_rshift_unsigned() ? l2_absorb_expr_gt_lt_ge_le1() : L2_FALSE;
 }
 
 /* expr_lshift_rshift_rshift_unsigned ->
@@ -3171,28 +3178,26 @@ void l2_absorb_expr_gt_lt_ge_le() {
  * | nil
  *
  * */
-void l2_absorb_expr_lshift_rshift_rshift_unsigned1() {
+boolean l2_absorb_expr_lshift_rshift_rshift_unsigned1() {
     _if_type (L2_TOKEN_LSHIFT)
     {
-        l2_absorb_expr_plus_sub();
-        l2_absorb_expr_lshift_rshift_rshift_unsigned1();
+        return l2_absorb_expr_plus_sub() ? l2_absorb_expr_lshift_rshift_rshift_unsigned1() : L2_FALSE;
     }
     _elif_type (L2_TOKEN_RSHIFT)
     {
-        l2_absorb_expr_plus_sub();
-        l2_absorb_expr_lshift_rshift_rshift_unsigned1();
+        return l2_absorb_expr_plus_sub() ? l2_absorb_expr_lshift_rshift_rshift_unsigned1() : L2_FALSE;
     }
     _elif_type (L2_TOKEN_RSHIFT_UNSIGNED)
     {
-        l2_absorb_expr_plus_sub();
-        l2_absorb_expr_lshift_rshift_rshift_unsigned1();
+        return l2_absorb_expr_plus_sub() ? l2_absorb_expr_lshift_rshift_rshift_unsigned1() : L2_FALSE;
     }
     _end
+
+    return L2_TRUE;
 }
 
-void l2_absorb_expr_lshift_rshift_rshift_unsigned() {
-    l2_absorb_expr_plus_sub();
-    l2_absorb_expr_lshift_rshift_rshift_unsigned1();
+boolean l2_absorb_expr_lshift_rshift_rshift_unsigned() {
+    return l2_absorb_expr_plus_sub() ? l2_absorb_expr_lshift_rshift_rshift_unsigned1() : L2_FALSE;
 }
 
 /* expr_plus_sub ->
@@ -3212,23 +3217,22 @@ void l2_absorb_expr_lshift_rshift_rshift_unsigned() {
  * | nil
  *
  * */
-void l2_absorb_expr_plus_sub1() {
+boolean l2_absorb_expr_plus_sub1() {
     _if_type (L2_TOKEN_PLUS)
     {
-        l2_absorb_expr_mul_div_mod();
-        l2_absorb_expr_plus_sub1();
+        return l2_absorb_expr_mul_div_mod() ? l2_absorb_expr_plus_sub1() : L2_FALSE;
     }
     _elif_type (L2_TOKEN_SUB)
     {
-        l2_absorb_expr_mul_div_mod();
-        l2_absorb_expr_plus_sub1();
+        return l2_absorb_expr_mul_div_mod() ? l2_absorb_expr_plus_sub1() : L2_FALSE;
     }
     _end
+
+    return L2_TRUE;
 }
 
-void l2_absorb_expr_plus_sub() {
-    l2_absorb_expr_mul_div_mod();
-    l2_absorb_expr_plus_sub1();
+boolean l2_absorb_expr_plus_sub() {
+    return l2_absorb_expr_mul_div_mod() ? l2_absorb_expr_plus_sub1() : L2_FALSE;
 }
 
 /* expr_mul_div_mod ->
@@ -3250,28 +3254,26 @@ void l2_absorb_expr_plus_sub() {
  * | nil
  *
  * */
-void l2_absorb_expr_mul_div_mod1() {
+boolean l2_absorb_expr_mul_div_mod1() {
     _if_type (L2_TOKEN_MUL)
     {
-        l2_absorb_expr_single();
-        l2_absorb_expr_mul_div_mod1();
+        return l2_absorb_expr_single() ? l2_absorb_expr_mul_div_mod1() : L2_FALSE;
     }
     _elif_type (L2_TOKEN_DIV)
     {
-        l2_absorb_expr_single();
-        l2_absorb_expr_mul_div_mod1();
+        return l2_absorb_expr_single() ? l2_absorb_expr_mul_div_mod1() : L2_FALSE;
     }
     _elif_type (L2_TOKEN_MOD)
     {
-        l2_absorb_expr_single();
-        l2_absorb_expr_mul_div_mod1();
+        return l2_absorb_expr_single() ? l2_absorb_expr_mul_div_mod1() : L2_FALSE;
     }
     _end
+
+    return L2_TRUE;
 }
 
-void l2_absorb_expr_mul_div_mod() {
-    l2_absorb_expr_single();
-    l2_absorb_expr_mul_div_mod1();
+boolean l2_absorb_expr_mul_div_mod() {
+    return l2_absorb_expr_single() ? l2_absorb_expr_mul_div_mod1() : L2_FALSE;
 }
 
 /* expr_single ->
@@ -3281,22 +3283,22 @@ void l2_absorb_expr_mul_div_mod() {
  * | expr_atom
  *
  * */
-void l2_absorb_expr_single() {
+boolean l2_absorb_expr_single() {
     _if_type (L2_TOKEN_LOGIC_NOT)
     {
-        l2_absorb_expr_single();
+        return l2_absorb_expr_single();
     }
     _elif_type (L2_TOKEN_BIT_NOT)
     {
-        l2_absorb_expr_single();
+        return l2_absorb_expr_single();
     }
     _elif_type (L2_TOKEN_SUB)
     {
-        l2_absorb_expr_single();
+        return l2_absorb_expr_single();
     }
     _else
     {
-        l2_absorb_expr_atom();
+        return l2_absorb_expr_atom();
     }
 }
 
@@ -3340,7 +3342,7 @@ void l2_absorb_real_param_list() {
  * | keyword: true/false
  *
  * */
-void l2_absorb_expr_atom() {
+boolean l2_absorb_expr_atom() {
     _if_type (L2_TOKEN_LP)
     {
         l2_absorb_expr();
@@ -3368,5 +3370,8 @@ void l2_absorb_expr_atom() {
     { }
     _elif_keyword (L2_KW_FALSE)
     { }
-    _throw_unexpected_token
+    _else {
+        return L2_FALSE;
+    }
+    return L2_TRUE;
 }

@@ -51,7 +51,7 @@ void l2_parse() {
 void l2_absorb_stmt_var_def_list1();
 void l2_absorb_stmt_elif();
 void l2_absorb_formal_param_list();
-void l2_absorb_stmts();
+boolean l2_absorb_stmts();
 
 
 /* stmt ->
@@ -74,7 +74,7 @@ void l2_absorb_stmts();
  * | eval expr;
  * |
  * */
-void l2_absorb_stmt() {
+boolean l2_absorb_stmt() {
     _declr_current_token_p
 
     _if_keyword (L2_KW_BREAK) /* "break" */
@@ -283,12 +283,17 @@ void l2_absorb_stmt() {
     }
     _elif_type (L2_TOKEN_LBRACE) /* { */
     {
-        l2_absorb_stmts(); /* absorb stmts */
+        /* braces flag + 1 */
+        g_parser_p->braces_flag += 1;
+
+        boolean stmts_flag = l2_absorb_stmts(); /* absorb stmts */
 
         _if_type (L2_TOKEN_RBRACE) /* } */
         {
             /* absorb '}' */
         } _throw_missing_rbrace
+
+        return stmts_flag;
 
     }
     _elif_keyword (L2_KW_IF) /* "if" */
@@ -357,13 +362,27 @@ void l2_absorb_stmt() {
     }
     _else
     {
-        l2_absorb_expr(); /* absorb expr */
+        if (!l2_absorb_expr()) { /* absorb expr */
+            /* braces flag - 1 */
+            g_parser_p->braces_flag -= 1;
 
-        _if_type (L2_TOKEN_SEMICOLON)
-        {
-            /* absorb ';' */
-        } _throw_missing_semicolon
+            _if (g_parser_p->braces_flag >= 0) {
+
+            } _throw_unexpected_token
+
+            return L2_FALSE;
+
+        } else {
+            /* if it's a expr, after eval_expr() then absorb ';' */
+            _if_type (L2_TOKEN_SEMICOLON)
+            {
+                /* absorb ';' */
+            } _throw_missing_semicolon
+        }
+
     }
+
+    return L2_TRUE;
 }
 
 /* stmts ->
@@ -371,14 +390,18 @@ void l2_absorb_stmt() {
  * | eof
  *
  * */
-void l2_absorb_stmts() {
-    if (l2_parse_probe_next_token_by_type(L2_TOKEN_TERMINATOR)) {
-        return;
+boolean l2_absorb_stmts() {
+    _if_type(L2_TOKEN_TERMINATOR)
+    {
+        return L2_TRUE;
+    }
+    _else
+    {
+        if (!l2_absorb_stmt()) {
+            return L2_TRUE;
+        }
 
-    } else {
-        l2_absorb_stmt();
-        l2_absorb_stmts();
-
+        return l2_absorb_stmts();
     }
 }
 
