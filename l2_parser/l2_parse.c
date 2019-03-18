@@ -690,7 +690,11 @@ l2_stmt_interrupt l2_parse_stmt_elif(l2_scope *scope_p) { /* the scopes in if..e
             if (expr_info.val.bool) { /* elif true */
                 _if_type (L2_TOKEN_LBRACE) /* { */
                 {
+                    /* braces flag + 1 */
+                    g_parser_p->braces_flag += 1;
+
                     sub_scope_p = l2_scope_create_common_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
+
                     irt = l2_parse_stmts(sub_scope_p); /* parse stmts */
 
                     _if_type (L2_TOKEN_RBRACE) /* } */
@@ -705,7 +709,10 @@ l2_stmt_interrupt l2_parse_stmt_elif(l2_scope *scope_p) { /* the scopes in if..e
             } else { /* elif false */
                 _if_type (L2_TOKEN_LBRACE) /* { */
                 {
-                    l2_absorb_stmts(); /* parse stmts */
+                    /* braces flag + 1 */
+                    g_parser_p->braces_flag += 1;
+
+                    irt.type = l2_absorb_stmts(); /* parse stmts */
 
                     _if_type (L2_TOKEN_RBRACE) /* } */
                     {
@@ -717,12 +724,18 @@ l2_stmt_interrupt l2_parse_stmt_elif(l2_scope *scope_p) { /* the scopes in if..e
             }
 
         } _throw_unexpected_token
+
+        return irt;
     }
     _elif_keyword (L2_KW_ELSE) /* "else" */
     {
         _if_type (L2_TOKEN_LBRACE) /* { */
         {
+            /* braces flag + 1 */
+            g_parser_p->braces_flag += 1;
+
             sub_scope_p = l2_scope_create_common_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
+
             irt = l2_parse_stmts(sub_scope_p); /* parse stmts */
 
             _if_type (L2_TOKEN_RBRACE) /* } */
@@ -730,6 +743,8 @@ l2_stmt_interrupt l2_parse_stmt_elif(l2_scope *scope_p) { /* the scopes in if..e
                 l2_scope_escape_scope(sub_scope_p);
 
             } _throw_missing_rbrace
+
+            return irt;
 
         } _throw_unexpected_token
     }
