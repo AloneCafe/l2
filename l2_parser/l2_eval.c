@@ -2885,18 +2885,18 @@ boolean l2_absorb_expr_comma() {
 boolean l2_absorb_expr_assign() {
     _if_type (L2_TOKEN_IDENTIFIER)
     {
-        _if_type(L2_TOKEN_ASSIGN) { l2_absorb_expr_assign(); }
-        _elif_type(L2_TOKEN_DIV_ASSIGN) { l2_absorb_expr_assign(); }
-        _elif_type(L2_TOKEN_MUL_ASSIGN) { l2_absorb_expr_assign(); }
-        _elif_type(L2_TOKEN_MOD_ASSIGN) { l2_absorb_expr_assign(); }
-        _elif_type(L2_TOKEN_PLUS_ASSIGN) { l2_absorb_expr_assign(); }
-        _elif_type(L2_TOKEN_SUB_ASSIGN) { l2_absorb_expr_assign(); }
-        _elif_type(L2_TOKEN_LSHIFT_ASSIGN) { l2_absorb_expr_assign(); }
-        _elif_type(L2_TOKEN_RSHIFT_ASSIGN) { l2_absorb_expr_assign(); }
-        _elif_type(L2_TOKEN_RSHIFT_UNSIGNED_ASSIGN) { l2_absorb_expr_assign(); }
-        _elif_type(L2_TOKEN_BIT_AND_ASSIGN) { l2_absorb_expr_assign(); }
-        _elif_type(L2_TOKEN_BIT_XOR_ASSIGN) { l2_absorb_expr_assign(); }
-        _elif_type(L2_TOKEN_BIT_OR_ASSIGN) { l2_absorb_expr_assign(); }
+        _if_type(L2_TOKEN_ASSIGN) { return l2_absorb_expr_assign(); }
+        _elif_type(L2_TOKEN_DIV_ASSIGN) { return l2_absorb_expr_assign(); }
+        _elif_type(L2_TOKEN_MUL_ASSIGN) { return l2_absorb_expr_assign(); }
+        _elif_type(L2_TOKEN_MOD_ASSIGN) { return l2_absorb_expr_assign(); }
+        _elif_type(L2_TOKEN_PLUS_ASSIGN) { return l2_absorb_expr_assign(); }
+        _elif_type(L2_TOKEN_SUB_ASSIGN) { return l2_absorb_expr_assign(); }
+        _elif_type(L2_TOKEN_LSHIFT_ASSIGN) { return l2_absorb_expr_assign(); }
+        _elif_type(L2_TOKEN_RSHIFT_ASSIGN) { return l2_absorb_expr_assign(); }
+        _elif_type(L2_TOKEN_RSHIFT_UNSIGNED_ASSIGN) { return l2_absorb_expr_assign(); }
+        _elif_type(L2_TOKEN_BIT_AND_ASSIGN) { return l2_absorb_expr_assign(); }
+        _elif_type(L2_TOKEN_BIT_XOR_ASSIGN) { return l2_absorb_expr_assign(); }
+        _elif_type(L2_TOKEN_BIT_OR_ASSIGN) { return l2_absorb_expr_assign(); }
         _else
         {
             l2_parse_token_back();
@@ -3352,10 +3352,12 @@ void l2_absorb_real_param_list() {
 boolean l2_absorb_expr_atom() {
     _if_type (L2_TOKEN_LP)
     {
-        l2_absorb_expr();
+        boolean inner_res = l2_absorb_expr();
         _if_type (L2_TOKEN_RP)
         { }
         _throw_missing_rp
+
+        return inner_res;
     }
     _elif_type (L2_TOKEN_IDENTIFIER)
     {
