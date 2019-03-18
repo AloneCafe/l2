@@ -1033,7 +1033,7 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
 
                 _if_type (L2_TOKEN_RBRACE) /* } */
                 {
-                    l2_scope_escape_scope(sub_scope_p);
+
 
                 } _throw_missing_rbrace
 
@@ -1041,12 +1041,11 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
                 switch (irt.type) {
                     case L2_STMT_INTERRUPT_RETURN_WITHOUT_VAL:
                     case L2_STMT_INTERRUPT_RETURN_WITH_VAL:
-                        return irt;
-
                     case L2_STMT_INTERRUPT_BREAK:
                         break;
 
                     case L2_STMT_INTERRUPT_CONTINUE:
+                    case L2_STMT_NO_INTERRUPT:
                         /* evaluate the third expr */
                         l2_token_stream_set_pos(g_parser_p->token_stream_p, third_expr_entry_pos);
 
@@ -1054,13 +1053,17 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
 
                         } _throw_unexpected_token
 
-                        /* | */
-                        /* V */
-
-                    case L2_STMT_NO_INTERRUPT:
                         l2_token_stream_set_pos(g_parser_p->token_stream_p, loop_entry_pos);
+
+                        /* apply the modifies in symbol table */
+                        l2_symbol_table_copy(&for_init_symbol_table_p, sub_scope_p->symbol_table_p);
+
+                        l2_scope_escape_scope(sub_scope_p);
+
                         goto __for_loop_entry__;
                 }
+
+                l2_scope_escape_scope(sub_scope_p);
 
             } _throw_unexpected_token
 
@@ -1420,15 +1423,15 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
 
         switch (right_expr_info.val_type) {
             case L2_EXPR_VAL_TYPE_INTEGER:
-                fprintf(stdout, "%d", right_expr_info.val.integer);
+                fprintf(stdout, "%d\n", right_expr_info.val.integer);
                 break;
 
             case L2_EXPR_VAL_TYPE_REAL:
-                fprintf(stdout, "%lf", right_expr_info.val.real);
+                fprintf(stdout, "%lf\n", right_expr_info.val.real);
                 break;
 
             case L2_EXPR_VAL_TYPE_BOOL:
-                fprintf(stdout, "%s", right_expr_info.val.bool ? "true" : "false");
+                fprintf(stdout, "%s\n", right_expr_info.val.bool ? "true" : "false");
                 break;
 
             default:
