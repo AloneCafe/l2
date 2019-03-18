@@ -715,6 +715,6 @@ int l2_token_stream_get_pos(l2_token_stream *token_stream_p) {
 
 void l2_token_stream_set_pos(l2_token_stream *token_stream_p, int pos) {
     l2_assert(token_stream_p, L2_INTERNAL_ERROR_NULL_POINTER);
-    l2_assert(pos > 0 && token_stream_p->token_vector_current_pos < token_stream_p->token_vector.size, L2_INTERNAL_ERROR_OUT_OF_RANGE);
+    l2_assert(pos > 0 && pos <= token_stream_p->token_vector.size, L2_INTERNAL_ERROR_OUT_OF_RANGE);
     token_stream_p->token_vector_current_pos = pos;
 }

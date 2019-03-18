@@ -177,7 +177,7 @@ boolean l2_symbol_table_add_symbol_procedure(l2_symbol_node **head_p, char *symb
         (*head_p)->next = L2_NULL_PTR;
         (*head_p)->symbol.symbol_name = symbol_name;
         (*head_p)->symbol.type = L2_SYMBOL_TYPE_PROCEDURE;
-        (*head_p)->symbol.u.procedure.entry_pos = procedure.entry_pos;
+        (*head_p)->symbol.u.procedure = procedure;
         return L2_TRUE;
     }
 
@@ -188,7 +188,7 @@ boolean l2_symbol_table_add_symbol_procedure(l2_symbol_node **head_p, char *symb
     current_p->next->next = L2_NULL_PTR;
     current_p->next->symbol.symbol_name = symbol_name;
     current_p->next->symbol.type = L2_SYMBOL_TYPE_PROCEDURE;
-    current_p->next->symbol.u.procedure.entry_pos = procedure.entry_pos;
+    current_p->next->symbol.u.procedure = procedure;
     return L2_TRUE;
 }
 

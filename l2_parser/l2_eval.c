@@ -2698,6 +2698,7 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
                 l2_token_stream_set_pos(g_parser_p->token_stream_p, symbol_node_p->symbol.u.procedure.entry_pos);
 
                 /* create new sub scope */
+
                 l2_scope *procedure_scope_p = l2_scope_create_common_scope(symbol_node_p->symbol.u.procedure.upper_scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
 
                 /* TODO enter into procedure */
@@ -2712,6 +2713,9 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
 
                     _if_type (L2_TOKEN_LBRACE) /* { */
                     {
+                        /* braces flag + 1 */
+                        g_parser_p->braces_flag += 1;
+
                         /* TODO the function maybe return a interrupt */
                         l2_stmt_interrupt irt = l2_parse_stmts(procedure_scope_p);
 
@@ -2736,6 +2740,9 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
                                 /* no interrupt means no return stmt */
                                 res_expr_info.val_type = L2_EXPR_VAL_NO_VAL;
                                 break;
+
+                            default: /* NOT STMT */
+                                res_expr_info.val_type = L2_EXPR_VAL_NOT_EXPR;
                         }
 
                         _if_type (L2_TOKEN_RBRACE)
