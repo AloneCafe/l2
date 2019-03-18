@@ -849,7 +849,10 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
 
                 _if_type (L2_TOKEN_LBRACE) /* { */
                 {
-                    l2_absorb_stmts();
+                    /* braces flag + 1 */
+                    g_parser_p->braces_flag += 1;
+
+                    irt.type = l2_absorb_stmts();
 
                     _if_type (L2_TOKEN_RBRACE)
                     {
@@ -867,6 +870,8 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
 
         if (!symbol_added)
             l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_REDEFINED, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);
+
+        return irt;
 
     }
     _elif_keyword (L2_KW_FOR) /* "for" */ /* for-loop */
@@ -1006,6 +1011,9 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
         if (second_expr_info.val.bool) { /* for true */
             _if_type (L2_TOKEN_LBRACE) /* { */
             {
+                /* braces flag + 1 */
+                g_parser_p->braces_flag += 1;
+
                 irt = l2_parse_stmts(sub_scope_p); /* parse stmts, may parse break or continue*/
 
                 _if_type (L2_TOKEN_RBRACE) /* } */
@@ -1044,7 +1052,10 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
         } else { /* for false */
             _if_type (L2_TOKEN_LBRACE) /* { */
             {
-                l2_absorb_stmts(); /* parse stmts */
+                /* braces flag + 1 */
+                g_parser_p->braces_flag += 1;
+
+                irt.type = l2_absorb_stmts(); /* parse stmts */
 
                 _if_type (L2_TOKEN_RBRACE)
                 {
@@ -1058,6 +1069,8 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
 
         /* when run over the for-loop, the initialization symbol table should be destroyed */
         l2_symbol_table_destroy(for_init_symbol_table_p);
+
+        return irt;
     }
     _elif_keyword (L2_KW_DO) /* "do" */ /* do...while-loop */
     {
@@ -1068,7 +1081,11 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
 
         _if_type (L2_TOKEN_LBRACE) /* { */
         {
+            /* braces flag + 1 */
+            g_parser_p->braces_flag += 1;
+
             sub_scope_p = l2_scope_create_do_while_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE, loop_entry_pos);
+
             irt = l2_parse_stmts(sub_scope_p); /* parse stmts */
 
             _if_type (L2_TOKEN_RBRACE) /* } */
@@ -1158,6 +1175,8 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
             } _throw_unexpected_token
 
         } _throw_unexpected_token
+
+        return irt;
     }
     _elif_keyword (L2_KW_WHILE) /* "while" */ /* while-loop */
     {
@@ -1186,7 +1205,11 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
             if (expr_info.val.bool) { /* while true */
                 _if_type (L2_TOKEN_LBRACE) /* { */
                 {
+                    /* braces flag + 1 */
+                    g_parser_p->braces_flag += 1;
+
                     sub_scope_p = l2_scope_create_while_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE, loop_entry_pos);
+
                     irt = l2_parse_stmts(sub_scope_p); /* parse stmts */
 
                     _if_type (L2_TOKEN_RBRACE) /* } */
@@ -1215,7 +1238,10 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
             } else { /* while false */
                 _if_type (L2_TOKEN_LBRACE) /* { */
                 {
-                    l2_absorb_stmts(); /* parse stmts */
+                    /* braces flag + 1 */
+                    g_parser_p->braces_flag += 1;
+
+                    irt.type = l2_absorb_stmts(); /* parse stmts */
 
                     _if_type (L2_TOKEN_RBRACE)
                     {
@@ -1226,6 +1252,9 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
             }
 
         } _throw_unexpected_token
+
+        return irt;
+
     }
     _elif_type (L2_TOKEN_LBRACE) /* { */
     {
@@ -1268,7 +1297,11 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
             if (expr_info.val.bool) { /* if true */
                 _if_type (L2_TOKEN_LBRACE) /* { */
                 {
+                    /* braces flag + 1 */
+                    g_parser_p->braces_flag += 1;
+
                     sub_scope_p = l2_scope_create_common_scope(scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
+
                     irt = l2_parse_stmts(sub_scope_p); /* parse stmts */
 
                     _if_type (L2_TOKEN_RBRACE) /* } */
@@ -1282,7 +1315,10 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
             } else { /* if false */
                 _if_type (L2_TOKEN_LBRACE) /* { */
                 {
-                    l2_absorb_stmts(); /* parse stmts */
+                    /* braces flag + 1 */
+                    g_parser_p->braces_flag += 1;
+
+                    irt.type = l2_absorb_stmts(); /* parse stmts */
 
                     _if_type (L2_TOKEN_RBRACE) /* } */
                     {
@@ -1292,9 +1328,9 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
                 } _throw_unexpected_token
             }
 
-            return irt;
-
         } _throw_unexpected_token
+
+        return irt;
 
     }
     _elif_type (L2_TOKEN_SEMICOLON)
