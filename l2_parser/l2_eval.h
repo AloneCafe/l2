@@ -58,5 +58,9 @@ boolean l2_absorb_expr_atom();
 void l2_parse_real_param_list(l2_scope *scope_p, l2_vector *symbol_vec_p);
 void l2_parse_real_param_list1(l2_scope *scope_p, l2_vector *symbol_vec_p);
 
+boolean l2_eval_update_symbol_bool(l2_scope *scope_p, char *symbol_name, boolean bool);
+boolean l2_eval_update_symbol_integer(l2_scope *scope_p, char *symbol_name, int integer);
+boolean l2_eval_update_symbol_real(l2_scope *scope_p, char *symbol_name, double real);
+
 
 #endif

@@ -537,50 +537,64 @@ void l2_parse_stmt_var_def_list1(l2_scope *scope_p) {
 
     _declr_current_token_p
 
-    _if_type (L2_TOKEN_COMMA)
+    _if_type (L2_TOKEN_COMMA) /* , */
     {
+        /* assumed definition */
         _if_type (L2_TOKEN_IDENTIFIER) /* id */
         {
             _get_current_token_p
 
-            _if_type (L2_TOKEN_ASSIGN) /* = */
+            /* allocate position for the identifier in symbol table */
+            l2_symbol_table_add_symbol_without_initialization(&scope_p->symbol_table_p, current_token_p->u.str.str_p);
+
+            /* rollback operation */
+            l2_token_stream_rollback(g_parser_p->token_stream_p);
+
+            _if_type (L2_TOKEN_IDENTIFIER)
             {
-                right_expr_info = l2_eval_expr(scope_p); /* expr */
+                boolean symbol_updated;
 
-                _if (right_expr_info.val_type != L2_EXPR_VAL_NOT_EXPR) {
+                l2_token *left_id_p = l2_parse_token_current();
+                char *id_str_p = left_id_p->u.str.str_p;
 
-                } _throw_unexpected_token
+                int id_err_line = left_id_p->current_line;
+                int id_err_col = left_id_p->current_col;
 
-                switch (right_expr_info.val_type) {
-                    case L2_EXPR_VAL_TYPE_INTEGER:
-                        symbol_added = l2_symbol_table_add_symbol_integer(&scope_p->symbol_table_p, current_token_p->u.str.str_p, right_expr_info.val.integer);
-                        break;
+                _if_type (L2_TOKEN_ASSIGN) /* = */
+                {
+                    right_expr_info = l2_eval_expr_assign(scope_p);
 
-                    case L2_EXPR_VAL_TYPE_REAL:
-                        symbol_added = l2_symbol_table_add_symbol_real(&scope_p->symbol_table_p, current_token_p->u.str.str_p, right_expr_info.val.real);
-                        break;
+                    switch (right_expr_info.val_type) {
+                        case L2_EXPR_VAL_TYPE_INTEGER: /* id = integer */
+                            symbol_updated = l2_eval_update_symbol_integer(scope_p, id_str_p,
+                                                                           right_expr_info.val.integer);
+                            break;
 
-                    case L2_EXPR_VAL_TYPE_BOOL:
-                        symbol_added = l2_symbol_table_add_symbol_bool(&scope_p->symbol_table_p, current_token_p->u.str.str_p, right_expr_info.val.bool);
-                        break;
+                        case L2_EXPR_VAL_TYPE_REAL: /* id = real */
+                            symbol_updated = l2_eval_update_symbol_real(scope_p, id_str_p,
+                                                                        right_expr_info.val.real);
+                            break;
 
-                    case L2_EXPR_VAL_NO_VAL:
-                        l2_parsing_error(L2_PARSING_ERROR_EXPR_RESULT_WITHOUT_VALUE, current_token_p->current_line, current_token_p->current_col);
+                        case L2_EXPR_VAL_TYPE_BOOL: /* id = true/false */
+                            symbol_updated = l2_eval_update_symbol_bool(scope_p, id_str_p,
+                                                                        right_expr_info.val.bool);
+                            break;
 
-                    default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error token type");
-                }
-            }
-            _else /* without initialization */
-            {
-                symbol_added = l2_symbol_table_add_symbol_without_initialization(&scope_p->symbol_table_p, current_token_p->u.str.str_p);
-            }
+                        default:
+                            l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE,
+                                              "eval return an error expression val-type");
+                    }
 
-            /* handle last part of definition list in recursion */
-            l2_parse_stmt_var_def_list1(scope_p);
+                    if (!symbol_updated) /* if update symbol failed */
+                        l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_UNDEFINED, id_err_line, id_err_col,
+                                         left_id_p->u.str.str_p);
 
-            if (!symbol_added)
-                l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_REDEFINED, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);
+                } _end
+
+                /* handle last part of definition list in recursion */
+                l2_parse_stmt_var_def_list1(scope_p);
+
+            } _end
 
         } _throw_unexpected_token
 
@@ -1022,7 +1036,6 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
 
         } _throw_unexpected_token
 
-        /* TODO due to check the code logic */
         if (second_expr_info.val.bool) { /* for true */
             _if_type (L2_TOKEN_LBRACE) /* { */
             {
@@ -1357,53 +1370,67 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
     }
     _elif_keyword (L2_KW_VAR) /* "var" */
     {
+        /* assumed definition */
         _if_type (L2_TOKEN_IDENTIFIER) /* id */
         {
             _get_current_token_p
 
-            _if_type (L2_TOKEN_ASSIGN) /* = */
+            /* allocate position for the identifier in symbol table */
+            l2_symbol_table_add_symbol_without_initialization(&scope_p->symbol_table_p, current_token_p->u.str.str_p);
+
+            /* rollback operation */
+            l2_token_stream_rollback(g_parser_p->token_stream_p);
+
+            _if_type (L2_TOKEN_IDENTIFIER)
             {
-                right_expr_info = l2_eval_expr(scope_p); /* expr */
+                boolean symbol_updated;
 
-                _if (right_expr_info.val_type != L2_EXPR_VAL_NOT_EXPR) {
+                l2_token *left_id_p = l2_parse_token_current();
+                char *id_str_p = left_id_p->u.str.str_p;
 
-                } _throw_unexpected_token
+                int id_err_line = left_id_p->current_line;
+                int id_err_col = left_id_p->current_col;
 
-                switch (right_expr_info.val_type) {
-                    case L2_EXPR_VAL_TYPE_INTEGER:
-                        symbol_added = l2_symbol_table_add_symbol_integer(&scope_p->symbol_table_p, current_token_p->u.str.str_p, right_expr_info.val.integer);
-                        break;
+                _if_type (L2_TOKEN_ASSIGN) /* = */
+                {
+                    right_expr_info = l2_eval_expr_assign(scope_p);
 
-                    case L2_EXPR_VAL_TYPE_REAL:
-                        symbol_added = l2_symbol_table_add_symbol_real(&scope_p->symbol_table_p, current_token_p->u.str.str_p, right_expr_info.val.real);
-                        break;
+                    switch (right_expr_info.val_type) {
+                        case L2_EXPR_VAL_TYPE_INTEGER: /* id = integer */
+                            symbol_updated = l2_eval_update_symbol_integer(scope_p, id_str_p,
+                                                                           right_expr_info.val.integer);
+                            break;
 
-                    case L2_EXPR_VAL_TYPE_BOOL:
-                        symbol_added = l2_symbol_table_add_symbol_bool(&scope_p->symbol_table_p, current_token_p->u.str.str_p, right_expr_info.val.bool);
-                        break;
+                        case L2_EXPR_VAL_TYPE_REAL: /* id = real */
+                            symbol_updated = l2_eval_update_symbol_real(scope_p, id_str_p,
+                                                                        right_expr_info.val.real);
+                            break;
 
-                    case L2_EXPR_VAL_NO_VAL:
-                        l2_parsing_error(L2_PARSING_ERROR_EXPR_RESULT_WITHOUT_VALUE, current_token_p->current_line, current_token_p->current_col);
+                        case L2_EXPR_VAL_TYPE_BOOL: /* id = true/false */
+                            symbol_updated = l2_eval_update_symbol_bool(scope_p, id_str_p,
+                                                                        right_expr_info.val.bool);
+                            break;
 
-                    default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error token type");
-                }
-            }
-            _else
-            {
-                symbol_added = l2_symbol_table_add_symbol_without_initialization(&scope_p->symbol_table_p, current_token_p->u.str.str_p);
-            }
+                        default:
+                            l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE,
+                                              "eval return an error expression val-type");
+                    }
 
-            /* handle last part of definition list in recursion */
-            l2_parse_stmt_var_def_list1(scope_p);
+                    if (!symbol_updated) /* if update symbol failed */
+                        l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_UNDEFINED, id_err_line, id_err_col,
+                                         left_id_p->u.str.str_p);
 
-            _if_type (L2_TOKEN_SEMICOLON)
-            {
-                /* absorb ';' */
-            } _throw_missing_semicolon
+                } _end
 
-            if (!symbol_added)
-                l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_REDEFINED, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);
+                /* handle last part of definition list in recursion */
+                l2_parse_stmt_var_def_list1(scope_p);
+
+                _if_type (L2_TOKEN_SEMICOLON)
+                {
+                    /* absorb ';' */
+                } _throw_missing_semicolon
+
+            } _end
 
         } _throw_unexpected_token
 
