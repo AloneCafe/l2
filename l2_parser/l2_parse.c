@@ -157,7 +157,10 @@ boolean l2_absorb_stmt() {
 
                     _if_type (L2_TOKEN_ASSIGN) /* = */
                     {
-                        l2_absorb_expr(); /* absorb expr */
+                        l2_absorb_expr_assign(); /* absorb expr */
+
+                        /* absorb last part of definition list in recursion */
+                        l2_absorb_stmt_var_def_list1();
 
                         _if_type (L2_TOKEN_SEMICOLON)
                         {
@@ -362,14 +365,14 @@ boolean l2_absorb_stmt() {
         {
             _if_type (L2_TOKEN_ASSIGN) /* = */
             {
-                l2_absorb_expr(); /* expr */
+                l2_absorb_expr_assign(); /* expr_assign */
             }
             _else /* without initialization */
             {
 
             }
 
-            /* handle last part of definition list in recursion */
+            /* absorb last part of definition list in recursion */
             l2_absorb_stmt_var_def_list1();
 
             _if_type (L2_TOKEN_SEMICOLON)
@@ -504,20 +507,20 @@ void l2_absorb_formal_param_list() {
  * */
 void l2_absorb_stmt_var_def_list1() {
 
-    _if_type (L2_TOKEN_COMMA)
+    _if_type (L2_TOKEN_COMMA) /* , */
     {
         _if_type (L2_TOKEN_IDENTIFIER) /* id */
         {
             _if_type (L2_TOKEN_ASSIGN) /* = */
             {
-                l2_absorb_expr(); /* expr */
+                l2_absorb_expr_assign(); /* expr_assign */
             }
             _else /* without initialization */
             {
 
             }
 
-            /* handle last part of definition list in recursion */
+            /* absorb last part of definition list in recursion */
             l2_absorb_stmt_var_def_list1();
 
         } _throw_unexpected_token
