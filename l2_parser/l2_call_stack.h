@@ -5,7 +5,7 @@
 #include "l2_symbol_table.h"
 
 typedef struct _l2_param_list {
-    l2_vector symbol_vec; /* l2_symbol vector */
+    l2_vector expr_info_vec; /* l2_symbol vector */
 }l2_param_list;
 
 typedef struct _l2_call_frame {

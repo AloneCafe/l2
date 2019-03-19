@@ -2511,55 +2511,60 @@ l2_expr_info l2_eval_expr_single(l2_scope *scope_p) {
 }
 
 /* real_param_list1 ->
- * | , id real_param_list1
+ * | , expr_assign real_param_list1
  * | nil
  * */
-void l2_parse_real_param_list1(l2_scope *scope_p, l2_vector *symbol_vec_p) {
+void l2_parse_real_param_list1(l2_scope *scope_p, l2_vector *expr_info_vec_p) {
     _declr_current_token_p
     _if_type (L2_TOKEN_COMMA)
     {
-        _if_type (L2_TOKEN_IDENTIFIER)
-        {
-            _get_current_token_p
-            char *id_str_p = current_token_p->u.str.str_p;
-            l2_symbol_node *symbol_node_p = l2_eval_get_symbol_node(scope_p, id_str_p);
-            if (!symbol_node_p) l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_UNDEFINED, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);
-            /* symbol_node_p is not null */
-            l2_vector_append(symbol_vec_p, &(symbol_node_p->symbol));
-            l2_parse_real_param_list1(scope_p, symbol_vec_p);
+        int before_eval_pos = l2_token_stream_get_pos(g_parser_p->token_stream_p);
+        l2_expr_info expr_info = l2_eval_expr_assign(scope_p);
 
-        } _throw_unexpected_token
+        _if (expr_info.val_type != L2_EXPR_VAL_NOT_EXPR)
+        {
+            l2_vector_append(expr_info_vec_p, &expr_info);
+            l2_parse_real_param_list1(scope_p, expr_info_vec_p);
+
+        }
+        _else
+        {
+            l2_token_stream_set_pos(g_parser_p->token_stream_p, before_eval_pos);
+        }
 
     } _end
 }
 
 /* real_param_list ->
- * | id real_param_list1
+ * | expr_assign real_param_list1
  * | nil
  *
  * */
-void l2_parse_real_param_list(l2_scope *scope_p, l2_vector *symbol_vec_p) {
+void l2_parse_real_param_list(l2_scope *scope_p, l2_vector *expr_info_vec_p) {
     _declr_current_token_p
-    _if_type (L2_TOKEN_IDENTIFIER)
-    {
-        _get_current_token_p
-        char *id_str_p = current_token_p->u.str.str_p;
-        l2_symbol_node *symbol_node_p = l2_eval_get_symbol_node(scope_p, id_str_p);
-        if (!symbol_node_p) l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_UNDEFINED, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);
-        /* symbol_node_p is not null */
-        l2_vector_append(symbol_vec_p, &(symbol_node_p->symbol));
-        l2_parse_real_param_list1(scope_p, symbol_vec_p);
 
-    } _end
+    int before_eval_pos = l2_token_stream_get_pos(g_parser_p->token_stream_p);
+    l2_expr_info expr_info = l2_eval_expr_assign(scope_p);
+
+    _if (expr_info.val_type != L2_EXPR_VAL_NOT_EXPR)
+    {
+        l2_vector_append(expr_info_vec_p, &expr_info);
+        l2_parse_real_param_list1(scope_p, expr_info_vec_p);
+
+    }
+    _else
+    {
+        l2_token_stream_set_pos(g_parser_p->token_stream_p, before_eval_pos);
+    }
 }
 
 /* formal_param_list1 ->
  * | , id formal_param_list1
  * | nil
  * */
-/* symbol_vec_p: including the symbols of real parameters */
+/* expr_info_vec_p: including the exprs of real parameters */
 /* symbol_pos: the current identifier count */
-void l2_parse_formal_param_list1(l2_scope *scope_p, l2_vector *symbol_vec_p, int symbol_pos) {
+void l2_parse_formal_param_list1(l2_scope *scope_p, l2_vector *expr_info_vec_p, int *symbol_pos_p) {
     _declr_current_token_p
     _if_type (L2_TOKEN_COMMA)
     {
@@ -2567,9 +2572,31 @@ void l2_parse_formal_param_list1(l2_scope *scope_p, l2_vector *symbol_vec_p, int
         {
             _get_current_token_p
             /* if (id count < real params count) */
-            if (symbol_pos < symbol_vec_p->size) {
+            if ((*symbol_pos_p) < expr_info_vec_p->size) {
 
-                l2_symbol symbol = *(l2_symbol *)l2_vector_at(symbol_vec_p, symbol_pos);
+                l2_symbol symbol;
+
+                l2_expr_info real_expr_info = *(l2_expr_info *)l2_vector_at(expr_info_vec_p, (*symbol_pos_p));
+
+                switch (real_expr_info.val_type) {
+                    case L2_EXPR_VAL_TYPE_BOOL:
+                        symbol.type = L2_SYMBOL_TYPE_BOOL;
+                        symbol.u.bool = real_expr_info.val.bool;
+                        break;
+
+                    case L2_EXPR_VAL_TYPE_INTEGER:
+                        symbol.type = L2_SYMBOL_TYPE_INTEGER;
+                        symbol.u.integer = real_expr_info.val.integer;
+                        break;
+
+                    case L2_EXPR_VAL_TYPE_REAL:
+                        symbol.type = L2_SYMBOL_TYPE_REAL;
+                        symbol.u.real = real_expr_info.val.real;
+
+                    case L2_EXPR_VAL_NO_VAL:
+                        l2_parsing_error(L2_PARSING_ERROR_EXPR_RESULT_WITHOUT_VALUE, current_token_p->current_line, current_token_p->current_col);
+                }
+
                 symbol.symbol_name = current_token_p->u.str.str_p;
 
                 boolean add_symbol_result = l2_symbol_table_add_symbol(&scope_p->symbol_table_p, symbol);
@@ -2578,7 +2605,8 @@ void l2_parse_formal_param_list1(l2_scope *scope_p, l2_vector *symbol_vec_p, int
                     l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_REDEFINED, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);
                 }
 
-                l2_parse_formal_param_list1(scope_p, symbol_vec_p, symbol_pos + 1);
+                l2_parse_formal_param_list1(scope_p, expr_info_vec_p, symbol_pos_p);
+                (*symbol_pos_p) += 1;
 
             } else { /* id count >= real params count */
                 _if_type (L2_TOKEN_IDENTIFIER)
@@ -2604,7 +2632,7 @@ void l2_parse_formal_param_list1(l2_scope *scope_p, l2_vector *symbol_vec_p, int
  * | nil
  *
  * */
-void l2_parse_formal_param_list(l2_scope *scope_p, l2_vector *symbol_vec_p) {
+void l2_parse_formal_param_list(l2_scope *scope_p, l2_vector *expr_info_vec_p) {
     _declr_current_token_p
     _get_current_token_p
     int symbol_pos = 0;
@@ -2612,9 +2640,31 @@ void l2_parse_formal_param_list(l2_scope *scope_p, l2_vector *symbol_vec_p) {
     _if_type (L2_TOKEN_IDENTIFIER)
     {
         _get_current_token_p
-        if (symbol_pos < symbol_vec_p->size) {
+        if (symbol_pos < expr_info_vec_p->size) {
 
-            l2_symbol symbol = *(l2_symbol *)l2_vector_at(symbol_vec_p, symbol_pos);
+            l2_symbol symbol;
+
+            l2_expr_info real_expr_info = *(l2_expr_info *)l2_vector_at(expr_info_vec_p, symbol_pos);
+
+            switch (real_expr_info.val_type) {
+                case L2_EXPR_VAL_TYPE_BOOL:
+                    symbol.type = L2_SYMBOL_TYPE_BOOL;
+                    symbol.u.bool = real_expr_info.val.bool;
+                    break;
+
+                case L2_EXPR_VAL_TYPE_INTEGER:
+                    symbol.type = L2_SYMBOL_TYPE_INTEGER;
+                    symbol.u.integer = real_expr_info.val.integer;
+                    break;
+
+                case L2_EXPR_VAL_TYPE_REAL:
+                    symbol.type = L2_SYMBOL_TYPE_REAL;
+                    symbol.u.real = real_expr_info.val.real;
+
+                case L2_EXPR_VAL_NO_VAL:
+                    l2_parsing_error(L2_PARSING_ERROR_EXPR_RESULT_WITHOUT_VALUE, current_token_p->current_line, current_token_p->current_col);
+            }
+
             symbol.symbol_name = current_token_p->u.str.str_p;
 
             boolean add_symbol_result = l2_symbol_table_add_symbol(&scope_p->symbol_table_p, symbol);
@@ -2623,9 +2673,11 @@ void l2_parse_formal_param_list(l2_scope *scope_p, l2_vector *symbol_vec_p) {
                 l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_REDEFINED, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);
             }
 
-            l2_parse_formal_param_list1(scope_p, symbol_vec_p, symbol_pos + 1);
+            l2_parse_formal_param_list1(scope_p, expr_info_vec_p, &symbol_pos);
+            symbol_pos += 1;
         }
-        else {
+        else
+        {
             _if_type (L2_TOKEN_IDENTIFIER)
             {
                 l2_parsing_error(L2_PARSING_ERROR_TOO_FEW_PARAMETERS, current_token_p->current_line, current_token_p->current_col);
@@ -2640,7 +2692,7 @@ void l2_parse_formal_param_list(l2_scope *scope_p, l2_vector *symbol_vec_p) {
 
     } _end
 
-    if (symbol_pos < symbol_vec_p->size) {
+    if (symbol_pos < expr_info_vec_p->size) {
         l2_parsing_error(L2_PARSING_ERROR_TOO_MANY_PARAMETERS, current_token_p->current_line, current_token_p->current_col);
     }
 }
@@ -2674,9 +2726,9 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
             symbol_node_p = l2_eval_get_symbol_node(scope_p, current_token_p->u.str.str_p);
             if (!symbol_node_p) l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_UNDEFINED, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);
 
-            l2_vector symbol_vec;
-            l2_vector_create(&symbol_vec, sizeof(l2_symbol));
-            l2_parse_real_param_list(scope_p, &symbol_vec);
+            l2_vector expr_info_vec;
+            l2_vector_create(&expr_info_vec, sizeof(l2_expr_info));
+            l2_parse_real_param_list(scope_p, &expr_info_vec);
 
             _if_type (L2_TOKEN_RP)
             {
@@ -2689,7 +2741,7 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
 
                 /* put all of call procedure informations into a single call_frame */
                 l2_call_frame call_frame;
-                call_frame.param_list.symbol_vec = symbol_vec;
+                call_frame.param_list.expr_info_vec = expr_info_vec;
                 call_frame.ret_pos = l2_token_stream_get_pos(g_parser_p->token_stream_p);
 
                 l2_call_stack_push_frame(g_parser_p->call_stack_p, call_frame);
@@ -2704,7 +2756,7 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
                 /* TODO enter into procedure */
                 _if_type (L2_TOKEN_LP) /* ( */
                 {
-                    l2_parse_formal_param_list(procedure_scope_p, &symbol_vec);
+                    l2_parse_formal_param_list(procedure_scope_p, &expr_info_vec);
 
                     _if_type (L2_TOKEN_RP)
                     {
@@ -2757,10 +2809,10 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
                 /* procedure execution complete, restore call frame*/
                 call_frame = l2_call_stack_pop_frame(g_parser_p->call_stack_p);
                 l2_token_stream_set_pos(g_parser_p->token_stream_p, call_frame.ret_pos);
-                l2_vector_destroy(&symbol_vec);
+                l2_vector_destroy(&expr_info_vec);
 
             } else { /* symbol is not procedure, it will not call the procedure */
-                l2_vector_destroy(&symbol_vec);
+                l2_vector_destroy(&expr_info_vec);
                 l2_parsing_error(L2_PARSING_ERROR_SYMBOL_IS_NOT_PROCEDURE, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);
             }
 
@@ -3310,32 +3362,45 @@ boolean l2_absorb_expr_single() {
 }
 
 /* real_param_list1 ->
- * | , id real_param_list1
+ * | , expr_assign real_param_list1
  * | nil
  * */
 void l2_absorb_real_param_list1() {
     _declr_current_token_p
     _if_type (L2_TOKEN_COMMA)
     {
-        _if_type (L2_TOKEN_IDENTIFIER)
+        int before_eval_pos = l2_token_stream_get_pos(g_parser_p->token_stream_p);
+
+        _if (l2_absorb_expr_assign())
         {
             l2_absorb_real_param_list1();
-
-        } _throw_unexpected_token
+        }
+        _else
+        {
+            l2_token_stream_set_pos(g_parser_p->token_stream_p, before_eval_pos);
+        }
 
     } _end
 }
 
 /* real_param_list ->
- * | id real_param_list1
+ * | expr_assign real_param_list1
  * | nil
  *
  * */
 void l2_absorb_real_param_list() {
-    _if_type (L2_TOKEN_IDENTIFIER)
+    _declr_current_token_p
+
+    int before_eval_pos = l2_token_stream_get_pos(g_parser_p->token_stream_p);
+
+    _if (l2_absorb_expr_assign())
     {
         l2_absorb_real_param_list1();
-    } _end
+    }
+    _else
+    {
+        l2_token_stream_set_pos(g_parser_p->token_stream_p, before_eval_pos);
+    }
 }
 
 /* expr_atom ->
