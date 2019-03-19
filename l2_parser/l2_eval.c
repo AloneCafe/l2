@@ -2636,6 +2636,10 @@ void l2_parse_formal_param_list1(l2_scope *scope_p, l2_vector *expr_info_vec_p, 
                 {
                     l2_parsing_error(L2_PARSING_ERROR_TOO_FEW_PARAMETERS, current_token_p->current_line, current_token_p->current_col);
                 }
+                _elif_type (L2_TOKEN_RP)
+                {
+                    l2_parsing_error(L2_PARSING_ERROR_TOO_FEW_PARAMETERS, current_token_p->current_line, current_token_p->current_col);
+                }
                 _else
                 {
                     /* symbol_pos == symbol_vec_p->size ( means real parameters list is over ) */
@@ -2709,6 +2713,10 @@ void l2_parse_formal_param_list(l2_scope *scope_p, l2_vector *expr_info_vec_p) {
         else
         {
             _if_type (L2_TOKEN_IDENTIFIER)
+            {
+                l2_parsing_error(L2_PARSING_ERROR_TOO_FEW_PARAMETERS, current_token_p->current_line, current_token_p->current_col);
+            }
+            _elif_type(L2_TOKEN_RP)
             {
                 l2_parsing_error(L2_PARSING_ERROR_TOO_FEW_PARAMETERS, current_token_p->current_line, current_token_p->current_col);
             }
