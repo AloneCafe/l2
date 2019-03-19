@@ -167,28 +167,28 @@ void l2_parsing_error(const l2_parsing_error_type error_type, int lines, int col
             fprintf(stderr, "l2 parsing error near line %d, column %d, left side of operator \'%s\' must be a bool value\n", lines, cols, token_str);
             break;
 
-        case L2_PARSING_LEFT_SIDE_OF_OPERATOR_MUST_BE_A_INTEGER_VALUE:
+        case L2_PARSING_ERROR_LEFT_SIDE_OF_OPERATOR_MUST_BE_A_INTEGER_VALUE:
             token_str = va_arg(va, char *);
             fprintf(stderr, "l2 parsing error near line %d, column %d, left side of operator \'%s\' must be a integer value\n", lines, cols, token_str);
             break;
 
-        case L2_PARSING_RIGHT_SIDE_OF_OPERATOR_MUST_BE_A_INTEGER_VALUE:
+        case L2_PARSING_ERROR_RIGHT_SIDE_OF_OPERATOR_MUST_BE_A_INTEGER_VALUE:
             token_str = va_arg(va, char *);
             fprintf(stderr, "l2 parsing error near line %d, column %d, right side of operator \'%s\' must be a integer value\n", lines, cols, token_str);
             break;
 
-        case L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE:
+        case L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE:
             token_str = va_arg(va, char *);
-            fprintf(stderr, "l2 parsing error near line %d, column %d, operator \'%s\' contains imcompatible type, ", lines, cols, token_str);
+            fprintf(stderr, "l2 parsing error near line %d, column %d, operator \'%s\' contains incompatible type, ", lines, cols, token_str);
             token_str2 = va_arg(va, char *);
             fprintf(stderr, "<%s> \'%s\' ", token_str2, token_str);
             token_str2 = va_arg(va, char *);
             fprintf(stderr, "<%s>\n", token_str2);
             break;
 
-        case L2_PARSING_ERROR_UNITARY_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE:
+        case L2_PARSING_ERROR_UNITARY_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE:
             token_str = va_arg(va, char *);
-            fprintf(stderr, "l2 parsing error near line %d, column %d, right side of operator \'%s\' must be a integer value\n", lines, cols, token_str);
+            fprintf(stderr, "l2 parsing error near line %d, column %d, right side of operator \'%s\' has incompatible type, ", lines, cols, token_str);
             token_str2 = va_arg(va, char *);
             fprintf(stderr, "\'%s\' <%s>\n", token_str, token_str2);
             break;
@@ -203,23 +203,27 @@ void l2_parsing_error(const l2_parsing_error_type error_type, int lines, int col
 
         case L2_PARSING_ERROR_SYMBOL_IS_NOT_PROCEDURE:
             token_str = va_arg(va, char *);
-            fprintf(stderr, "l2 parsing error near line %d, column %d, symbol \'%s\' is not a procedure", lines, cols, token_str);
+            fprintf(stderr, "l2 parsing error near line %d, column %d, symbol \'%s\' is not a procedure\n", lines, cols, token_str);
             break;
 
         case L2_PARSING_ERROR_TOO_MANY_PARAMETERS:
-            fprintf(stderr, "l2 parsing error near line %d, column %d, there are too many parameters", lines, cols);
+            fprintf(stderr, "l2 parsing error near line %d, column %d, there are too many parameters\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_TOO_FEW_PARAMETERS:
-            fprintf(stderr, "l2 parsing error near line %d, column %d, there are too few parameters", lines, cols);
+            fprintf(stderr, "l2 parsing error near line %d, column %d, there are too few parameters\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_EXPR_RESULT_WITHOUT_VALUE:
-            fprintf(stderr, "l2 parsing error near line %d, column %d, expr without value", lines, cols);
+            fprintf(stderr, "l2 parsing error near line %d, column %d, expr without value\n", lines, cols);
+            break;
+
+        case L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE:
+            fprintf(stderr, "l2 parsing error near line %d, column %d, incompatible expr type\n", lines, cols);
             break;
 
         default:
-            fprintf(stderr, "l2 parsing error, an unknown error occured\n");
+            fprintf(stderr, "l2 parsing error, an unknown error occurred\n");
     }
 
     va_end(va);

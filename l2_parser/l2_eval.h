@@ -3,13 +3,17 @@
 
 #include "../l2_lexer/l2_token_stream.h"
 #include "l2_parse.h"
+#include "l2_symbol_table.h"
 
 typedef enum _l2_expr_val_type {
     L2_EXPR_VAL_NOT_EXPR, /* not expr */
     L2_EXPR_VAL_NO_VAL,
-    L2_EXPR_VAL_TYPE_REAL,
+
     L2_EXPR_VAL_TYPE_INTEGER,
-    L2_EXPR_VAL_TYPE_BOOL
+    L2_EXPR_VAL_TYPE_REAL,
+    L2_EXPR_VAL_TYPE_BOOL,
+
+    L2_EXPR_VAL_TYPE_PROCEDURE
 }l2_expr_val_type;
 
 typedef struct _l2_expr_info {
@@ -18,6 +22,7 @@ typedef struct _l2_expr_info {
         boolean bool;
         double real;
         int integer;
+        l2_procedure procedure;
     }val;
 }l2_expr_info;
 

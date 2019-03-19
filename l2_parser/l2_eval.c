@@ -104,6 +104,7 @@ l2_expr_info l2_eval_expr_comma(l2_scope *scope_p) {
  *
  * */
 l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
+    _declr_current_token_p
     l2_token *left_id_p;
     l2_expr_info right_expr_info, res_expr_info;
     l2_symbol_node *left_symbol_p;
@@ -122,6 +123,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
 
         _if_type (L2_TOKEN_ASSIGN) /* = */
         {
+            _get_current_token_p
             token_opr_p = l2_parse_token_current();
             opr_err_line = token_opr_p->current_line;
             opr_err_col = token_opr_p->current_col;
@@ -142,7 +144,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -230,7 +232,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -316,7 +318,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -396,7 +398,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -484,7 +486,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -572,7 +574,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -654,7 +656,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -736,7 +738,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -818,7 +820,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -900,7 +902,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -982,7 +984,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -1064,7 +1066,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -1388,31 +1390,31 @@ l2_expr_info l2_eval_expr_eq_ne1(l2_scope *scope_p, l2_expr_info left_expr_info)
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "==", "integer", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "==", "integer", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = ((double)left_expr_info.val.integer == right_expr_info.val.real);
                         break;
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             case L2_EXPR_VAL_TYPE_BOOL:
                 switch (right_expr_info.val_type) {
                     case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "==", "bool", "integer");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "==", "bool", "integer");
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         new_left_expr_info.val.bool = (left_expr_info.val.bool == right_expr_info.val.bool);
                         break;
 
                     case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "==", "bool", "real");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "==", "bool", "real");
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
@@ -1423,19 +1425,19 @@ l2_expr_info l2_eval_expr_eq_ne1(l2_scope *scope_p, l2_expr_info left_expr_info)
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "==", "real", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "==", "real", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = (left_expr_info.val.real == right_expr_info.val.real);
                         break;
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             default:
-                l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
         }
         return l2_eval_expr_eq_ne1(scope_p, new_left_expr_info);
 
@@ -1453,31 +1455,31 @@ l2_expr_info l2_eval_expr_eq_ne1(l2_scope *scope_p, l2_expr_info left_expr_info)
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "!=", "integer", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "!=", "integer", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = ((double)left_expr_info.val.integer != right_expr_info.val.real);
                         break;
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             case L2_EXPR_VAL_TYPE_BOOL:
                 switch (right_expr_info.val_type) {
                     case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "!=", "bool", "integer");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "!=", "bool", "integer");
 
                     case L2_EXPR_VAL_TYPE_BOOL:
                         new_left_expr_info.val.bool = (left_expr_info.val.bool != right_expr_info.val.bool);
                         break;
 
                     case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "!=", "bool", "real");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "!=", "bool", "real");
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
@@ -1488,19 +1490,19 @@ l2_expr_info l2_eval_expr_eq_ne1(l2_scope *scope_p, l2_expr_info left_expr_info)
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "!=", "real", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "!=", "real", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = (left_expr_info.val.real != right_expr_info.val.real);
                         break;
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             default:
-                l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
         }
         return l2_eval_expr_eq_ne1(scope_p, new_left_expr_info);
 
@@ -1555,30 +1557,30 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">=", "integer", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">=", "integer", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = ((double)left_expr_info.val.integer >= right_expr_info.val.real);
                         break;
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             case L2_EXPR_VAL_TYPE_BOOL:
                 switch (right_expr_info.val_type) {
                     case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">=", "bool", "integer");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">=", "bool", "integer");
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">=", "bool", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">=", "bool", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">=", "bool", "real");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">=", "bool", "real");
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
@@ -1589,19 +1591,19 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">=", "real", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">=", "real", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = (left_expr_info.val.real >= right_expr_info.val.real);
                         break;
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             default:
-                l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
         }
         return l2_eval_expr_gt_lt_ge_le1(scope_p, new_left_expr_info);
 
@@ -1619,30 +1621,30 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">", "integer", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">", "integer", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = ((double)left_expr_info.val.integer > right_expr_info.val.real);
                         break;
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             case L2_EXPR_VAL_TYPE_BOOL:
                 switch (right_expr_info.val_type) {
                     case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">", "bool", "integer");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">", "bool", "integer");
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">", "bool", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">", "bool", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">", "bool", "real");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">", "bool", "real");
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
@@ -1653,19 +1655,19 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">", "real", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">", "real", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = (left_expr_info.val.real > right_expr_info.val.real);
                         break;
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             default:
-                l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
         }
         return l2_eval_expr_gt_lt_ge_le1(scope_p, new_left_expr_info);
 
@@ -1683,30 +1685,30 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<=", "integer", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<=", "integer", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = ((double)left_expr_info.val.integer <= right_expr_info.val.real);
                         break;
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             case L2_EXPR_VAL_TYPE_BOOL:
                 switch (right_expr_info.val_type) {
                     case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<=", "bool", "integer");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<=", "bool", "integer");
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<=", "bool", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<=", "bool", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<=", "bool", "real");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<=", "bool", "real");
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
@@ -1717,19 +1719,19 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<=", "real", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<=", "real", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = (left_expr_info.val.real <= right_expr_info.val.real);
                         break;
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             default:
-                l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
         }
         return l2_eval_expr_gt_lt_ge_le1(scope_p, new_left_expr_info);
 
@@ -1747,30 +1749,30 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<", "integer", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<", "integer", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = ((double)left_expr_info.val.integer < right_expr_info.val.real);
                         break;
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             case L2_EXPR_VAL_TYPE_BOOL:
                 switch (right_expr_info.val_type) {
                     case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<", "bool", "integer");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<", "bool", "integer");
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<", "bool", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<", "bool", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<", "bool", "real");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<", "bool", "real");
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
@@ -1781,19 +1783,19 @@ l2_expr_info l2_eval_expr_gt_lt_ge_le1(l2_scope *scope_p, l2_expr_info left_expr
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<", "real", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<", "real", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val.bool = (left_expr_info.val.real < right_expr_info.val.real);
                         break;
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             default:
-                l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
         }
         return l2_eval_expr_gt_lt_ge_le1(scope_p, new_left_expr_info);
 
@@ -1845,50 +1847,50 @@ l2_expr_info l2_eval_expr_lshift_rshift_rshift_unsigned1(l2_scope *scope_p, l2_e
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "integer", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "integer", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "integer", "real");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "integer", "real");
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             case L2_EXPR_VAL_TYPE_BOOL:
                 switch (right_expr_info.val_type) {
                     case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "bool", "integer");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "bool", "integer");
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "bool", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "bool", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "bool", "real");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "bool", "real");
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             case L2_EXPR_VAL_TYPE_REAL:
                 switch (right_expr_info.val_type) {
                     case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "real", "integer");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "real", "integer");
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "real", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "real", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "real", "real");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "<<", "real", "real");
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             default:
-                l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
         }
         return l2_eval_expr_lshift_rshift_rshift_unsigned1(scope_p, new_left_expr_info);
 
@@ -1906,50 +1908,50 @@ l2_expr_info l2_eval_expr_lshift_rshift_rshift_unsigned1(l2_scope *scope_p, l2_e
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "integer", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "integer", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "integer", "real");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "integer", "real");
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             case L2_EXPR_VAL_TYPE_BOOL:
                 switch (right_expr_info.val_type) {
                     case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "bool", "integer");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "bool", "integer");
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "bool", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "bool", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "bool", "real");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "bool", "real");
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             case L2_EXPR_VAL_TYPE_REAL:
                 switch (right_expr_info.val_type) {
                     case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "real", "integer");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "real", "integer");
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "real", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "real", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "real", "real");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>", "real", "real");
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             default:
-                l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
         }
         return l2_eval_expr_lshift_rshift_rshift_unsigned1(scope_p, new_left_expr_info);
 
@@ -1967,50 +1969,50 @@ l2_expr_info l2_eval_expr_lshift_rshift_rshift_unsigned1(l2_scope *scope_p, l2_e
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "integer", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "integer", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "integer", "real");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "integer", "real");
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             case L2_EXPR_VAL_TYPE_BOOL:
                 switch (right_expr_info.val_type) {
                     case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "bool", "integer");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "bool", "integer");
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "bool", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "bool", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "bool", "real");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "bool", "real");
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             case L2_EXPR_VAL_TYPE_REAL:
                 switch (right_expr_info.val_type) {
                     case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "real", "integer");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "real", "integer");
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "real", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "real", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "real", "real");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, ">>>", "real", "real");
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             default:
-                l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
         }
         return l2_eval_expr_lshift_rshift_rshift_unsigned1(scope_p, new_left_expr_info);
 
@@ -2061,7 +2063,7 @@ l2_expr_info l2_eval_expr_plus_sub1(l2_scope *scope_p, l2_expr_info left_expr_in
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "+", "integer", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "+", "integer", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
@@ -2069,23 +2071,23 @@ l2_expr_info l2_eval_expr_plus_sub1(l2_scope *scope_p, l2_expr_info left_expr_in
                         break;
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             case L2_EXPR_VAL_TYPE_BOOL:
                 switch (right_expr_info.val_type) {
                     case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "+", "bool", "integer");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "+", "bool", "integer");
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "+", "bool", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "+", "bool", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "+", "bool", "real");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "+", "bool", "real");
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
@@ -2097,7 +2099,7 @@ l2_expr_info l2_eval_expr_plus_sub1(l2_scope *scope_p, l2_expr_info left_expr_in
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "+", "real", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "+", "real", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
@@ -2105,12 +2107,12 @@ l2_expr_info l2_eval_expr_plus_sub1(l2_scope *scope_p, l2_expr_info left_expr_in
                         break;
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             default:
-                l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
         }
         return l2_eval_expr_plus_sub1(scope_p, new_left_expr_info);
 
@@ -2129,7 +2131,7 @@ l2_expr_info l2_eval_expr_plus_sub1(l2_scope *scope_p, l2_expr_info left_expr_in
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "-", "integer", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "-", "integer", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
@@ -2137,23 +2139,23 @@ l2_expr_info l2_eval_expr_plus_sub1(l2_scope *scope_p, l2_expr_info left_expr_in
                         break;
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             case L2_EXPR_VAL_TYPE_BOOL:
                 switch (right_expr_info.val_type) {
                     case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "-", "bool", "integer");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "-", "bool", "integer");
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "-", "bool", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "-", "bool", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "-", "bool", "real");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "-", "bool", "real");
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
@@ -2165,7 +2167,7 @@ l2_expr_info l2_eval_expr_plus_sub1(l2_scope *scope_p, l2_expr_info left_expr_in
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "-", "real", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "-", "real", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
@@ -2173,12 +2175,12 @@ l2_expr_info l2_eval_expr_plus_sub1(l2_scope *scope_p, l2_expr_info left_expr_in
                         break;
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             default:
-                l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
         }
         return l2_eval_expr_plus_sub1(scope_p, new_left_expr_info);
 
@@ -2230,7 +2232,7 @@ l2_expr_info l2_eval_expr_mul_div_mod1(l2_scope *scope_p, l2_expr_info left_expr
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "*", "integer", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "*", "integer", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
@@ -2238,23 +2240,23 @@ l2_expr_info l2_eval_expr_mul_div_mod1(l2_scope *scope_p, l2_expr_info left_expr
                         break;
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             case L2_EXPR_VAL_TYPE_BOOL:
                 switch (right_expr_info.val_type) {
                     case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "*", "bool", "integer");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "*", "bool", "integer");
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "*", "bool", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "*", "bool", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "*", "bool", "real");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "*", "bool", "real");
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
@@ -2266,7 +2268,7 @@ l2_expr_info l2_eval_expr_mul_div_mod1(l2_scope *scope_p, l2_expr_info left_expr
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "*", "real", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "*", "real", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
@@ -2274,12 +2276,12 @@ l2_expr_info l2_eval_expr_mul_div_mod1(l2_scope *scope_p, l2_expr_info left_expr
                         break;
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             default:
-                l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
         }
         return l2_eval_expr_lshift_rshift_rshift_unsigned1(scope_p, new_left_expr_info);
 
@@ -2297,7 +2299,7 @@ l2_expr_info l2_eval_expr_mul_div_mod1(l2_scope *scope_p, l2_expr_info left_expr
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "/", "integer", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "/", "integer", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
@@ -2305,23 +2307,23 @@ l2_expr_info l2_eval_expr_mul_div_mod1(l2_scope *scope_p, l2_expr_info left_expr
                         break;
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             case L2_EXPR_VAL_TYPE_BOOL:
                 switch (right_expr_info.val_type) {
                     case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "/", "bool", "integer");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "/", "bool", "integer");
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "/", "bool", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "/", "bool", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "/", "bool", "real");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "/", "bool", "real");
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
@@ -2333,7 +2335,7 @@ l2_expr_info l2_eval_expr_mul_div_mod1(l2_scope *scope_p, l2_expr_info left_expr
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "/", "real", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "/", "real", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
                         new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
@@ -2341,12 +2343,12 @@ l2_expr_info l2_eval_expr_mul_div_mod1(l2_scope *scope_p, l2_expr_info left_expr
                         break;
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             default:
-                l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
         }
         return l2_eval_expr_lshift_rshift_rshift_unsigned1(scope_p, new_left_expr_info);
 
@@ -2364,50 +2366,50 @@ l2_expr_info l2_eval_expr_mul_div_mod1(l2_scope *scope_p, l2_expr_info left_expr
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "integer", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "integer", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "integer", "real");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "integer", "real");
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             case L2_EXPR_VAL_TYPE_BOOL:
                 switch (right_expr_info.val_type) {
                     case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "bool", "integer");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "bool", "integer");
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "bool", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "bool", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "bool", "real");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "bool", "real");
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             case L2_EXPR_VAL_TYPE_REAL:
                 switch (right_expr_info.val_type) {
                     case L2_EXPR_VAL_TYPE_INTEGER:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "real", "integer");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "real", "integer");
 
                     case L2_EXPR_VAL_TYPE_BOOL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "real", "bool");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "real", "bool");
 
                     case L2_EXPR_VAL_TYPE_REAL:
-                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "real", "real");
+                        l2_parsing_error(L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "%", "real", "real");
 
                     default:
-                        l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                        l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
                 }
                 break;
 
             default:
-                l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
         }
         return l2_eval_expr_lshift_rshift_rshift_unsigned1(scope_p, new_left_expr_info);
 
@@ -2442,17 +2444,18 @@ l2_expr_info l2_eval_expr_single(l2_scope *scope_p) {
         res_expr_info.val_type = L2_EXPR_VAL_TYPE_BOOL;
         switch (right_expr_info.val_type) {
             case L2_EXPR_VAL_TYPE_INTEGER:
-                l2_parsing_error(L2_PARSING_ERROR_UNITARY_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "!", "integer");
+                l2_parsing_error(L2_PARSING_ERROR_UNITARY_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "!", "integer");
 
             case L2_EXPR_VAL_TYPE_BOOL:
                 res_expr_info.val.bool = !(right_expr_info.val.bool);
                 break;
 
             case L2_EXPR_VAL_TYPE_REAL:
-                l2_parsing_error(L2_PARSING_ERROR_UNITARY_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "!", "real");
+                l2_parsing_error(L2_PARSING_ERROR_UNITARY_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "!", "real");
 
             default:
-                l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
+
         }
         return res_expr_info;
 
@@ -2469,13 +2472,13 @@ l2_expr_info l2_eval_expr_single(l2_scope *scope_p) {
                 break;
 
             case L2_EXPR_VAL_TYPE_BOOL:
-                l2_parsing_error(L2_PARSING_ERROR_UNITARY_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "~", "bool");
+                l2_parsing_error(L2_PARSING_ERROR_UNITARY_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "~", "bool");
 
             case L2_EXPR_VAL_TYPE_REAL:
-                l2_parsing_error(L2_PARSING_ERROR_UNITARY_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "~", "real");
+                l2_parsing_error(L2_PARSING_ERROR_UNITARY_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "~", "real");
 
             default:
-                l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
         }
         return res_expr_info;
 
@@ -2492,14 +2495,15 @@ l2_expr_info l2_eval_expr_single(l2_scope *scope_p) {
                 break;
 
             case L2_EXPR_VAL_TYPE_BOOL:
-                l2_parsing_error(L2_PARSING_ERROR_UNITARY_OPERATOR_CONTAINS_IMCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "-", "bool");
+                l2_parsing_error(L2_PARSING_ERROR_UNITARY_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE, current_token_p->current_line, current_token_p->current_col, "-", "bool");
 
             case L2_EXPR_VAL_TYPE_REAL:
                 res_expr_info.val_type = L2_EXPR_VAL_TYPE_REAL;
                 res_expr_info.val.real = -(right_expr_info.val.real);
                 break;
+                
             default:
-                l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
         }
         return res_expr_info;
 
@@ -2592,6 +2596,12 @@ void l2_parse_formal_param_list1(l2_scope *scope_p, l2_vector *expr_info_vec_p, 
                     case L2_EXPR_VAL_TYPE_REAL:
                         symbol.type = L2_SYMBOL_TYPE_REAL;
                         symbol.u.real = real_expr_info.val.real;
+                        break;
+
+                    case L2_EXPR_VAL_TYPE_PROCEDURE:
+                        symbol.type = L2_SYMBOL_TYPE_PROCEDURE;
+                        symbol.u.procedure = real_expr_info.val.procedure;
+                        break;
 
                     case L2_EXPR_VAL_NO_VAL:
                         l2_parsing_error(L2_PARSING_ERROR_EXPR_RESULT_WITHOUT_VALUE, current_token_p->current_line, current_token_p->current_col);
@@ -2661,6 +2671,12 @@ void l2_parse_formal_param_list(l2_scope *scope_p, l2_vector *expr_info_vec_p) {
                 case L2_EXPR_VAL_TYPE_REAL:
                     symbol.type = L2_SYMBOL_TYPE_REAL;
                     symbol.u.real = real_expr_info.val.real;
+                    break;
+
+                case L2_EXPR_VAL_TYPE_PROCEDURE:
+                    symbol.type = L2_SYMBOL_TYPE_PROCEDURE;
+                    symbol.u.procedure = real_expr_info.val.procedure;
+                    break;
 
                 case L2_EXPR_VAL_NO_VAL:
                     l2_parsing_error(L2_PARSING_ERROR_EXPR_RESULT_WITHOUT_VALUE, current_token_p->current_line, current_token_p->current_col);
@@ -2820,7 +2836,7 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
 
             return res_expr_info;
         }
-        _else
+        _else /* pure id */
         {
             char *id_str_p = current_token_p->u.str.str_p;
             symbol_node_p = l2_eval_get_symbol_node(scope_p, id_str_p);
@@ -2844,8 +2860,13 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
                     res_expr_info.val.real = symbol_node_p->symbol.u.real;
                     break;
 
+                case L2_SYMBOL_TYPE_PROCEDURE:
+                    res_expr_info.val_type = L2_EXPR_VAL_TYPE_PROCEDURE;
+                    res_expr_info.val.procedure = symbol_node_p->symbol.u.procedure;
+                    break;
+
                 default:
-                    l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "eval return an error expression val-type");
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
             }
         }
 

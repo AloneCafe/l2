@@ -7,6 +7,7 @@
 #include "l2_scope.h"
 
 typedef enum _l2_symbol_type {
+    L2_SYMBOL_PRESERVE,
     L2_SYMBOL_UNINITIALIZED,
     /* L2_SYMBOL_TYPE_NULL, */
 
