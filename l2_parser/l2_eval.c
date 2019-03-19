@@ -2605,8 +2605,9 @@ void l2_parse_formal_param_list1(l2_scope *scope_p, l2_vector *expr_info_vec_p, 
                     l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_REDEFINED, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);
                 }
 
-                l2_parse_formal_param_list1(scope_p, expr_info_vec_p, symbol_pos_p);
                 (*symbol_pos_p) += 1;
+                l2_parse_formal_param_list1(scope_p, expr_info_vec_p, symbol_pos_p);
+
 
             } else { /* id count >= real params count */
                 _if_type (L2_TOKEN_IDENTIFIER)
@@ -2673,8 +2674,9 @@ void l2_parse_formal_param_list(l2_scope *scope_p, l2_vector *expr_info_vec_p) {
                 l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_REDEFINED, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);
             }
 
-            l2_parse_formal_param_list1(scope_p, expr_info_vec_p, &symbol_pos);
             symbol_pos += 1;
+            l2_parse_formal_param_list1(scope_p, expr_info_vec_p, &symbol_pos);
+
         }
         else
         {
