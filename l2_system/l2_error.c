@@ -222,6 +222,10 @@ void l2_parsing_error(const l2_parsing_error_type error_type, int lines, int col
             fprintf(stderr, "l2 parsing error near line %d, column %d, incompatible expr type\n", lines, cols);
             break;
 
+        case L2_PARSING_ERROR_INCOMPATIBLE_SYMBOL_TYPE:
+            fprintf(stderr, "l2 parsing error near line %d, column %d, incompatible symbol type\n", lines, cols);
+            break;
+
         default:
             fprintf(stderr, "l2 parsing error, an unknown error occurred\n");
     }
