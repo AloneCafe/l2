@@ -2737,6 +2737,7 @@ void l2_parse_formal_param_list(l2_scope *scope_p, l2_vector *expr_info_vec_p) {
 
 
 /* expr_atom ->
+ * | ( expr )
  * | id
  * | id ( real_param_list )
  * | //not implement// id [ expr ]
@@ -2752,8 +2753,16 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
     _declr_current_token_p
     l2_symbol_node *symbol_node_p;
     l2_expr_info res_expr_info;
+    _if_type (L2_TOKEN_LP)
+    {
+        l2_expr_info inner_res = l2_eval_expr(scope_p);
+        _if_type (L2_TOKEN_RP)
+        { }
+        _throw_missing_rp
 
-    _if_type (L2_TOKEN_IDENTIFIER) /* id */
+        return inner_res;
+    }
+    _elif_type (L2_TOKEN_IDENTIFIER) /* id */
     {
         _get_current_token_p
 
@@ -2955,6 +2964,8 @@ boolean l2_absorb_expr_comma1() {
     {
         return l2_absorb_expr_assign() ? l2_absorb_expr_comma1() : L2_FALSE;
     } _end
+
+    return L2_TRUE;
 }
 
 boolean l2_absorb_expr_comma() {
