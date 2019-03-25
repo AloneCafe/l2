@@ -203,6 +203,10 @@ void l2_parsing_error(const l2_parsing_error_type error_type, int lines, int col
             fprintf(stderr, "l2 parsing error near line %d, column %d: \n\tinvalid keyword \'break\' in current content\n", lines, cols);
             break;
 
+        case L2_PARSING_ERROR_INVALID_RETURN_IN_CURRENT_CONTEXT:
+            fprintf(stderr, "l2 parsing error near line %d, column %d: \n\tinvalid keyword \'return\' in current content\n", lines, cols);
+            break;
+
         case L2_PARSING_ERROR_SYMBOL_IS_NOT_PROCEDURE:
             token_str = va_arg(va, char *);
             fprintf(stderr, "l2 parsing error near line %d, column %d: \n\tperforms calling on symbol \'%s\' which is not a procedure\n", lines, cols, token_str);

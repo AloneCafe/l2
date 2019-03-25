@@ -2798,7 +2798,7 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
 
                 /* create new sub scope */
 
-                l2_scope *procedure_scope_p = l2_scope_create_common_scope(symbol_node_p->symbol.u.procedure.upper_scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
+                l2_scope *procedure_scope_p = l2_scope_create_procedure_scope(symbol_node_p->symbol.u.procedure.upper_scope_p, L2_SCOPE_CREATE_SUB_SCOPE);
 
                 /* TODO enter into procedure */
                 _if_type (L2_TOKEN_LP) /* ( */

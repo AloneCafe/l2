@@ -812,10 +812,14 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
             irt.line_of_irt_stmt = current_token_p->current_line;
 
         } _throw_missing_semicolon
-/*
-        if (scope_p->scope_type == L2_SCOPE_TYPE_COMMON)
+
+        if (l2_scope_find_nearest_scope_by_type(scope_p, L2_SCOPE_TYPE_DO_WHILE)) {
+        } else if (l2_scope_find_nearest_scope_by_type(scope_p, L2_SCOPE_TYPE_WHILE)) {
+        } else if (l2_scope_find_nearest_scope_by_type(scope_p, L2_SCOPE_TYPE_FOR)) {
+        } else {
             l2_parsing_error(L2_PARSING_ERROR_INVALID_BREAK_IN_CURRENT_CONTEXT, current_token_p->current_line, current_token_p->current_col);
-*/
+        }
+
         return irt;
     }
     _elif_keyword (L2_KW_CONTINUE) /* "continue" */
@@ -829,10 +833,13 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
 
         } _throw_missing_semicolon
 
-/*
-        if (scope_p->scope_type == L2_SCOPE_TYPE_COMMON)
+        if (l2_scope_find_nearest_scope_by_type(scope_p, L2_SCOPE_TYPE_DO_WHILE)) {
+        } else if (l2_scope_find_nearest_scope_by_type(scope_p, L2_SCOPE_TYPE_WHILE)) {
+        } else if (l2_scope_find_nearest_scope_by_type(scope_p, L2_SCOPE_TYPE_FOR)) {
+        } else {
             l2_parsing_error(L2_PARSING_ERROR_INVALID_CONTINUE_IN_CURRENT_CONTEXT, current_token_p->current_line, current_token_p->current_col);
-*/
+        }
+
         return irt;
     }
     _elif_keyword (L2_KW_RETURN) /* "return" */
@@ -859,6 +866,11 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
             {
                 /* absorb ';' */
             } _throw_missing_semicolon
+        }
+
+        if (l2_scope_find_nearest_scope_by_type(scope_p, L2_SCOPE_TYPE_PROCEDURE)) {
+        } else {
+            l2_parsing_error(L2_PARSING_ERROR_INVALID_RETURN_IN_CURRENT_CONTEXT, current_token_p->current_line, current_token_p->current_col);
         }
 
         return irt;

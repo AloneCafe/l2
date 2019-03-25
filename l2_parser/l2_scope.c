@@ -139,6 +139,11 @@ l2_scope_guid l2_scope_create_do_while_scope(l2_scope_guid src, l2_scope_create_
     return res_guid;
 }
 
+l2_scope_guid l2_scope_create_procedure_scope(l2_scope_guid src, l2_scope_create_flag cf) {
+    l2_scope_guid res_guid = l2_scope_create_scope(src, cf, L2_SCOPE_TYPE_PROCEDURE);
+    return res_guid;
+}
+
 l2_scope_guid l2_scope_find_nearest_scope_by_type(l2_scope_guid current_scope, l2_scope_type scope_type) {
     l2_scope_guid scope;
     for (scope = current_scope; scope != L2_NULL_PTR; scope = scope->upper_p) {

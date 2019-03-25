@@ -11,6 +11,7 @@ typedef enum _l2_scope_create_flag {
 
 typedef enum _l2_scope_type {
     L2_SCOPE_TYPE_COMMON,
+    L2_SCOPE_TYPE_PROCEDURE,
     L2_SCOPE_TYPE_DO_WHILE,
     L2_SCOPE_TYPE_WHILE,
     L2_SCOPE_TYPE_FOR
@@ -36,6 +37,7 @@ l2_scope_guid l2_scope_create_common_scope(l2_scope_guid src, l2_scope_create_fl
 l2_scope_guid l2_scope_create_for_scope(l2_scope_guid src, l2_scope_create_flag cf, int loop_entry_pos);
 l2_scope_guid l2_scope_create_while_scope(l2_scope_guid src, l2_scope_create_flag cf, int loop_entry_pos);
 l2_scope_guid l2_scope_create_do_while_scope(l2_scope_guid src, l2_scope_create_flag cf, int loop_entry_pos);
+l2_scope_guid l2_scope_create_procedure_scope(l2_scope_guid src, l2_scope_create_flag cf);
 l2_scope_guid l2_scope_find_nearest_loop_scope(l2_scope_guid current_scope);
 l2_scope_guid l2_scope_find_nearest_scope_by_type(l2_scope_guid current_scope, l2_scope_type scope_type);
 
