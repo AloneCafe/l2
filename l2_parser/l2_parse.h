@@ -68,6 +68,7 @@ if ((cond)) {
 #define _repl \
 if (g_parser_p->token_stream_p->char_stream_p->fp == stdin) { \
 fprintf(stdout, L2_PROMPT_STRING); \
+fflush(stdout); \
 }
 
 #define _repl_head \
@@ -75,6 +76,7 @@ if (g_parser_p->token_stream_p->char_stream_p->fp == stdin) { \
 fprintf(stdout, "l2 programming language & interpreter\ncurrent version: %s\n", L2_VERSION); \
 fprintf(stdout, "l2 interpreter shell, user interface of REPL\n"); \
 fprintf(stdout, L2_PROMPT_STRING); \
+fflush(stdout); \
 }
 
 typedef struct _l2_parser {

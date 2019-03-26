@@ -62,6 +62,7 @@ void l2_internal_error(const l2_internal_error_type error_type, ...) {
 }
 
 void l2_parsing_error(const l2_parsing_error_type error_type, int lines, int cols, ...) {
+
     va_list va;
     va_start(va, cols);
 

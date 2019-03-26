@@ -43,9 +43,6 @@ char l2_char_stream_next_char(l2_char_stream *char_stream_p) {
     }
 
     if (ch == '\n') {
-
-        _repl
-
         char_stream_p->lines += 1;
         char_stream_p->cols = 0;
     } else {

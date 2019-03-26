@@ -469,6 +469,9 @@ l2_stmt_interrupt l2_parse_stmts(l2_scope *scope_p) {
         }
 
         /* there is no interrupt */
+
+        _repl /* prompt */
+
         irt = l2_parse_stmts(scope_p);
     }
     return irt;
