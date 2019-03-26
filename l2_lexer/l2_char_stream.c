@@ -24,6 +24,8 @@ l2_char_stream *l2_char_stream_create(FILE *fp) {
 void l2_char_stream_destroy(l2_char_stream *char_stream_p) {
     l2_assert(char_stream_p, L2_INTERNAL_ERROR_NULL_POINTER);
     l2_vector_destroy(&char_stream_p->chars_vector);
+    if (char_stream_p->fp != stdin)
+        fclose(char_stream_p->fp);
     free(char_stream_p);
 }
 
