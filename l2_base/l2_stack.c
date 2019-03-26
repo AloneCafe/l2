@@ -28,8 +28,7 @@ void l2_stack_push_back(l2_stack *stack, const void *data) {
     l2_assert(stack, L2_INTERNAL_ERROR_NULL_POINTER);
     int i;
     if (stack->size >= stack->max_size)
-        stack->stack_p = l2_storage_mem_resize(g_parser_p->storage_p, stack->stack_p, stack->max_size * stack->single_size, stack->max_size =
-                ((stack->size - stack->max_size) / 100 + 1) * 100 * stack->single_size);
+        stack->stack_p = l2_storage_mem_resize(g_parser_p->storage_p, stack->stack_p, stack->max_size * stack->single_size, (stack->max_size += 100) * stack->single_size);
     for (i = 0; i < stack->single_size; i++) {
         ((char *)(stack->stack_p))[stack->size * stack->single_size + i] = ((char *)data)[i];
     }

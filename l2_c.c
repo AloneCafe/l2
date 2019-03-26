@@ -111,6 +111,9 @@ int main(int argc, char *argv[]) {
         case L2_INTERPRETER_INPUT_TYPE_REPL:
             l2_parse_initialize(stdin);
             break;
+
+        default:
+            exit(-1);
     }
 
     l2_parse();

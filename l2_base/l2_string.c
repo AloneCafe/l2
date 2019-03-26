@@ -28,8 +28,8 @@ void l2_string_push_char(l2_string *str, const char ch) {
     l2_assert(str, L2_INTERNAL_ERROR_NULL_POINTER);
     if (str->len >= str->max_len)
         str->str_p = l2_storage_mem_resize(g_parser_p->storage_p, str->str_p, (str->max_len + 1) * sizeof(char),
-                                           str->max_len = ((((str->len - str->max_len) / 100 + 1) * 100 + 1) *
-                                                           sizeof(char)));
+                                           ((str->max_len += 100) + 1) *
+                                                           sizeof(char));
     str->str_p[str->len++] = ch;
     str->str_p[str->len] = L2_STRING_END_MASK;
 }

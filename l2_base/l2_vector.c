@@ -24,8 +24,7 @@ void l2_vector_append(l2_vector *vec, const void *data) {
     l2_assert(vec, L2_INTERNAL_ERROR_NULL_POINTER);
     int i;
     if (vec->size >= vec->max_size)
-        vec->vector_p = l2_storage_mem_resize(g_parser_p->storage_p, vec->vector_p, vec->max_size * vec->single_size, vec->max_size =
-                ((vec->size - vec->max_size) / 100 + 1) * 100 * vec->single_size);
+        vec->vector_p = l2_storage_mem_resize(g_parser_p->storage_p, vec->vector_p, vec->max_size * vec->single_size, (vec->max_size += 100) * vec->single_size);
     for (i = 0; i < vec->single_size; i++) {
         ((char *)(vec->vector_p))[vec->size * vec->single_size + i] = ((char *)data)[i];
     }
