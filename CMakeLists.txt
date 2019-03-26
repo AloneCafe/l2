@@ -27,7 +27,6 @@ add_executable(l2
         l2_system/l2_warning.c
         l2_system/l2_warning.h
         l2_c.c
-        l2_c.h
         l2_parser/l2_scope.c
         l2_parser/l2_scope.h
         l2_lexer/l2_cast.c

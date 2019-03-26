@@ -5,8 +5,12 @@
 #include "../l2_base/l2_common_type.h"
 #include "../l2_system/l2_assert.h"
 #include "../l2_base/l2_vector.h"
+#include "../l2_parser/l2_parse.h"
+
+extern l2_parser *g_parser_p;
 
 l2_char_stream *l2_char_stream_create(FILE *fp) {
+
     l2_assert(fp, L2_INTERNAL_ERROR_NULL_POINTER);
     l2_char_stream *char_stream_p = malloc(sizeof(l2_char_stream));
     char_stream_p->fp = fp;
@@ -37,6 +41,9 @@ char l2_char_stream_next_char(l2_char_stream *char_stream_p) {
     }
 
     if (ch == '\n') {
+
+        _repl
+
         char_stream_p->lines += 1;
         char_stream_p->cols = 0;
     } else {

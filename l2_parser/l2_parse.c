@@ -45,6 +45,7 @@ boolean l2_parse_probe_next_token_by_type(l2_token_type type) {
 }
 
 void l2_parse() {
+    _repl_head
     l2_parse_stmts(g_parser_p->global_scope_p);
 }
 
