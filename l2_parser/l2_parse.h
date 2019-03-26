@@ -8,7 +8,7 @@
 #include "l2_eval.h"
 #include "l2_call_stack.h"
 
-#define L2_VERSION "v0.1.3-alpha"
+#define L2_VERSION "v0.2.4"
 
 #define L2_PROMPT_STRING "(l2) $ "
 
@@ -65,7 +65,7 @@ l2_parsing_error((parsing_err_type), __token_current_p->current_line, __token_cu
 #define _if(cond) \
 if ((cond)) {
 
-    /*
+
 #define _repl \
 if (g_parser_p->token_stream_p->char_stream_p->fp == stdin) { \
 fprintf(stdout, L2_PROMPT_STRING); \
@@ -79,10 +79,11 @@ fprintf(stdout, "l2 interpreter shell, user interface of REPL\n"); \
 fprintf(stdout, L2_PROMPT_STRING); \
 fflush(stdout); \
 }
-     */
 
+/*
 #define _repl
 #define _repl_head
+*/
 
 typedef struct _l2_parser {
     l2_token_stream *token_stream_p;
