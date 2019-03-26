@@ -2854,6 +2854,7 @@ l2_expr_info l2_eval_expr_atom(l2_scope *scope_p) {
                 } _throw_unexpected_token
 
                 /* procedure execution complete, restore call frame*/
+                l2_scope_escape_scope(procedure_scope_p); /* escape from procedure scope */
                 call_frame = l2_call_stack_pop_frame(g_parser_p->call_stack_p);
                 l2_token_stream_set_pos(g_parser_p->token_stream_p, call_frame.ret_pos);
                 l2_vector_destroy(&expr_info_vec);
