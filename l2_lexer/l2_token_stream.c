@@ -345,7 +345,12 @@ l2_token *l2_token_stream_next_token(l2_token_stream *token_stream_p) {
                     l2_string_push_char(&token_str_buff, ch);
                     fa_state = 0x21;
 
-                } else { /* get 0 */
+				} else if (ch == '.') {
+					t.type = L2_TOKEN_REAL_LITERAL;
+					l2_string_push_char(&token_str_buff, ch);
+					fa_state = 0x31;
+
+				} else { /* get 0 */
                     t.u.integer = 0;
                     l2_char_stream_rollback(token_stream_p->char_stream_p);
                     goto ret;
