@@ -8,7 +8,7 @@
 #include "l2_eval.h"
 #include "l2_call_stack.h"
 
-#define L2_VERSION "v0.2.4"
+#define L2_VERSION "v0.2.6"
 
 #define L2_PROMPT_STRING "(l2) $ "
 
