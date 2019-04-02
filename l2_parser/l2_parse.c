@@ -552,7 +552,9 @@ void l2_parse_stmt_var_def_list1(l2_scope *scope_p) {
             _get_current_token_p
 
             /* allocate position for the identifier in symbol table */
-            l2_symbol_table_add_symbol_without_initialization(&scope_p->symbol_table_p, current_token_p->u.str.str_p);
+            symbol_added = l2_symbol_table_add_symbol_without_initialization(&scope_p->symbol_table_p, current_token_p->u.str.str_p);
+
+			if (!symbol_added) l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_REDEFINED, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);
 
             /* rollback operation */
             l2_token_stream_rollback(g_parser_p->token_stream_p);
@@ -1412,7 +1414,9 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
             _get_current_token_p
 
             /* allocate position for the identifier in symbol table */
-            l2_symbol_table_add_symbol_without_initialization(&scope_p->symbol_table_p, current_token_p->u.str.str_p);
+			symbol_added = l2_symbol_table_add_symbol_without_initialization(&scope_p->symbol_table_p, current_token_p->u.str.str_p);
+
+			if (!symbol_added) l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_REDEFINED, current_token_p->current_line, current_token_p->current_col, current_token_p->u.str.str_p);
 
             /* rollback operation */
             l2_token_stream_rollback(g_parser_p->token_stream_p);
