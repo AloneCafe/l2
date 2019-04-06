@@ -31,14 +31,14 @@ void *l2_storage_mem_new(l2_storage *storage_p, l2_mem_size mem_size) {
         for (mem_link = storage_p->head_p; mem_link->next != L2_NULL_PTR; mem_link = mem_link->next);
         mem_link->next = malloc(sizeof(l2_mem_link));
         mem_link->next->next = L2_NULL_PTR;
-        l2_sys_assert(mem_link->next->mem_p = malloc(mem_size));
+		l2_assert(mem_link->next->mem_p = malloc(mem_size), L2_INTERNAL_ERROR_NULL_POINTER);
         storage_p->size += 1;
         return mem_link->next->mem_p;
 
     } else {
         storage_p->head_p = malloc(sizeof(l2_mem_link));
         storage_p->head_p->next = L2_NULL_PTR;
-        l2_sys_assert(storage_p->head_p->mem_p = malloc(mem_size));
+		l2_assert(storage_p->head_p->mem_p = malloc(mem_size), L2_INTERNAL_ERROR_NULL_POINTER);
         storage_p->size += 1;
         return storage_p->head_p->mem_p;
     }
@@ -50,14 +50,14 @@ void *l2_storage_mem_new_with_zero(l2_storage *storage_p, l2_mem_size mem_size) 
         for (mem_link = storage_p->head_p; mem_link->next != L2_NULL_PTR; mem_link = mem_link->next);
         mem_link->next = malloc(sizeof(l2_mem_link));
         mem_link->next->next = L2_NULL_PTR;
-        l2_sys_assert(mem_link->next->mem_p = calloc(mem_size, 1));
+        l2_assert(mem_link->next->mem_p = calloc(mem_size, 1), L2_INTERNAL_ERROR_NULL_POINTER);
         storage_p->size += 1;
         return mem_link->next->mem_p;
 
     } else {
         storage_p->head_p = malloc(sizeof(l2_mem_link));
         storage_p->head_p->next = L2_NULL_PTR;
-        l2_sys_assert(storage_p->head_p->mem_p = calloc(mem_size, 1));
+        l2_assert(storage_p->head_p->mem_p = calloc(mem_size, 1), L2_INTERNAL_ERROR_NULL_POINTER);
         storage_p->size += 1;
         return storage_p->head_p->mem_p;
     }
@@ -72,7 +72,7 @@ void *l2_storage_mem_renew(l2_storage *storage_p, void *old_void_ptr, l2_mem_siz
 
     for (mem_link = storage_p->head_p; mem_link != L2_NULL_PTR; mem_link = mem_link->next) {
         if (old_void_ptr == mem_link->mem_p) {
-            l2_sys_assert(new_void_ptr = realloc(old_void_ptr, mem_renew_size));
+            l2_assert(new_void_ptr = realloc(old_void_ptr, mem_renew_size), L2_INTERNAL_ERROR_NULL_POINTER);
             mem_link->mem_p = new_void_ptr;
             return new_void_ptr;
         }
@@ -93,7 +93,7 @@ void *l2_storage_mem_resize(l2_storage *storage_p, void *old_void_ptr, l2_mem_si
         if (old_void_ptr == mem_link->mem_p) {
             temp_p = malloc(mem_old_size);
             memcpy(temp_p, mem_link->mem_p, mem_old_size > mem_resize ? mem_resize : mem_old_size);
-            l2_sys_assert(new_void_ptr = realloc(old_void_ptr, mem_resize));
+            l2_assert(new_void_ptr = realloc(old_void_ptr, mem_resize), L2_INTERNAL_ERROR_NULL_POINTER);
             memcpy(new_void_ptr, temp_p, mem_old_size > mem_resize ? mem_resize : mem_old_size);
             mem_link->mem_p = new_void_ptr;
             free(temp_p);

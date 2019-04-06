@@ -20,6 +20,9 @@ void l2_parse_finalize() {
     l2_gc_destroy(g_parser_p->gc_list_p);
     l2_storage_destroy(g_parser_p->storage_p);
     free(g_parser_p);
+#if _DEBUG
+	system("pause");
+#endif
 }
 
 void l2_parse_initialize(FILE *fp) {
