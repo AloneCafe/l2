@@ -8,9 +8,7 @@
 #include "l2_eval.h"
 #include "l2_call_stack.h"
 
-#define L2_VERSION "v0.2.7"
-
-#define L2_PROMPT_STRING "(l2) $ "
+#define L2_VERSION "v0.2.11"
 
 
 #define _if_keyword(kw) \
@@ -68,7 +66,6 @@ if ((cond)) {
 
 #define _repl \
 if (g_parser_p->token_stream_p->char_stream_p->fp == stdin) { \
-fprintf(stdout, L2_PROMPT_STRING); \
 fflush(stdout); \
 }
 
@@ -76,7 +73,6 @@ fflush(stdout); \
 if (g_parser_p->token_stream_p->char_stream_p->fp == stdin) { \
 fprintf(stdout, "l2 programming language & interpreter\ncurrent version: %s\n", L2_VERSION); \
 fprintf(stdout, "l2 interpreter shell, user interface of REPL\n"); \
-fprintf(stdout, L2_PROMPT_STRING); \
 fflush(stdout); \
 }
 
