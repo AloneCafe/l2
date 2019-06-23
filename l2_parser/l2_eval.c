@@ -8,7 +8,6 @@
 #include "../l2_lexer/l2_cast.h"
 
 
-extern char *g_l2_token_keywords[];
 extern l2_parser *g_parser_p;
 
 /* handle the div-by-zero error which possible occur */
@@ -775,7 +774,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                 case L2_EXPR_VAL_TYPE_INTEGER:
                     switch (left_symbol_p->symbol.type) {
                         case L2_SYMBOL_TYPE_INTEGER:
-                            symbol_updated = l2_eval_update_symbol_integer(scope_p, id_str_p, res_expr_info.val.integer = ((unsigned int)left_symbol_p->symbol.u.integer) >> right_expr_info.val.integer);
+                            symbol_updated = l2_eval_update_symbol_integer(scope_p, id_str_p, res_expr_info.val.integer = ((uint64_t)left_symbol_p->symbol.u.integer) >> right_expr_info.val.integer);
                             res_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
                             break;
 

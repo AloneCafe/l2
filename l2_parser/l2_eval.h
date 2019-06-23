@@ -21,7 +21,7 @@ typedef struct _l2_expr_info {
     union _val_union {
         boolean bool;
         double real;
-        int integer;
+        int64_t integer;
         l2_procedure procedure;
     }val;
 }l2_expr_info;

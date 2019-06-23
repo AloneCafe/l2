@@ -5,6 +5,8 @@
 #include "../l2_base/l2_vector.h"
 #include "l2_char_stream.h"
 
+extern char *g_l2_token_keywords[];
+
 typedef enum _l2_token_type {
     L2_TOKEN_TERMINATOR,
     L2_TOKEN_KEYWORD, /* keyword */

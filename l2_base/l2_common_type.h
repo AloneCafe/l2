@@ -11,10 +11,10 @@
 
 #define l2_char_is_blank(c) ((c) == ' ' || (c) == '\t' || (c) == '\n' || (c) == '\r')
 
-typedef unsigned int l2_mem_size;
-typedef unsigned int l2_string_size;
-typedef unsigned int l2_stack_size;
-typedef unsigned int l2_vector_size;
+typedef uint64_t l2_mem_size;
+typedef uint64_t l2_string_size;
+typedef uint64_t l2_stack_size;
+typedef uint64_t l2_vector_size;
 
 typedef char boolean;
 
