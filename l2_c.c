@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "l2_parser/l2_parse.h"
 #include "l2_system/l2_assert.h"
 #include "l2_lexer/l2_char_stream.h"
 #include "l2_lexer/l2_token_stream.h"
-#include "l2_parser/l2_parse.h"
+
 
 typedef enum _l2_init_env_error_type {
     L2_INIT_ENV_NO_ERROR,
@@ -56,26 +57,26 @@ int l2_init_env(int argc, char *argv[], l2_env_args *env_args_p) {
                                 return L2_INIT_ENV_ERROR_INVALID_OPTION;
                             }
 
-                            fprintf(stdout, "l2 programming language & interpreter\ncurrent version: %s\n", L2_VERSION);
+                            fprintf(stdout, "L2 编程语言及其解释器\n当前版本: %s\n", L2_VERSION);
                             exit(0);
 
                         case 'h': /* print help info */
                             if (args[cp + 1] != '\0') { /* judge the next char */
-                                fprintf(stderr, "invalid option: %s\n'-h' to get help\n", argv[i]);
+                                fprintf(stderr, "无效的选项: %s\n使用选项 '-h' 以查看帮助\n", argv[i]);
                                 return L2_INIT_ENV_ERROR_INVALID_OPTION;
                             }
 
                             fprintf(stdout,
-                                    "l2 programming language & interpreter\n"
-                                    "\nUsage: %s [options] <source_file>\n"
-                                    "Options:\n"
-                                    "-v: print the version info\n"
-                                    "-h: print the help info\n"
+                                    "L2 编程语言及其解释器\n"
+                                    "用法: %s [选项] <源代码文件>\n"
+                                    "选项:\n"
+                                    "-v: 打印版本信息\n"
+                                    "-h: 打印帮助信息\n"
                             , argv[0]);
                             exit(0);
 
                         default:
-                            fprintf(stderr, "invalid option: %s\n'-h' to get help\n", argv[i]);
+                            fprintf(stderr, "无效选项: %s\n使用选项 '-h' 以查看帮助\n", argv[i]);
                             return L2_INIT_ENV_ERROR_INVALID_OPTION;
                     }
                     break;
@@ -84,7 +85,7 @@ int l2_init_env(int argc, char *argv[], l2_env_args *env_args_p) {
                     env_args_p->input_type = L2_INTERPRETER_INPUT_TYPE_SINGLE_SOURCE_FILE;
                     env_args_p->source_file_p = fopen(argv[i], "r");
                     if (!env_args_p->source_file_p) {
-                        fprintf(stderr, "fatal: can not open source file: %s\n", argv[i]);
+                        fprintf(stderr, "严重错误: 无法打开源代码文件: %s\n", argv[i]);
                         return L2_INIT_ENV_ERROR_CANNOT_OPEN_SOURCE_FILE;
                     }
                     break;

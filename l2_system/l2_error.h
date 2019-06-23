@@ -3,14 +3,6 @@
 
 #include "../l2_base/l2_common_type.h"
 
-#ifdef L2_ZH
-#define l2_parsing_error l2_parsing_error_zh
-#define l2_internal_error l2_internal_error_zh
-#else
-#define l2_parsing_error l2_parsing_error_en
-#define l2_internal_error l2_internal_error_en
-#endif
-
 typedef enum _l2_internal_error_type {
     L2_INTERNAL_ERROR_OUT_OF_RANGE,
     L2_INTERNAL_ERROR_NULL_POINTER,
@@ -58,9 +50,9 @@ typedef enum _l2_parsing_error_type {
 }l2_parsing_error_type;
 
 void l2_clean_before_abort();
-void l2_internal_error_en(l2_internal_error_type error_type, ...);
-void l2_parsing_error_en(l2_parsing_error_type error_type, int lines, int cols, ...);
-void l2_internal_error_zh(l2_internal_error_type error_type, ...);
-void l2_parsing_error_zh(l2_parsing_error_type error_type, int lines, int cols, ...);
+/* void l2_internal_error_en(l2_internal_error_type error_type, ...); */
+/* void l2_parsing_error_en(l2_parsing_error_type error_type, int lines, int cols, ...); */
+void l2_internal_error(l2_internal_error_type error_type, ...);
+void l2_parsing_error(l2_parsing_error_type error_type, int lines, int cols, ...);
 
 #endif

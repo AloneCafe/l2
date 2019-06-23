@@ -18,7 +18,7 @@ char *g_l2_token_keywords[] = {
         "break",
         "continue",
         "return",
-        "procedure",
+        "proc",
         "eval"
 };
 

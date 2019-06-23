@@ -12,6 +12,7 @@ void l2_clean_before_abort() {
     l2_parse_finalize();
 }
 
+/*
 void l2_internal_error_en(const l2_internal_error_type error_type, ...) {
     va_list va;
     va_start(va, error_type);
@@ -60,8 +61,9 @@ void l2_internal_error_en(const l2_internal_error_type error_type, ...) {
     l2_clean_before_abort();
     exit(error_type);
 }
+ */
 
-void l2_internal_error_zh(const l2_internal_error_type error_type, ...) {
+void l2_internal_error(const l2_internal_error_type error_type, ...) {
     va_list va;
     va_start(va, error_type);
     char *msg;
@@ -110,6 +112,7 @@ void l2_internal_error_zh(const l2_internal_error_type error_type, ...) {
     exit(error_type);
 }
 
+/*
 void l2_parsing_error_en(const l2_parsing_error_type error_type, int lines, int cols, ...) {
 
     va_list va;
@@ -127,10 +130,6 @@ void l2_parsing_error_en(const l2_parsing_error_type error_type, int lines, int 
 
         case L2_PARSING_ERROR_UNEXPECTED_TOKEN:
             token_p = va_arg(va, l2_token *);
-            /*
-            switch (token_p->type) {
-
-            }*/
             fprintf(stderr, "l2 parsing error near line %d, column %d: \n\tunexpected token\n", lines, cols);
             break;
 
@@ -292,8 +291,9 @@ void l2_parsing_error_en(const l2_parsing_error_type error_type, int lines, int 
     l2_clean_before_abort();
     exit(error_type);
 }
+*/
 
-void l2_parsing_error_zh(const l2_parsing_error_type error_type, int lines, int cols, ...) {
+void l2_parsing_error(const l2_parsing_error_type error_type, int lines, int cols, ...) {
 
     va_list va;
     va_start(va, cols);

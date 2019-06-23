@@ -186,7 +186,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                             break;
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "between bool and integer");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "在布尔型与整数型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
                             symbol_updated = l2_eval_update_symbol_real(scope_p, id_str_p, res_expr_info.val.real = left_symbol_p->symbol.u.real / right_expr_info.val.integer);
@@ -209,7 +209,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                             break;
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "between bool and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "在布尔型与实数型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
                             symbol_updated = l2_eval_update_symbol_real(scope_p, id_str_p, res_expr_info.val.real = left_symbol_p->symbol.u.real / right_expr_info.val.real);
@@ -227,13 +227,13 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                 case L2_EXPR_VAL_TYPE_BOOL:
                     switch (left_symbol_p->symbol.type) {
                         case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "between integer and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "在整数型与布尔型之间");
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "between bool and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "在布尔型与布尔型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "between real and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "在实数型与布尔型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "/=", "between native pointer and bool");
@@ -272,7 +272,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                             break;
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "between bool and integer");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "在布尔型与整数型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
                             symbol_updated = l2_eval_update_symbol_real(scope_p, id_str_p, res_expr_info.val.real = left_symbol_p->symbol.u.real * right_expr_info.val.integer);
@@ -295,7 +295,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                             break;
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "between bool and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "在布尔型与实数型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
                             symbol_updated = l2_eval_update_symbol_real(scope_p, id_str_p, res_expr_info.val.real = left_symbol_p->symbol.u.real * right_expr_info.val.real);
@@ -313,13 +313,13 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                 case L2_EXPR_VAL_TYPE_BOOL:
                     switch (left_symbol_p->symbol.type) {
                         case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "between integer and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "在整数型与布尔型之间");
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "between bool and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "在布尔型与布尔型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "between real and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "在实数型与布尔型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "*=", "between native pointer and bool");
@@ -358,10 +358,10 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                             break;
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between bool and integer");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "在布尔型与整数型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between real and integer");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "在实数型与整数型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between native pointer and integer");
@@ -374,13 +374,13 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                 case L2_EXPR_VAL_TYPE_REAL:
                     switch (left_symbol_p->symbol.type) {
                         case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between integer and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "在整数型与实数型之间");
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between bool and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "在布尔型与实数型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between real and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "在实数型与实数型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between native pointer and real");
@@ -393,13 +393,13 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                 case L2_EXPR_VAL_TYPE_BOOL:
                     switch (left_symbol_p->symbol.type) {
                         case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between integer and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "在整数型与布尔型之间");
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between bool and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "在布尔型与布尔型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between real and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "在实数型与布尔型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "%=", "between native pointer and bool");
@@ -440,7 +440,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                             break;
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "+=", "between bool and integer");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "+=", "在布尔型与整数型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
                             symbol_updated = l2_eval_update_symbol_real(scope_p, id_str_p, res_expr_info.val.real = left_symbol_p->symbol.u.real + right_expr_info.val.integer);
@@ -463,7 +463,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                             break;
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "+=", "between bool and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "+=", "在布尔型与实数型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
                             symbol_updated = l2_eval_update_symbol_real(scope_p, id_str_p, res_expr_info.val.real = left_symbol_p->symbol.u.real + right_expr_info.val.real);
@@ -481,13 +481,13 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                 case L2_EXPR_VAL_TYPE_BOOL:
                     switch (left_symbol_p->symbol.type) {
                         case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "+=", "between integer and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "+=", "在整数型与布尔型之间");
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "+=", "between bool and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "+=", "在布尔型与布尔型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "+=", "between real and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "+=", "在实数型与布尔型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "+=", "between native pointer and bool");
@@ -528,7 +528,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                             break;
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "between bool and integer");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "在布尔型与整数型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
                             symbol_updated = l2_eval_update_symbol_real(scope_p, id_str_p, res_expr_info.val.real = left_symbol_p->symbol.u.real - right_expr_info.val.integer);
@@ -551,7 +551,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                             break;
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "between bool and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "在布尔型与实数型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
                             symbol_updated = l2_eval_update_symbol_real(scope_p, id_str_p, res_expr_info.val.real = left_symbol_p->symbol.u.real - right_expr_info.val.real);
@@ -569,13 +569,13 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                 case L2_EXPR_VAL_TYPE_BOOL:
                     switch (left_symbol_p->symbol.type) {
                         case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "between integer and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "在整数型与布尔型之间");
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "between bool and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "在布尔型与布尔型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "between real and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "在实数型与布尔型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "-=", "between native pointer and bool");
@@ -616,10 +616,10 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                             break;
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between bool and integer");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "在布尔型与整数型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between real and integer");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "在实数型与整数型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between native pointer and integer");
@@ -632,13 +632,13 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                 case L2_EXPR_VAL_TYPE_REAL:
                     switch (left_symbol_p->symbol.type) {
                         case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between integer and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "在整数型与实数型之间");
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between bool and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "在布尔型与实数型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between real and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "在实数型与实数型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between native pointer and real");
@@ -651,13 +651,13 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                 case L2_EXPR_VAL_TYPE_BOOL:
                     switch (left_symbol_p->symbol.type) {
                         case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between integer and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "在整数型与布尔型之间");
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between bool and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "在布尔型与布尔型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between real and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "在实数型与布尔型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "<<=", "between native pointer and bool");
@@ -698,10 +698,10 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                             break;
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between bool and integer");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "在布尔型与整数型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between real and integer");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "在实数型与整数型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between native pointer and integer");
@@ -714,13 +714,13 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                 case L2_EXPR_VAL_TYPE_REAL:
                     switch (left_symbol_p->symbol.type) {
                         case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between integer and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "在整数型与实数型之间");
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between bool and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "在布尔型与实数型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between real and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "在实数型与实数型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between native pointer and real");
@@ -733,13 +733,13 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                 case L2_EXPR_VAL_TYPE_BOOL:
                     switch (left_symbol_p->symbol.type) {
                         case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between integer and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "在整数型与布尔型之间");
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between bool and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "在布尔型与布尔型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between real and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "在实数型与布尔型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>=", "between native pointer and bool");
@@ -780,10 +780,10 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                             break;
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between bool and integer");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "在布尔型与整数型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between real and integer");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "在实数型与整数型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between native pointer and integer");
@@ -796,13 +796,13 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                 case L2_EXPR_VAL_TYPE_REAL:
                     switch (left_symbol_p->symbol.type) {
                         case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between integer and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "在整数型与实数型之间");
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between bool and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "在布尔型与实数型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between real and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "在实数型与实数型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between native pointer and real");
@@ -815,13 +815,13 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                 case L2_EXPR_VAL_TYPE_BOOL:
                     switch (left_symbol_p->symbol.type) {
                         case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between integer and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "在整数型与布尔型之间");
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between bool and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "在布尔型与布尔型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between real and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "在实数型与布尔型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, ">>>=", "between native pointer and bool");
@@ -862,10 +862,10 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                             break;
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between bool and integer");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "在布尔型与整数型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between real and integer");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "在实数型与整数型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between native pointer and integer");
@@ -878,13 +878,13 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                 case L2_EXPR_VAL_TYPE_REAL:
                     switch (left_symbol_p->symbol.type) {
                         case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between integer and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "在整数型与实数型之间");
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between bool and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "在布尔型与实数型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between real and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "在实数型与实数型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between native pointer and real");
@@ -897,13 +897,13 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                 case L2_EXPR_VAL_TYPE_BOOL:
                     switch (left_symbol_p->symbol.type) {
                         case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between integer and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "在整数型与布尔型之间");
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between bool and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "在布尔型与布尔型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between real and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "在实数型与布尔型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "&=", "between native pointer and bool");
@@ -944,10 +944,10 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                             break;
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between bool and integer");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "在布尔型与整数型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between real and integer");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "在实数型与整数型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between native pointer and integer");
@@ -960,13 +960,13 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                 case L2_EXPR_VAL_TYPE_REAL:
                     switch (left_symbol_p->symbol.type) {
                         case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between integer and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "在整数型与实数型之间");
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between bool and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "在布尔型与实数型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between real and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "在实数型与实数型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between native pointer and real");
@@ -979,13 +979,13 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                 case L2_EXPR_VAL_TYPE_BOOL:
                     switch (left_symbol_p->symbol.type) {
                         case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between integer and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "在整数型与布尔型之间");
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between bool and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "在布尔型与布尔型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between real and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "在实数型与布尔型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "^=", "between native pointer and bool");
@@ -1026,10 +1026,10 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                             break;
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between bool and integer");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "在布尔型与整数型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between real and integer");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "在实数型与整数型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between native pointer and integer");
@@ -1042,13 +1042,13 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                 case L2_EXPR_VAL_TYPE_REAL:
                     switch (left_symbol_p->symbol.type) {
                         case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between integer and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "在整数型与实数型之间");
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between bool and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "在布尔型与实数型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between real and real");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "在实数型与实数型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between native pointer and real");
@@ -1061,13 +1061,13 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                 case L2_EXPR_VAL_TYPE_BOOL:
                     switch (left_symbol_p->symbol.type) {
                         case L2_SYMBOL_TYPE_INTEGER:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between integer and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "在整数型与布尔型之间");
 
                         case L2_SYMBOL_TYPE_BOOL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between bool and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "在布尔型与布尔型之间");
 
                         case L2_SYMBOL_TYPE_REAL:
-                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between real and bool");
+                            l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "在实数型与布尔型之间");
 
                         //case L2_SYMBOL_TYPE_NATIVE_POINTER:
                         //    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_OPERATION, opr_err_line, opr_err_col, "|=", "between native pointer and bool");
