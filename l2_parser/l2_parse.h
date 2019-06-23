@@ -8,8 +8,8 @@
 #include "l2_eval.h"
 #include "l2_call_stack.h"
 
-#define L2_VERSION "v0.2.11"
-
+#define L2_VERSION "v0.2.13" /* version info */
+#define L2_ZH /* zh environment */
 
 #define _if_keyword(kw) \
 if (l2_parse_probe_next_token_by_type_and_str(L2_TOKEN_KEYWORD, g_l2_token_keywords[(kw)])) { l2_parse_token_forward(); \
@@ -69,12 +69,21 @@ if (g_parser_p->token_stream_p->char_stream_p->fp == stdin) { \
 fflush(stdout); \
 }
 
+#ifdef L2_ZH
 #define _repl_head \
 if (g_parser_p->token_stream_p->char_stream_p->fp == stdin) { \
-fprintf(stdout, "l2 programming language & interpreter\ncurrent version: %s\n", L2_VERSION); \
+fprintf(stdout, "L2 编程语言及其解释器\n当前版本: %s ", L2_VERSION); \
+fprintf(stdout, "L2 解释器命令行, REPL 用户界面\n"); \
+fflush(stdout); \
+}
+#else
+#define _repl_head \
+if (g_parser_p->token_stream_p->char_stream_p->fp == stdin) { \
+fprintf(stdout, "l2 programming language & interpreter\ncurrent version: %s ", L2_VERSION); \
 fprintf(stdout, "l2 interpreter shell, user interface of REPL\n"); \
 fflush(stdout); \
 }
+#endif
 
 /*
 #define _repl
