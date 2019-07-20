@@ -1,7 +1,7 @@
 #ifndef _L2_ERROR_H_
 #define _L2_ERROR_H_
 
-#include "../l2_base/l2_common_type.h"
+#include "../l2_tpl/l2_common_type.h"
 
 typedef enum _l2_internal_error_type {
     L2_INTERNAL_ERROR_OUT_OF_RANGE,
@@ -52,7 +52,7 @@ typedef enum _l2_parsing_error_type {
 void l2_clean_before_abort();
 /* void l2_internal_error_en(l2_internal_error_type error_type, ...); */
 /* void l2_parsing_error_en(l2_parsing_error_type error_type, int lines, int cols, ...); */
-void l2_internal_error(l2_internal_error_type error_type, ...);
-void l2_parsing_error(l2_parsing_error_type error_type, int lines, int cols, ...);
+void _Noreturn l2_internal_error(l2_internal_error_type error_type, ...);
+void _Noreturn l2_parsing_error(l2_parsing_error_type error_type, int lines, int cols, ...);
 
 #endif

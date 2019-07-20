@@ -1,6 +1,6 @@
 #include "l2_scope.h"
-#include "../l2_system/l2_error.h"
-#include "../l2_system/l2_assert.h"
+#include "../l2_drv/l2_error.h"
+#include "../l2_drv/l2_assert.h"
 #include "l2_parse.h"
 #include "l2_symbol_table.h"
 

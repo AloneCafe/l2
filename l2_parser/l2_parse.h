@@ -1,10 +1,10 @@
 #ifndef _L2_PARSE_H_
 #define _L2_PARSE_H_
 
-#define L2_VERSION "v0.3.1" /* version info */
+#define L2_VERSION "v0.3.3" /* version info */
 
-#include "../l2_base/l2_common_type.h"
-#include "../l2_lexer/l2_token_stream.h"
+#include "../l2_tpl/l2_common_type.h"
+#include "l2_token_stream.h"
 #include "l2_scope.h"
 #include "../l2_mem/l2_gc.h"
 #include "l2_eval.h"

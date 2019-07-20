@@ -1,7 +1,7 @@
 #ifndef _L2_EVAL_H_
 #define _L2_EVAL_H_
 
-#include "../l2_lexer/l2_token_stream.h"
+#include "l2_token_stream.h"
 #include "l2_parse.h"
 #include "l2_symbol_table.h"
 

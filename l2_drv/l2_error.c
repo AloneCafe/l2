@@ -3,7 +3,7 @@
 #include <stdarg.h>
 
 #include "l2_error.h"
-#include "../l2_base/l2_string.h"
+#include "../l2_tpl/l2_string.h"
 #include "../l2_parser/l2_parse.h"
 
 extern l2_parser *g_parser_p;
@@ -63,7 +63,7 @@ void l2_internal_error_en(const l2_internal_error_type error_type, ...) {
 }
  */
 
-void l2_internal_error(const l2_internal_error_type error_type, ...) {
+void _Noreturn l2_internal_error(const l2_internal_error_type error_type, ...) {
     va_list va;
     va_start(va, error_type);
     char *msg;
@@ -293,7 +293,7 @@ void l2_parsing_error_en(const l2_parsing_error_type error_type, int lines, int 
 }
 */
 
-void l2_parsing_error(const l2_parsing_error_type error_type, int lines, int cols, ...) {
+void _Noreturn l2_parsing_error(const l2_parsing_error_type error_type, int lines, int cols, ...) {
 
     va_list va;
     va_start(va, cols);

@@ -1,9 +1,9 @@
 #ifndef _L2_CAST_H_
 #define _L2_CAST_H_
 
-#include "../l2_base/l2_common_type.h"
-#include "../l2_base/l2_vector.h"
-#include "../l2_base/l2_stack.h"
+#include "../l2_tpl/l2_common_type.h"
+#include "../l2_tpl/l2_vector.h"
+#include "../l2_tpl/l2_stack.h"
 
 #define l2_pow(r, a, n) { int i, ans = 1; for (i = 0; i < (n); i++) ans *= (a); (r) = ans; }
 

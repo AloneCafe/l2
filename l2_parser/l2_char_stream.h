@@ -3,8 +3,8 @@
 
 #include <stdio.h>
 
-#include "../l2_base/l2_common_type.h"
-#include "../l2_base/l2_vector.h"
+#include "../l2_tpl/l2_common_type.h"
+#include "../l2_tpl/l2_vector.h"
 
 typedef struct _l2_char_stream {
     FILE *fp;

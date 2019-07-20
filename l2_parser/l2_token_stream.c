@@ -1,8 +1,8 @@
 #include "stdlib.h"
 #include "l2_token_stream.h"
-#include "../l2_system/l2_error.h"
-#include "../l2_system/l2_assert.h"
-#include "../l2_system/l2_warning.h"
+#include "../l2_drv/l2_error.h"
+#include "../l2_drv/l2_assert.h"
+#include "../l2_drv/l2_warning.h"
 #include "l2_cast.h"
 
 char *g_l2_token_keywords[] = {

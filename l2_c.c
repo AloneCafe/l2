@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "l2_parser/l2_parse.h"
-#include "l2_system/l2_assert.h"
-#include "l2_lexer/l2_char_stream.h"
-#include "l2_lexer/l2_token_stream.h"
+#include "l2_drv/l2_assert.h"
+#include "l2_parser/l2_char_stream.h"
+#include "l2_parser/l2_token_stream.h"
 
 
 typedef enum _l2_init_env_error_type {

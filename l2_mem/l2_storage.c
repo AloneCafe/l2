@@ -1,7 +1,7 @@
 #include "stdlib.h"
 #include "memory.h"
 
-#include "../l2_system/l2_assert.h"
+#include "../l2_drv/l2_assert.h"
 #include "l2_storage.h"
 
 void l2_storage_free_mem_link(l2_mem_link *mem_link_p) {

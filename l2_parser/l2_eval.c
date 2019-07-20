@@ -1,11 +1,11 @@
 #include "memory.h"
 #include "l2_parse.h"
 #include "l2_eval.h"
-#include "../l2_system/l2_error.h"
+#include "../l2_drv/l2_error.h"
 #include "l2_symbol_table.h"
 #include "stdarg.h"
-#include "../l2_lexer/l2_token_stream.h"
-#include "../l2_lexer/l2_cast.h"
+#include "l2_token_stream.h"
+#include "l2_cast.h"
 
 
 extern l2_parser *g_parser_p;
@@ -131,9 +131,8 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
         _if_type (L2_TOKEN_ASSIGN) /* = */
         {
             _get_current_token_p
-            token_opr_p = l2_parse_token_current();
-            opr_err_line = token_opr_p->current_line;
-            opr_err_col = token_opr_p->current_col;
+            opr_err_line = current_token_p->current_line;
+            opr_err_col = current_token_p->current_col;
 
             right_expr_info = l2_eval_expr_assign(scope_p);
 
@@ -155,7 +154,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, opr_err_line, opr_err_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -168,9 +167,9 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
         }
         _elif_type (L2_TOKEN_DIV_ASSIGN) /* /= */
         {
-            token_opr_p = l2_parse_token_current();
-            opr_err_line = token_opr_p->current_line;
-            opr_err_col = token_opr_p->current_col;
+            _get_current_token_p
+            opr_err_line = current_token_p->current_line;
+            opr_err_col = current_token_p->current_col;
 
             right_expr_info = l2_eval_expr_assign(scope_p);
             left_symbol_p = l2_eval_get_symbol_node(scope_p, id_str_p);
@@ -243,7 +242,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, opr_err_line, opr_err_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -254,9 +253,9 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
         }
         _elif_type (L2_TOKEN_MUL_ASSIGN) /* *= */
         {
-            token_opr_p = l2_parse_token_current();
-            opr_err_line = token_opr_p->current_line;
-            opr_err_col = token_opr_p->current_col;
+            _get_current_token_p
+            opr_err_line = current_token_p->current_line;
+            opr_err_col = current_token_p->current_col;
 
             right_expr_info = l2_eval_expr_assign(scope_p);
             left_symbol_p = l2_eval_get_symbol_node(scope_p, id_str_p);
@@ -329,7 +328,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, opr_err_line, opr_err_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -340,9 +339,9 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
         }
         _elif_type (L2_TOKEN_MOD_ASSIGN) /* %= */
         {
-            token_opr_p = l2_parse_token_current();
-            opr_err_line = token_opr_p->current_line;
-            opr_err_col = token_opr_p->current_col;
+            _get_current_token_p
+            opr_err_line = current_token_p->current_line;
+            opr_err_col = current_token_p->current_col;
 
             right_expr_info = l2_eval_expr_assign(scope_p);
             left_symbol_p = l2_eval_get_symbol_node(scope_p, id_str_p);
@@ -409,7 +408,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, opr_err_line, opr_err_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -420,9 +419,9 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
         }
         _elif_type (L2_TOKEN_PLUS_ASSIGN) /* += */
         {
-            token_opr_p = l2_parse_token_current();
-            opr_err_line = token_opr_p->current_line;
-            opr_err_col = token_opr_p->current_col;
+            _get_current_token_p
+            opr_err_line = current_token_p->current_line;
+            opr_err_col = current_token_p->current_col;
 
             right_expr_info = l2_eval_expr_assign(scope_p);
             left_symbol_p = l2_eval_get_symbol_node(scope_p, id_str_p);
@@ -497,7 +496,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, opr_err_line, opr_err_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -508,9 +507,9 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
         }
         _elif_type (L2_TOKEN_SUB_ASSIGN) /* -= */
         {
-            token_opr_p = l2_parse_token_current();
-            opr_err_line = token_opr_p->current_line;
-            opr_err_col = token_opr_p->current_col;
+            _get_current_token_p
+            opr_err_line = current_token_p->current_line;
+            opr_err_col = current_token_p->current_col;
 
             right_expr_info = l2_eval_expr_assign(scope_p);
             left_symbol_p = l2_eval_get_symbol_node(scope_p, id_str_p);
@@ -585,7 +584,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, opr_err_line, opr_err_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -596,9 +595,9 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
         }
         _elif_type (L2_TOKEN_LSHIFT_ASSIGN) /* <<= */
         {
-            token_opr_p = l2_parse_token_current();
-            opr_err_line = token_opr_p->current_line;
-            opr_err_col = token_opr_p->current_col;
+            _get_current_token_p
+            opr_err_line = current_token_p->current_line;
+            opr_err_col = current_token_p->current_col;
 
             right_expr_info = l2_eval_expr_assign(scope_p);
             left_symbol_p = l2_eval_get_symbol_node(scope_p, id_str_p);
@@ -667,7 +666,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, opr_err_line, opr_err_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -678,9 +677,9 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
         }
         _elif_type (L2_TOKEN_RSHIFT_ASSIGN) /* >>= */
         {
-            token_opr_p = l2_parse_token_current();
-            opr_err_line = token_opr_p->current_line;
-            opr_err_col = token_opr_p->current_col;
+            _get_current_token_p
+            opr_err_line = current_token_p->current_line;
+            opr_err_col = current_token_p->current_col;
 
             right_expr_info = l2_eval_expr_assign(scope_p);
             left_symbol_p = l2_eval_get_symbol_node(scope_p, id_str_p);
@@ -749,7 +748,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, opr_err_line, opr_err_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -760,9 +759,9 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
         }
         _elif_type (L2_TOKEN_RSHIFT_UNSIGNED_ASSIGN) /* >>>= */
         {
-            token_opr_p = l2_parse_token_current();
-            opr_err_line = token_opr_p->current_line;
-            opr_err_col = token_opr_p->current_col;
+            _get_current_token_p
+            opr_err_line = current_token_p->current_line;
+            opr_err_col = current_token_p->current_col;
 
             right_expr_info = l2_eval_expr_assign(scope_p);
             left_symbol_p = l2_eval_get_symbol_node(scope_p, id_str_p);
@@ -831,7 +830,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, opr_err_line, opr_err_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -842,9 +841,9 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
         }
         _elif_type (L2_TOKEN_BIT_AND_ASSIGN) /* &= */
         {
-            token_opr_p = l2_parse_token_current();
-            opr_err_line = token_opr_p->current_line;
-            opr_err_col = token_opr_p->current_col;
+            _get_current_token_p
+            opr_err_line = current_token_p->current_line;
+            opr_err_col = current_token_p->current_col;
 
             right_expr_info = l2_eval_expr_assign(scope_p);
             left_symbol_p = l2_eval_get_symbol_node(scope_p, id_str_p);
@@ -913,7 +912,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, opr_err_line, opr_err_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -924,9 +923,9 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
         }
         _elif_type (L2_TOKEN_BIT_XOR_ASSIGN) /* ^= */
         {
-            token_opr_p = l2_parse_token_current();
-            opr_err_line = token_opr_p->current_line;
-            opr_err_col = token_opr_p->current_col;
+            _get_current_token_p
+            opr_err_line = current_token_p->current_line;
+            opr_err_col = current_token_p->current_col;
 
             right_expr_info = l2_eval_expr_assign(scope_p);
             left_symbol_p = l2_eval_get_symbol_node(scope_p, id_str_p);
@@ -995,7 +994,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, opr_err_line, opr_err_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -1006,15 +1005,13 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
         }
         _elif_type (L2_TOKEN_BIT_OR_ASSIGN) /* |= */
         {
-            token_opr_p = l2_parse_token_current();
-            opr_err_line = token_opr_p->current_line;
-            opr_err_col = token_opr_p->current_col;
+            _get_current_token_p
+            opr_err_line = current_token_p->current_line;
+            opr_err_col = current_token_p->current_col;
 
             right_expr_info = l2_eval_expr_assign(scope_p);
             left_symbol_p = l2_eval_get_symbol_node(scope_p, id_str_p);
             if (!left_symbol_p) l2_parsing_error(L2_PARSING_ERROR_IDENTIFIER_UNDEFINED, id_err_line, id_err_col, left_id_p->u.str.str_p);
-
-            char buff_s[100];
 
             switch (right_expr_info.val_type) {
                 case L2_EXPR_VAL_TYPE_INTEGER:
@@ -1077,7 +1074,7 @@ l2_expr_info l2_eval_expr_assign(l2_scope *scope_p) {
                     break;
 
                 default:
-                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, current_token_p->current_line, current_token_p->current_col);
+                    l2_parsing_error(L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE, opr_err_line, opr_err_col);
             }
 
             if (!symbol_updated) /* if update symbol failed */
@@ -1109,7 +1106,6 @@ l2_expr_info l2_eval_expr_condition(l2_scope *scope_p) {
     _declr_current_token_p
 
     first_expr_info = l2_eval_expr_logic_or(scope_p);
-    int second_pos;
 
     _if_type (L2_TOKEN_QM) {
         //second_pos = l2_parse_token_stream_get_pos();

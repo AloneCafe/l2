@@ -2,10 +2,10 @@
 #include "stdio.h"
 #include "l2_char_stream.h"
 
-#include "../l2_base/l2_common_type.h"
-#include "../l2_system/l2_assert.h"
-#include "../l2_base/l2_vector.h"
-#include "../l2_parser/l2_parse.h"
+#include "../l2_tpl/l2_common_type.h"
+#include "../l2_drv/l2_assert.h"
+#include "../l2_tpl/l2_vector.h"
+#include "l2_parse.h"
 
 extern l2_parser *g_parser_p;
 

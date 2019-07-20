@@ -1,8 +1,8 @@
 #ifndef _L2_SCOPE_H_
 #define _L2_SCOPE_H_
 
-#include "../l2_base/l2_common_type.h"
-#include "../l2_base/l2_vector.h"
+#include "../l2_tpl/l2_common_type.h"
+#include "../l2_tpl/l2_vector.h"
 
 typedef enum _l2_scope_create_flag {
     L2_SCOPE_CREATE_SUB_SCOPE,

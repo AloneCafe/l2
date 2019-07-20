@@ -1,7 +1,7 @@
 #ifndef _L2_WARNING_H_
 #define _L2_WARNING_H_
 
-#include "../l2_base/l2_common_type.h"
+#include "../l2_tpl/l2_common_type.h"
 
 typedef enum _l2_parsing_warning_type {
     L2_PARSING_WARNING_UNKNOWN_ESCAPE_SEQUENCE

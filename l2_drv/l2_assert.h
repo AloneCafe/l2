@@ -3,7 +3,7 @@
 
 #include <assert.h>
 
-#include "../l2_base/l2_common_type.h"
+#include "../l2_tpl/l2_common_type.h"
 #include "l2_error.h"
 
 #define l2_assert(val, error_type) (l2_assert_func((long)(val), error_type, __func__, __FILE__, __LINE__))

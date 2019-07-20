@@ -1,9 +1,9 @@
 #ifndef _L2_SYMBOL_TABLE_H_
 #define _L2_SYMBOL_TABLE_H_
 
-#include "../l2_base/l2_common_type.h"
-#include "../l2_base/l2_vector.h"
-#include "../l2_base/l2_string.h"
+#include "../l2_tpl/l2_common_type.h"
+#include "../l2_tpl/l2_vector.h"
+#include "../l2_tpl/l2_string.h"
 #include "l2_scope.h"
 
 typedef enum _l2_symbol_type {

@@ -1,8 +1,8 @@
 #ifndef _L2_TOKEN_STREAM_H_
 #define _L2_TOKEN_STREAM_H_
 
-#include "../l2_base/l2_string.h"
-#include "../l2_base/l2_vector.h"
+#include "../l2_tpl/l2_string.h"
+#include "../l2_tpl/l2_vector.h"
 #include "l2_char_stream.h"
 
 extern char *g_l2_token_keywords[];

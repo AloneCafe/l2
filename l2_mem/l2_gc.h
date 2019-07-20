@@ -1,7 +1,7 @@
 #ifndef _L2_GC_H_
 #define _L2_GC_H_
 
-#include "../l2_base/l2_common_type.h"
+#include "../l2_tpl/l2_common_type.h"
 
 typedef struct _l2_gc_mem_node {
     void *managed_mem_p;

@@ -2,10 +2,10 @@
 #include "stdlib.h"
 #include "string.h"
 #include "l2_parse.h"
-#include "../l2_lexer/l2_token_stream.h"
+#include "l2_token_stream.h"
 #include "l2_symbol_table.h"
-#include "../l2_system/l2_error.h"
-#include "../l2_system/l2_assert.h"
+#include "../l2_drv/l2_error.h"
+#include "../l2_drv/l2_assert.h"
 #include "l2_eval.h"
 #include "l2_scope.h"
 

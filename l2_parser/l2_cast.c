@@ -3,9 +3,9 @@
 #include "stdlib.h"
 
 #include "l2_cast.h"
-#include "../l2_system/l2_assert.h"
-#include "../l2_base/l2_vector.h"
-#include "../l2_base/l2_stack.h"
+#include "../l2_drv/l2_assert.h"
+#include "../l2_tpl/l2_vector.h"
+#include "../l2_tpl/l2_stack.h"
 
 int l2_cast_hex_str_to_int(const char *s) {
     l2_assert(s, L2_INTERNAL_ERROR_NULL_POINTER);
