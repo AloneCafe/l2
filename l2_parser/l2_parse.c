@@ -9,8 +9,6 @@
 #include "l2_eval.h"
 #include "l2_scope.h"
 
-extern char *g_l2_token_keywords[];
-
 l2_parser *g_parser_p;
 
 void l2_parse_finalize() {
@@ -935,103 +933,101 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
     }
     _elif_keyword (L2_KW_FOR) /* "for" */ /* for-loop */
     {
-        int temp_pos = l2_token_stream_get_pos(g_parser_p->token_stream_p);
-
-        /* prove that the for statements is completed */
-        _if_type (L2_TOKEN_LP) /* ( */
-        {
-            /* handle the first expr ( allow to using definition stmt for variable )*/
-            _if_keyword (L2_KW_VAR)
+        if (_is_repl) {
+            int temp_pos = l2_token_stream_get_pos(g_parser_p->token_stream_p);
+            /* prove that the for statements is completed */
+            _if_type (L2_TOKEN_LP) /* ( */
             {
-                _if_type (L2_TOKEN_IDENTIFIER) /* id */
+                /* handle the first expr ( allow to using definition stmt for variable )*/
+                _if_keyword (L2_KW_VAR)
                 {
-                    _get_current_token_p
-
-                    _if_type (L2_TOKEN_ASSIGN) /* = */
+                    _if_type (L2_TOKEN_IDENTIFIER) /* id */
                     {
-                        l2_absorb_expr_assign(); /* absorb expr */
+                        _get_current_token_p
 
-                        /* absorb last part of definition list in recursion */
-                        l2_absorb_stmt_var_def_list1();
-
-                        _if_type (L2_TOKEN_SEMICOLON)
+                        _if_type (L2_TOKEN_ASSIGN) /* = */
                         {
-                            /* absorb ';' */
-                        } _throw_missing_semicolon
+                            l2_absorb_expr_assign(); /* absorb expr */
 
-                    }
-                    _elif_type (L2_TOKEN_SEMICOLON)
+                            /* absorb last part of definition list in recursion */
+                            l2_absorb_stmt_var_def_list1();
+
+                            _if_type (L2_TOKEN_SEMICOLON)
+                            {
+                                /* absorb ';' */
+                            }_throw_missing_semicolon
+
+                        }
+                        _elif_type (L2_TOKEN_SEMICOLON)
+                        {
+                            /* absorb ';' without initializing the variable */
+                        }_throw_unexpected_token
+
+                    }_throw_unexpected_token
+                }
+                _elif_type (L2_TOKEN_SEMICOLON)
+                {
+                    /* this means there is an empty expr in for-loop */
+                    /* also absorb ';' */
+                }
+                _else {
+                    l2_absorb_expr();
+                    _if_type (L2_TOKEN_SEMICOLON)
                     {
-                        /* absorb ';' without initializing the variable */
-                    } _throw_unexpected_token
+                        /* absorb ';' */
+                    }_throw_missing_semicolon
+                }
 
-                } _throw_unexpected_token
-            }
-            _elif_type (L2_TOKEN_SEMICOLON)
-            {
-                /* this means there is an empty expr in for-loop */
-                /* also absorb ';' */
-            }
-            _else
-            {
-                l2_absorb_expr();
                 _if_type (L2_TOKEN_SEMICOLON)
                 {
-                    /* absorb ';' */
-                } _throw_missing_semicolon
-            }
+                    /* this means there is an empty expr in for-loop,
+                     * and the second expr will have a bool-value with true if it is empty  */
+                    /* also absorb ';' */
+                }
+                _else {
+                    l2_absorb_expr();
+                    _if_type (L2_TOKEN_SEMICOLON)
+                    {
+                        /* absorb ';' */
+                    }_throw_missing_semicolon
+                }
 
-            _if_type (L2_TOKEN_SEMICOLON)
-            {
-                /* this means there is an empty expr in for-loop,
-                 * and the second expr will have a bool-value with true if it is empty  */
-                /* also absorb ';' */
-            }
-            _else
-            {
-                l2_absorb_expr();
-                _if_type (L2_TOKEN_SEMICOLON)
-                {
-                    /* absorb ';' */
-                } _throw_missing_semicolon
-            }
-
-            /* handle the third expr ( absorb it ) */
-            _if_type (L2_TOKEN_RP)
-            {
-                /* this means there is an empty expr in for-loop */
-            }
-            _else
-            {
-                /* just absorb the third expr */
-                l2_absorb_expr();
-
+                /* handle the third expr ( absorb it ) */
                 _if_type (L2_TOKEN_RP)
                 {
-                    /* absorb ')' */
-                } _throw_missing_rp
-            }
+                    /* this means there is an empty expr in for-loop */
+                }
+                _else {
+                    /* just absorb the third expr */
+                    l2_absorb_expr();
 
-        } _throw_unexpected_token
+                    _if_type (L2_TOKEN_RP)
+                    {
+                        /* absorb ')' */
+                    }_throw_missing_rp
+                }
 
-        /* absorb the for stmt loop structure */
-        _if_type (L2_TOKEN_LBRACE) /* { */
-        {
-            /* braces flag + 1 */
-            g_parser_p->braces_flag += 1;
+            }_throw_unexpected_token
 
-            l2_absorb_stmts(); /* parse stmts, may parse break or continue*/
-
-            _if_type (L2_TOKEN_RBRACE) /* } */
+            /* absorb the for stmt loop structure */
+            _if_type (L2_TOKEN_LBRACE) /* { */
             {
-                /* absorb '}' */
-            }_throw_missing_rbrace
+                /* braces flag + 1 */
+                g_parser_p->braces_flag += 1;
 
-        } _throw_unexpected_token
-        /* prove complete */
+                l2_absorb_stmts(); /* parse stmts, may parse break or continue*/
 
-        /* restore the position of token stream */
-        l2_token_stream_set_pos(g_parser_p->token_stream_p, temp_pos);
+                _if_type (L2_TOKEN_RBRACE) /* } */
+                {
+                    /* absorb '}' */
+                }_throw_missing_rbrace
+
+            }_throw_unexpected_token
+            /* prove complete */
+
+            /* restore the position of token stream */
+            l2_token_stream_set_pos(g_parser_p->token_stream_p, temp_pos);
+        }
 
         _get_current_token_p
 
@@ -1225,7 +1221,6 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
                             { } _throw_unexpected_token
                         }
 
-
                         l2_token_stream_set_pos(g_parser_p->token_stream_p, loop_entry_pos);
 
                         /* apply the modifies in symbol table */
@@ -1265,48 +1260,48 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
     }
     _elif_keyword (L2_KW_DO) /* "do" */ /* do...while-loop */
     {
-        int temp_pos = l2_token_stream_get_pos(g_parser_p->token_stream_p);
-
-        /* prove that the do-while statements is completed */
-        _if_type (L2_TOKEN_LBRACE) /* { */
-        {
-            /* braces flag + 1 */
-            g_parser_p->braces_flag += 1;
-
-            l2_absorb_stmts(); /* absorb stmts */
-
-            _if_type (L2_TOKEN_RBRACE) /* } */
+        if (_is_repl) {
+            int temp_pos = l2_token_stream_get_pos(g_parser_p->token_stream_p);
+            /* prove that the do-while statements is completed */
+            _if_type (L2_TOKEN_LBRACE) /* { */
             {
-                /* absorb '}' */
-            } _throw_missing_rbrace
+                /* braces flag + 1 */
+                g_parser_p->braces_flag += 1;
 
-        } _throw_unexpected_token
+                l2_absorb_stmts(); /* absorb stmts */
 
-        _if_keyword (L2_KW_WHILE) /* "while" */
-        {
-            _get_current_token_p
+                _if_type (L2_TOKEN_RBRACE) /* } */
+                {
+                    /* absorb '}' */
+                }_throw_missing_rbrace
 
-            _if_type (L2_TOKEN_LP) /* ( */
+            }_throw_unexpected_token
+
+            _if_keyword (L2_KW_WHILE) /* "while" */
             {
-                l2_absorb_expr(); /* absorb expr */
-            } _throw_unexpected_token
+                _get_current_token_p
 
-            _if_type (L2_TOKEN_RP) /* ) */
-            {
-                /* absorb ')' */
-            } _throw_missing_rp
+                _if_type (L2_TOKEN_LP) /* ( */
+                {
+                    l2_absorb_expr(); /* absorb expr */
+                }_throw_unexpected_token
 
-            _if_type (L2_TOKEN_SEMICOLON) /* ; */
-            {
-                /* absorb ';' */
-            } _throw_missing_semicolon
+                _if_type (L2_TOKEN_RP) /* ) */
+                {
+                    /* absorb ')' */
+                }_throw_missing_rp
 
-        } _throw_unexpected_token
-        /* prove complete */
+                _if_type (L2_TOKEN_SEMICOLON) /* ; */
+                {
+                    /* absorb ';' */
+                }_throw_missing_semicolon
 
-        /* restore the position of token stream */
-        l2_token_stream_set_pos(g_parser_p->token_stream_p, temp_pos);
+            }_throw_unexpected_token
+            /* prove complete */
 
+            /* restore the position of token stream */
+            l2_token_stream_set_pos(g_parser_p->token_stream_p, temp_pos);
+        }
 
         l2_expr_info expr_info;
 
@@ -1414,38 +1409,39 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
     }
     _elif_keyword (L2_KW_WHILE) /* "while" */ /* while-loop */
     {
-        int temp_pos = l2_token_stream_get_pos(g_parser_p->token_stream_p);
-
-        /* prove that the while statements is completed */
-        _if_type (L2_TOKEN_LP) /* ( */
-        {
-            l2_absorb_expr(); /* absorb expr */
-
-            _if_type (L2_TOKEN_RP)
+        if (_is_repl) {
+            int temp_pos = l2_token_stream_get_pos(g_parser_p->token_stream_p);
+            /* prove that the while statements is completed */
+            _if_type (L2_TOKEN_LP) /* ( */
             {
-                /* absorb ')' */
-            } _throw_missing_rp
+                l2_absorb_expr(); /* absorb expr */
 
-
-            _if_type (L2_TOKEN_LBRACE) /* { */
-            {
-                /* braces flag + 1 */
-                g_parser_p->braces_flag += 1;
-
-                l2_absorb_stmts(); /* absorb stmts */
-
-                _if_type (L2_TOKEN_RBRACE)
+                _if_type (L2_TOKEN_RP)
                 {
-                    /* absorb '}' */
-                } _throw_missing_rbrace
+                    /* absorb ')' */
+                }_throw_missing_rp
 
-            } _throw_unexpected_token
 
-        } _throw_unexpected_token
-        /* prove complete */
+                _if_type (L2_TOKEN_LBRACE) /* { */
+                {
+                    /* braces flag + 1 */
+                    g_parser_p->braces_flag += 1;
 
-        /* restore the position of token stream */
-        l2_token_stream_set_pos(g_parser_p->token_stream_p, temp_pos);
+                    l2_absorb_stmts(); /* absorb stmts */
+
+                    _if_type (L2_TOKEN_RBRACE)
+                    {
+                        /* absorb '}' */
+                    }_throw_missing_rbrace
+
+                }_throw_unexpected_token
+
+            }_throw_unexpected_token
+            /* prove complete */
+
+            /* restore the position of token stream */
+            l2_token_stream_set_pos(g_parser_p->token_stream_p, temp_pos);
+        }
 
         l2_expr_info expr_info;
         _get_current_token_p
@@ -1525,6 +1521,28 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
     }
     _elif_type (L2_TOKEN_LBRACE) /* { */
     {
+        if (_is_repl) {
+            int temp_pos = l2_token_stream_get_pos(g_parser_p->token_stream_p);
+            /* prove that the block is completed */
+            _if_type (L2_TOKEN_LBRACE) /* { */
+            {
+                /* braces flag + 1 */
+                g_parser_p->braces_flag += 1;
+
+                l2_absorb_stmts(); /* absorb stmts */
+
+                _if_type (L2_TOKEN_RBRACE)
+                {
+                    /* absorb '}' */
+                }_throw_missing_rbrace
+
+            }_throw_unexpected_token
+            /* prove complete */
+
+            /* restore the position of token stream */
+            l2_token_stream_set_pos(g_parser_p->token_stream_p, temp_pos);
+        }
+
         /* braces flag + 1 */
         g_parser_p->braces_flag += 1;
 
@@ -1543,6 +1561,40 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
     }
     _elif_keyword (L2_KW_IF) /* "if" */
     {
+        if (_is_repl) {
+            int temp_pos = l2_token_stream_get_pos(g_parser_p->token_stream_p);
+            /* prove that the while statements is completed */
+            _if_type (L2_TOKEN_LP) /* ( */
+            {
+                l2_absorb_expr(); /* absorb expr */
+
+                _if_type (L2_TOKEN_RP)
+                {
+                    /* absorb ')' */
+                }_throw_missing_rp
+
+
+                _if_type (L2_TOKEN_LBRACE) /* { */
+                {
+                    /* braces flag + 1 */
+                    g_parser_p->braces_flag += 1;
+
+                    l2_absorb_stmt_elif(); /* absorb stmt_elif */
+
+                    _if_type (L2_TOKEN_RBRACE)
+                    {
+                        /* absorb '}' */
+                    }_throw_missing_rbrace
+
+                }_throw_unexpected_token
+
+            }_throw_unexpected_token
+            /* prove complete */
+
+            /* restore the position of token stream */
+            l2_token_stream_set_pos(g_parser_p->token_stream_p, temp_pos);
+        }
+
         _get_current_token_p
 
         _if_type (L2_TOKEN_LP) /* ( */
@@ -1688,7 +1740,7 @@ l2_stmt_interrupt l2_parse_stmt(l2_scope *scope_p) {
 
         switch (right_expr_info.val_type) {
             case L2_EXPR_VAL_TYPE_INTEGER:
-                fprintf(stdout, "%d\n", right_expr_info.val.integer);
+                fprintf(stdout, "%lld\n", right_expr_info.val.integer);
                 break;
 
             case L2_EXPR_VAL_TYPE_REAL:

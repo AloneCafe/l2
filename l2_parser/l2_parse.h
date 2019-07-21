@@ -75,10 +75,7 @@ fprintf(stdout, "L2 解释器命令行, REPL 用户界面\n"); \
 fflush(stdout); \
 }
 
-/*
-#define _repl
-#define _repl_head
-*/
+#define _is_repl (g_parser_p->token_stream_p->char_stream_p->fp == stdin)
 
 typedef struct _l2_parser {
     l2_token_stream *token_stream_p;
@@ -106,6 +103,8 @@ typedef struct _l2_stmt_interrupt {
         l2_expr_info ret_expr_info;
     }u;
 }l2_stmt_interrupt;
+
+extern char *g_l2_token_keywords[];
 
 void l2_parse_initialize(FILE *fp);
 void l2_parse_finalize();
