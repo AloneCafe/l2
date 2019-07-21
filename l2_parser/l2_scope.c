@@ -47,7 +47,7 @@ l2_scope_guid l2_scope_create_scope(l2_scope_guid src, l2_scope_create_flag cf, 
 
         case L2_SCOPE_CREATE_COORDINATE_SCOPE:
             if (!src->upper_p)
-                l2_internal_error(L2_INTERNAL_ERROR_ILLEGAL_OPERATION, "can not create coordinate scope after global scope");
+                l2_internal_error(L2_INTERNAL_ERROR_ILLEGAL_OPERATION, "无法在全局作用域邻近位置创建平行的作用域");
 
             scope_p = src;
             while (scope_p->coor_p) scope_p = scope_p->coor_p;
@@ -62,7 +62,7 @@ l2_scope_guid l2_scope_create_scope(l2_scope_guid src, l2_scope_create_flag cf, 
             return scope_p->coor_p;
 
         default:
-            l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "run into unreachable case");
+            l2_internal_error(L2_INTERNAL_ERROR_UNREACHABLE_CODE, "出现意外错误，运行至不可达的代码块");
     }
 }
 
