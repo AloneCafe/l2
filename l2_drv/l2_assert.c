@@ -5,7 +5,7 @@
 void l2_assert_func(long val, l2_internal_error_type error_type, const char *func_str, const char *file_str, const int line) {
     char s[100];
     if (!val) {
-        sprintf(s, "¶ÏÑÔÊ§°Ü (º¯Êý: %s, ÎÄ¼þ: %s, ÐÐ: %d)\n", func_str, file_str, line);
+        sprintf(s, "æ–­è¨€å¤±è´¥ (å‡½æ•°: %s, æ–‡ä»¶: %s, è¡Œ: %d)\n", func_str, file_str, line);
         l2_internal_error(error_type, s);
     }
 }

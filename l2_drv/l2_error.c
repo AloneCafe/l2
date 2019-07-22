@@ -72,40 +72,40 @@ void _Noreturn l2_internal_error(const l2_internal_error_type error_type, ...) {
     switch (error_type) {
         case L2_INTERNAL_ERROR_NULL_POINTER:
             msg = va_arg(va, char *);
-            fprintf(stderr, "L2 ½âÊÍÆ÷ÄÚ²¿´íÎó: \n\tÊ¹ÓÃ¿ÕÖ¸Õë½øĞĞ²Ù×÷: %s\n", msg);
+            fprintf(stderr, "L2 è§£é‡Šå™¨å†…éƒ¨é”™è¯¯: \n\tä½¿ç”¨ç©ºæŒ‡é’ˆè¿›è¡Œæ“ä½œ: %s\n", msg);
             break;
 
         case L2_INTERNAL_ERROR_OUT_OF_RANGE:
             msg = va_arg(va, char *);
-            fprintf(stderr, "L2 ½âÊÍÆ÷ÄÚ²¿´íÎó: \n\t³¬³öÊı¾İ·¶Î§: %s\n", msg);
+            fprintf(stderr, "L2 è§£é‡Šå™¨å†…éƒ¨é”™è¯¯: \n\tè¶…å‡ºæ•°æ®èŒƒå›´: %s\n", msg);
             break;
 
         case L2_INTERNAL_ERROR_ILLEGAL_OPERATION:
             msg = va_arg(va, char *);
-            fprintf(stderr, "L2 ½âÊÍÆ÷ÄÚ²¿´íÎó: \n\t¼ì²âµ½·Ç·¨²Ù×÷: %s\n", msg);
+            fprintf(stderr, "L2 è§£é‡Šå™¨å†…éƒ¨é”™è¯¯: \n\tæ£€æµ‹åˆ°éæ³•æ“ä½œ: %s\n", msg);
             break;
 
         case L2_INTERNAL_ERROR_UNREACHABLE_CODE:
             msg = va_arg(va, char *);
-            fprintf(stderr, "L2 ½âÊÍÆ÷ÄÚ²¿´íÎó: \n\tÔËĞĞÖÁÎŞ·¨µ½´ïµÄ´úÂë¶Î: %s\n", msg);
+            fprintf(stderr, "L2 è§£é‡Šå™¨å†…éƒ¨é”™è¯¯: \n\tè¿è¡Œè‡³æ— æ³•åˆ°è¾¾çš„ä»£ç æ®µ: %s\n", msg);
             break;
 
         case L2_INTERNAL_ERROR_MEM_BLOCK_NOT_MANAGED:
             ptr = va_arg(va, void *);
-            fprintf(stderr, "L2 ½âÊÍÆ÷ÄÚ²¿´íÎó: \n\tÄÚ´æÇø¿éÎ´ÍĞ¹Ü: Ö¸Õë - %p\n", ptr);
+            fprintf(stderr, "L2 è§£é‡Šå™¨å†…éƒ¨é”™è¯¯: \n\tå†…å­˜åŒºå—æœªæ‰˜ç®¡: æŒ‡é’ˆ - %p\n", ptr);
             break;
 
         case L2_INTERNAL_ERROR_MEM_BLOCK_NOT_IN_GC:
             ptr = va_arg(va, void *);
-            fprintf(stderr, "L2 ½âÊÍÆ÷ÄÚ²¿´íÎó: \n\tÄÚ´æÇø¿éÎ´ÔÚ GC(À¬»ø»ØÊÕ) Á´ÖĞ: Ö¸Õë - %p\n", ptr);
+            fprintf(stderr, "L2 è§£é‡Šå™¨å†…éƒ¨é”™è¯¯: \n\tå†…å­˜åŒºå—æœªåœ¨ GC(åƒåœ¾å›æ”¶) é“¾ä¸­: æŒ‡é’ˆ - %p\n", ptr);
             break;
 
         default:
             msg = va_arg(va, char *);
-            fprintf(stderr, "L2 ½âÊÍÆ÷ÄÚ²¿´íÎó: \n\t·¢ÉúÎ´Öª´íÎó: %s\n", msg);
+            fprintf(stderr, "L2 è§£é‡Šå™¨å†…éƒ¨é”™è¯¯: \n\tå‘ç”ŸæœªçŸ¥é”™è¯¯: %s\n", msg);
     }
 
-    fprintf(stderr, "L2 ½âÊÍÆ÷ÒÑÒì³£ÖÕÖ¹\n");
+    fprintf(stderr, "L2 è§£é‡Šå™¨å·²å¼‚å¸¸ç»ˆæ­¢\n");
 
     va_end(va);
     l2_clean_before_abort();
@@ -305,7 +305,7 @@ void _Noreturn l2_parsing_error(const l2_parsing_error_type error_type, int line
     switch (error_type) {
         case L2_PARSING_ERROR_ILLEGAL_CHARACTER:
             illegal_char = (char)va_arg(va, int);
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\t½âÎöµ½·Ç·¨×Ö·û \'%c\'(0x%X)\n", lines, cols, illegal_char, illegal_char);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tè§£æåˆ°éæ³•å­—ç¬¦ \'%c\'(0x%X)\n", lines, cols, illegal_char, illegal_char);
             break;
 
         case L2_PARSING_ERROR_UNEXPECTED_TOKEN:
@@ -314,107 +314,107 @@ void _Noreturn l2_parsing_error(const l2_parsing_error_type error_type, int line
             switch (token_p->type) {
 
             }*/
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\t½âÎöµ½·Ç·¨´Ê·¨ÔªËØ\n", lines, cols);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tè§£æåˆ°éæ³•è¯æ³•å…ƒç´ \n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_ILLEGAL_NUMBER_IN_AN_OCTAL_LITERAL:
             illegal_char = (char)va_arg(va, int);
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\tÔÚ°Ë½øÖÆ×ÖÃæÁ¿ÖĞ°üº¬ÁË·Ç·¨Êı×Ö \'%c\'\n", lines, cols, illegal_char);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tåœ¨å…«è¿›åˆ¶å­—é¢é‡ä¸­åŒ…å«äº†éæ³•æ•°å­— \'%c\'\n", lines, cols, illegal_char);
             break;
 
         case L2_PARSING_ERROR_INCOMPLETE_HEX_LITERAL:
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\t²»ÍêÕûµÄÊ®Áù½øÖÆ×ÖÃæÁ¿\n", lines, cols);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tä¸å®Œæ•´çš„åå…­è¿›åˆ¶å­—é¢é‡\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_INCOMPLETE_REAL_LITERAL:
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\t²»ÍêÕûµÄÊµÊı (real) ×ÖÃæÁ¿\n", lines, cols);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tä¸å®Œæ•´çš„å®æ•° (real) å­—é¢é‡\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_EMPTY_CHARACTER_LITERAL:
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\t×Ö·û×ÖÃæÁ¿²»ÄÜÎª¿Õ\n", lines, cols);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tå­—ç¬¦å­—é¢é‡ä¸èƒ½ä¸ºç©º\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_INCOMPLETE_CHARACTER_LITERAL:
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\t²»ÍêÕûµÄ×Ö·û×ÖÃæÁ¿, ×Ö·û×ÖÃæÁ¿Ó¦¸ÃÒÔµ¥ÒıºÅ ' ½áÊø\n", lines, cols);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tä¸å®Œæ•´çš„å­—ç¬¦å­—é¢é‡, å­—ç¬¦å­—é¢é‡åº”è¯¥ä»¥å•å¼•å· ' ç»“æŸ\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_MULTI_CHARACTER_IN_SINGLE_CHARACTER_LITERAL:
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\tÔÚµ¥¸ö×Ö·û×ÖÃæÁ¿ÖĞ³öÏÖ¶à¸ö×Ö·û\n", lines, cols);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tåœ¨å•ä¸ªå­—ç¬¦å­—é¢é‡ä¸­å‡ºç°å¤šä¸ªå­—ç¬¦\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_INCOMPLETE_STRING_LITERAL:
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\t²»ÍêÕûµÄ×Ö·û´®×ÖÃæÁ¿, ×Ö·û´®×ÖÃæÁ¿Ó¦¸ÃÒÔË«ÒıºÅ \" ½áÊø\n", lines, cols);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tä¸å®Œæ•´çš„å­—ç¬¦ä¸²å­—é¢é‡, å­—ç¬¦ä¸²å­—é¢é‡åº”è¯¥ä»¥åŒå¼•å· \" ç»“æŸ\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_MISSING_COLON:
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\t²»ÍêÕûµÄÌõ¼ş±í´ïÊ½, ¿ÉÄÜÈ±ÉÙÃ°ºÅ \':\'\n", lines, cols);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tä¸å®Œæ•´çš„æ¡ä»¶è¡¨è¾¾å¼, å¯èƒ½ç¼ºå°‘å†’å· \':\'\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_MISSING_SEMICOLON:
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\tÔÚÓï¾äÄ©Î²¿ÉÄÜÈ±ÉÙÁË·ÖºÅ\n", lines, cols);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tåœ¨è¯­å¥æœ«å°¾å¯èƒ½ç¼ºå°‘äº†åˆ†å·\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_MISSING_RBRACE:
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\tÈ±ÉÙ¿é½áÊø·û, ÓÒ»¨À¨ºÅ }\n", lines, cols);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tç¼ºå°‘å—ç»“æŸç¬¦, å³èŠ±æ‹¬å· }\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_MISSING_RP:
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\tÈ±ÉÙÓÒÔ²À¨ºÅ \')\'\n", lines, cols);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tç¼ºå°‘å³åœ†æ‹¬å· \')\'\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_IDENTIFIER_UNDEFINED:
             token_str = va_arg(va, char *);
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\t±êÊ¶·û \'%s\' Î´¶¨Òå\n", lines, cols, token_str);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tæ ‡è¯†ç¬¦ \'%s\' æœªå®šä¹‰\n", lines, cols, token_str);
             break;
 
         case L2_PARSING_ERROR_IDENTIFIER_REDEFINED:
             token_str = va_arg(va, char *);
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\t±êÊ¶·û \'%s\' ÖØ¶¨Òå\n", lines, cols, token_str);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tæ ‡è¯†ç¬¦ \'%s\' é‡å®šä¹‰\n", lines, cols, token_str);
             break;
 
         case L2_PARSING_ERROR_REFERENCE_SYMBOL_BEFORE_INITIALIZATION:
             token_str = va_arg(va, char *);
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\t·ûºÅ \'%s\' ÔÚ³õÊ¼»¯Ö®Ç°±»ÒıÓÃÁË\n", lines, cols, token_str);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tç¬¦å· \'%s\' åœ¨åˆå§‹åŒ–ä¹‹å‰è¢«å¼•ç”¨äº†\n", lines, cols, token_str);
             break;
 
         case L2_PARSING_ERROR_INCOMPATIBLE_OPERATION:
             token_str = va_arg(va, char *);
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\t²»¼æÈİµÄ²Ù×÷ \'%s\' ÔÚ ", lines, cols, token_str);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tä¸å…¼å®¹çš„æ“ä½œ \'%s\' åœ¨ ", lines, cols, token_str);
             token_str = va_arg(va, char *);
-            fprintf(stderr, "%s Ö®ÉÏ\n", token_str);
+            fprintf(stderr, "%s ä¹‹ä¸Š\n", token_str);
             break;
 
         case L2_PARSING_ERROR_DIVIDE_BY_ZERO:
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\tÊÔÍ¼³ıÒÔÕûÊı 0\n", lines, cols);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tè¯•å›¾é™¤ä»¥æ•´æ•° 0\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_EXPR_NOT_BOOL:
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\t±í´ïÊ½²»ÊÇ²¼¶ûÀàĞÍ (bool)\n", lines, cols);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tè¡¨è¾¾å¼ä¸æ˜¯å¸ƒå°”ç±»å‹ (bool)\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_RIGHT_SIDE_OF_OPERATOR_MUST_BE_A_BOOL_VALUE:
             token_str = va_arg(va, char *);
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\t²Ù×÷·û \'%s\' µÄÓÒ²à±ØĞëÊÇ²¼¶ûÀàĞÍ (bool) µÄÖµ\n", lines, cols, token_str);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tæ“ä½œç¬¦ \'%s\' çš„å³ä¾§å¿…é¡»æ˜¯å¸ƒå°”ç±»å‹ (bool) çš„å€¼\n", lines, cols, token_str);
             break;
 
         case L2_PARSING_ERROR_LEFT_SIDE_OF_OPERATOR_MUST_BE_A_BOOL_VALUE:
             token_str = va_arg(va, char *);
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\t²Ù×÷·û \'%s\' µÄ×ó²à±ØĞëÊÇ²¼¶ûÀàĞÍ (bool) µÄÖµ\n", lines, cols, token_str);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tæ“ä½œç¬¦ \'%s\' çš„å·¦ä¾§å¿…é¡»æ˜¯å¸ƒå°”ç±»å‹ (bool) çš„å€¼\n", lines, cols, token_str);
             break;
 
         case L2_PARSING_ERROR_LEFT_SIDE_OF_OPERATOR_MUST_BE_A_INTEGER_VALUE:
             token_str = va_arg(va, char *);
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\t²Ù×÷·û \'%s\' µÄ×ó²à±ØĞëÊÇÕûÊıĞÍ (integer) µÄÖµ\n", lines, cols, token_str);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tæ“ä½œç¬¦ \'%s\' çš„å·¦ä¾§å¿…é¡»æ˜¯æ•´æ•°å‹ (integer) çš„å€¼\n", lines, cols, token_str);
             break;
 
         case L2_PARSING_ERROR_RIGHT_SIDE_OF_OPERATOR_MUST_BE_A_INTEGER_VALUE:
             token_str = va_arg(va, char *);
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\t²Ù×÷·û \'%s\' µÄÓÒ²à±ØĞëÊÇÕûÊıĞÍ (integer) µÄÖµ\n", lines, cols, token_str);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tæ“ä½œç¬¦ \'%s\' çš„å³ä¾§å¿…é¡»æ˜¯æ•´æ•°å‹ (integer) çš„å€¼\n", lines, cols, token_str);
             break;
 
         case L2_PARSING_ERROR_DUALISTIC_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE:
             token_str = va_arg(va, char *);
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\t²Ù×÷·û \'%s\' ×÷ÓÃÓÚ²»¼æÈİµÄÀàĞÍÖ®ÉÏ, ", lines, cols, token_str);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tæ“ä½œç¬¦ \'%s\' ä½œç”¨äºä¸å…¼å®¹çš„ç±»å‹ä¹‹ä¸Š, ", lines, cols, token_str);
             token_str2 = va_arg(va, char *);
             fprintf(stderr, "<%s> \'%s\' ", token_str2, token_str);
             token_str2 = va_arg(va, char *);
@@ -423,53 +423,53 @@ void _Noreturn l2_parsing_error(const l2_parsing_error_type error_type, int line
 
         case L2_PARSING_ERROR_UNITARY_OPERATOR_CONTAINS_INCOMPATIBLE_TYPE:
             token_str = va_arg(va, char *);
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\t²Ù×÷·û \'%s\' µÄÓÒ²à¾ßÓĞ²»¼æÈİµÄÀàĞÍ, ", lines, cols, token_str);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tæ“ä½œç¬¦ \'%s\' çš„å³ä¾§å…·æœ‰ä¸å…¼å®¹çš„ç±»å‹, ", lines, cols, token_str);
             token_str2 = va_arg(va, char *);
             fprintf(stderr, "\'%s\' <%s>\n", token_str, token_str2);
             break;
 
         case L2_PARSING_ERROR_INVALID_CONTINUE_IN_CURRENT_CONTEXT:
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\tÔÚµ±Ç°µÄÉÏÏÂÎÄÖĞ³öÏÖÎŞĞ§µÄ¹Ø¼ü×Ö \'continue\'\n", lines, cols);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tåœ¨å½“å‰çš„ä¸Šä¸‹æ–‡ä¸­å‡ºç°æ— æ•ˆçš„å…³é”®å­— \'continue\'\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_INVALID_BREAK_IN_CURRENT_CONTEXT:
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\tÔÚµ±Ç°µÄÉÏÏÂÎÄÖĞ³öÏÖÎŞĞ§µÄ¹Ø¼ü×Ö \'break\'\n", lines, cols);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tåœ¨å½“å‰çš„ä¸Šä¸‹æ–‡ä¸­å‡ºç°æ— æ•ˆçš„å…³é”®å­— \'break\'\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_INVALID_RETURN_IN_CURRENT_CONTEXT:
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\tÔÚµ±Ç°µÄÉÏÏÂÎÄÖĞ³öÏÖÎŞĞ§µÄ¹Ø¼ü×Ö \'return\'\n", lines, cols);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tåœ¨å½“å‰çš„ä¸Šä¸‹æ–‡ä¸­å‡ºç°æ— æ•ˆçš„å…³é”®å­— \'return\'\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_SYMBOL_IS_NOT_PROCEDURE:
             token_str = va_arg(va, char *);
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\t·ûºÅ \'%s\' ²¢·Ç¹ı³Ì, ÎŞ·¨½øĞĞµ÷ÓÃ\n", lines, cols, token_str);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tç¬¦å· \'%s\' å¹¶éè¿‡ç¨‹, æ— æ³•è¿›è¡Œè°ƒç”¨\n", lines, cols, token_str);
             break;
 
         case L2_PARSING_ERROR_TOO_MANY_PARAMETERS:
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\tµ÷ÓÃ¹ı³ÌµÄ²ÎÊıÌ«¶à\n", lines, cols);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tè°ƒç”¨è¿‡ç¨‹çš„å‚æ•°å¤ªå¤š\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_TOO_FEW_PARAMETERS:
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\tµ÷ÓÃ¹ı³ÌµÄ²ÎÊıÌ«ÉÙ\n", lines, cols);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tè°ƒç”¨è¿‡ç¨‹çš„å‚æ•°å¤ªå°‘\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_EXPR_RESULT_WITHOUT_VALUE:
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\t±í´ïÊ½²¢²»¾ßÓĞÈÎºÎÖµ\n", lines, cols);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tè¡¨è¾¾å¼å¹¶ä¸å…·æœ‰ä»»ä½•å€¼\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_INCOMPATIBLE_EXPR_TYPE:
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\t²»¼æÈİµÄ±í´ïÊ½ÖµÀàĞÍ\n", lines, cols);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tä¸å…¼å®¹çš„è¡¨è¾¾å¼å€¼ç±»å‹\n", lines, cols);
             break;
 
         case L2_PARSING_ERROR_INCOMPATIBLE_SYMBOL_TYPE:
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): \n\t²»¼æÈİµÄ·ûºÅÀàĞÍ\n", lines, cols);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯ (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): \n\tä¸å…¼å®¹çš„ç¬¦å·ç±»å‹\n", lines, cols);
             break;
 
         default:
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ´íÎó, ³öÏÖÒ»¸öÎ´Öª´íÎó\n");
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šé”™è¯¯, å‡ºç°ä¸€ä¸ªæœªçŸ¥é”™è¯¯\n");
     }
 
-    fprintf(stderr, "L2 ½âÊÍÆ÷ÒÑÒì³£ÖÕÖ¹\n");
+    fprintf(stderr, "L2 è§£é‡Šå™¨å·²å¼‚å¸¸ç»ˆæ­¢\n");
 
     va_end(va);
     l2_clean_before_abort();

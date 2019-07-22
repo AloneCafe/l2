@@ -70,8 +70,8 @@ fflush(stdout); \
 
 #define _repl_head \
 if (g_parser_p->token_stream_p->char_stream_p->fp == stdin) { \
-fprintf(stdout, "L2 编程语言及其解释器\n当前版本: %s ", L2_VERSION); \
-fprintf(stdout, "L2 解释器命令行, REPL 用户界面\n"); \
+fprintf(stdout, "L2 缂栫▼璇█鍙婂叾瑙ｉ噴鍣╘n褰撳墠鐗堟湰: %s ", L2_VERSION); \
+fprintf(stdout, "L2 瑙ｉ噴鍣ㄥ懡浠よ, REPL 鐢ㄦ埛鐣岄潰\n"); \
 fflush(stdout); \
 }
 

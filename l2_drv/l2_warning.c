@@ -34,11 +34,11 @@ void l2_parsing_warning(l2_parsing_warning_type warning_type, int lines, int col
     switch (warning_type) {
         case L2_PARSING_WARNING_UNKNOWN_ESCAPE_SEQUENCE:
             escape_seq = va_arg(va, char *);
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ¾¯¸æ (ÔÚ %d ĞĞ %d ÁĞ¸½½ü): Î´ÖªµÄ×ªÒåĞòÁĞ \'\\%s\', Ëü½«±»½âÊÍÆ÷µ±×öÆÕÍ¨×Ö·û\n", lines, cols, escape_seq);
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šè­¦å‘Š (åœ¨ %d è¡Œ %d åˆ—é™„è¿‘): æœªçŸ¥çš„è½¬ä¹‰åºåˆ— \'\\%s\', å®ƒå°†è¢«è§£é‡Šå™¨å½“åšæ™®é€šå­—ç¬¦\n", lines, cols, escape_seq);
             break;
 
         default:
-            fprintf(stderr, "L2 ½Å±¾½âÊÍ¾¯¸æ, ³öÏÖÒ»¸öÎ´Öª¾¯¸æ\n");
+            fprintf(stderr, "L2 è„šæœ¬è§£é‡Šè­¦å‘Š, å‡ºç°ä¸€ä¸ªæœªçŸ¥è­¦å‘Š\n");
     }
 
     va_end(va);
