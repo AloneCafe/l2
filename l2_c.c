@@ -57,26 +57,26 @@ int l2_init_env(int argc, char *argv[], l2_env_args *env_args_p) {
                                 return L2_INIT_ENV_ERROR_INVALID_OPTION;
                             }
 
-                            fprintf(stdout, "L2 ±à³ÌÓïÑÔ¼°Æä½âÊÍÆ÷\nµ±Ç°°æ±¾: %s\n", L2_VERSION);
+                            fprintf(stdout, "L2 ç¼–ç¨‹è¯­è¨€åŠå…¶è§£é‡Šå™¨\nå½“å‰ç‰ˆæœ¬: %s\n", L2_VERSION);
                             exit(0);
 
                         case 'h': /* print help info */
                             if (args[cp + 1] != '\0') { /* judge the next char */
-                                fprintf(stderr, "ÎŞĞ§µÄÑ¡Ïî: %s\nÊ¹ÓÃÑ¡Ïî '-h' ÒÔ²é¿´°ïÖú\n", argv[i]);
+                                fprintf(stderr, "æ— æ•ˆçš„é€‰é¡¹: %s\nä½¿ç”¨é€‰é¡¹ '-h' ä»¥æŸ¥çœ‹å¸®åŠ©\n", argv[i]);
                                 return L2_INIT_ENV_ERROR_INVALID_OPTION;
                             }
 
                             fprintf(stdout,
-                                    "L2 ±à³ÌÓïÑÔ¼°Æä½âÊÍÆ÷\n"
-                                    "ÓÃ·¨: %s [Ñ¡Ïî] <Ô´´úÂëÎÄ¼ş>\n"
-                                    "Ñ¡Ïî:\n"
-                                    "-v: ´òÓ¡°æ±¾ĞÅÏ¢\n"
-                                    "-h: ´òÓ¡°ïÖúĞÅÏ¢\n"
+                                    "L2 ç¼–ç¨‹è¯­è¨€åŠå…¶è§£é‡Šå™¨\n"
+                                    "ç”¨æ³•: %s [é€‰é¡¹] <æºä»£ç æ–‡ä»¶>\n"
+                                    "é€‰é¡¹:\n"
+                                    "-v: æ‰“å°ç‰ˆæœ¬ä¿¡æ¯\n"
+                                    "-h: æ‰“å°å¸®åŠ©ä¿¡æ¯\n"
                             , argv[0]);
                             exit(0);
 
                         default:
-                            fprintf(stderr, "ÎŞĞ§Ñ¡Ïî: %s\nÊ¹ÓÃÑ¡Ïî '-h' ÒÔ²é¿´°ïÖú\n", argv[i]);
+                            fprintf(stderr, "æ— æ•ˆé€‰é¡¹: %s\nä½¿ç”¨é€‰é¡¹ '-h' ä»¥æŸ¥çœ‹å¸®åŠ©\n", argv[i]);
                             return L2_INIT_ENV_ERROR_INVALID_OPTION;
                     }
                     break;
@@ -85,7 +85,7 @@ int l2_init_env(int argc, char *argv[], l2_env_args *env_args_p) {
                     env_args_p->input_type = L2_INTERPRETER_INPUT_TYPE_SINGLE_SOURCE_FILE;
                     env_args_p->source_file_p = fopen(argv[i], "r");
                     if (!env_args_p->source_file_p) {
-                        fprintf(stderr, "ÑÏÖØ´íÎó: ÎŞ·¨´ò¿ªÔ´´úÂëÎÄ¼ş: %s\n", argv[i]);
+                        fprintf(stderr, "ä¸¥é‡é”™è¯¯: æ— æ³•æ‰“å¼€æºä»£ç æ–‡ä»¶: %s\n", argv[i]);
                         return L2_INIT_ENV_ERROR_CANNOT_OPEN_SOURCE_FILE;
                     }
                     break;
