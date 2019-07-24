@@ -2302,7 +2302,7 @@ l2_expr_info l2_eval_expr_mul_div_mod1(l2_scope *scope_p, l2_expr_info left_expr
                 switch (right_expr_info.val_type) {
                     case L2_EXPR_VAL_TYPE_INTEGER:
                         new_left_expr_info.val_type = L2_EXPR_VAL_TYPE_INTEGER;
-                        new_left_expr_info.val.integer = (left_expr_info.val.integer / right_expr_info.val.integer);
+                        new_left_expr_info.val.integer = (left_expr_info.val.integer / l2_eval_div_by_zero_filter(right_expr_info.val.integer, current_token_p->current_line, current_token_p->current_col));
                         break;
 
                     case L2_EXPR_VAL_TYPE_BOOL:
