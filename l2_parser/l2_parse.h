@@ -1,7 +1,7 @@
 #ifndef _L2_PARSE_H_
 #define _L2_PARSE_H_
 
-#define L2_VERSION "v0.3.3" /* version info */
+#define L2_VERSION "v0.3.4" /* version info */
 
 #include "../l2_tpl/l2_common_type.h"
 #include "l2_token_stream.h"
