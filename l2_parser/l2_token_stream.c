@@ -156,7 +156,11 @@ l2_token *l2_token_stream_next_token(l2_token_stream *token_stream_p) {
                     ch = l2_char_stream_next_char(token_stream_p->char_stream_p);
                     if (ch == '=') {
                         t.type = L2_TOKEN_DIV_ASSIGN;
-                    } else {
+                    } else if (ch == '/') {
+						do {
+							ch = l2_char_stream_next_char(token_stream_p->char_stream_p);
+						} while (ch != '\n' && ch != EOF);
+		    		} else {
                         l2_char_stream_rollback(token_stream_p->char_stream_p);
                     }
                     goto ret;
